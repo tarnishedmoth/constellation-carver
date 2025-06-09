@@ -1,9 +1,5 @@
 extends Control
 
-@onready var pd_display: Control = %PDDisplay
-@onready var page_select: OptionButton = %PageSelect
-
-
 var current_project_name: String = "Project1"
 var current_project_filepath: String:
 	get:
@@ -26,30 +22,32 @@ var current_page_filepath: String:
 var project_contents: Dictionary = {}
 var page_contents: Dictionary = {}
 
+@onready var pd_display: Control = %PDDisplay
+@onready var page_select: OptionButton = %PageSelect
 
-func load_page(new_content) -> void:
-	page_contents = new_content
+@onready var project = ConstellationProject.new()
+		
+func load_page(filepath) -> void:
+	page_contents = Particles.load_json_from_file(filepath)
 	if page_contents.is_empty():
-		print("An empty page appears!")
+		print("Loaded page is empty!")
 	else:
 		print(page_contents)
 
+func save_page(filepath) -> void:
+	var formatted = Particles.stringify(page_contents)
+	var result = Particles.save_json_to_file(formatted, filepath)
+	
+func new_page() -> void:
+	project.new_page("test", "")
 
-func _on_load_project_pressed() -> void:
-	project_contents = Particles.load_json_from_file(current_page_filepath)
-	if project_contents.is_empty():
-		print("Loaded project is empty!")
-	else:
-		print(project_contents)
-
-
-func _on_save_project_pressed() -> void:
-	project_contents = page_contents
-	var formatted = Particles.stringify(project_contents)
-	var result = Particles.save_json_to_file(formatted, current_page_filepath)
-
+func _on_load_project_pressed() -> void: load_page(current_page_filepath)
+func _on_save_project_pressed() -> void: save_page(current_page_filepath)
 
 func _on_page_select_item_selected(index: int) -> void:
 	# Load a new page
 	current_page_name = page_select.get_item_text(index)
-	load_page(Particles.load_json_from_file(current_page_filepath))
+	load_page(current_page_filepath)
+
+func _on_new_project_pressed() -> void: pass
+func _on_new_page_pressed() -> void: new_page()

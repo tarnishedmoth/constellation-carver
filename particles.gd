@@ -31,4 +31,4 @@ static func save_json_to_file(formatted_data:String, filepath:String) -> bool:
 	return true
 	
 static func stringify(data:Dictionary) -> String:
-	return JSON.stringify(data, "\t")
+	return JSON.stringify(data, "\t", false)
