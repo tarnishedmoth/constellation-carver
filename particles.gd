@@ -1,6 +1,5 @@
 class_name ParticleParser extends Node
 
-var _data:Dictionary = {}
 var file_saves_directory:String = "user://projects"
 var file_assets_directory:String = "user://assets"
 
@@ -21,10 +20,14 @@ static func load_json_from_file(filepath:String) -> Dictionary:
 
 ## Returns true for successful save, false otherwise.
 static func save_json_to_file(formatted_data:String, filepath:String) -> bool:
-	if FileAccess.file_exists(filepath):
-		var file = FileAccess.open(filepath, FileAccess.READ_WRITE) ## Doing this so I don't accidentally erase files
-		
-	
+	var dirpath = filepath.get_base_dir()
+	if DirAccess.open(dirpath) == null:
+		DirAccess.make_dir_recursive_absolute(dirpath)
+		print_debug("Made a new directory!")
+	var file = FileAccess.open(filepath, FileAccess.WRITE) ## Doing this so I don't accidentally erase files
+	file.store_string(formatted_data)
+	file.close()
+	print("Saved")
 	return true
 	
 static func stringify(data:Dictionary) -> String:

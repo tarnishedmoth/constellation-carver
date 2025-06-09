@@ -13,6 +13,7 @@ config_version=5
 config/name="Constellation Carver"
 config/description="A GUI editor for designing mini websites, viewable in Particle Studios' \"Constellations\" web browser on PlayDate by Panic."
 config/version="0.1.0"
+run/main_scene="uid://c2mlaly46p3v5"
 config/features=PackedStringArray("4.4", "GL Compatibility")
 run/low_processor_mode=true
 boot_splash/show_image=false
@@ -20,7 +21,7 @@ config/icon="res://icon.svg"
 
 [autoload]
 
-Js="*res://js.gd"
+Particles="*res://particles.gd"
 
 [debug]
 
