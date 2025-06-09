@@ -5,11 +5,6 @@ const HEADER:Dictionary = {
 	"title": "My Site",
 	"content": []
 }
-class Style:
-	var text_align:String
-	var margin_top:int
-	var margin_bottom:int
-	var scale:int
 
 var file_saves_directory:String = "user://projects"
 var file_assets_directory:String = "user://assets"
