@@ -5,6 +5,11 @@ const HEADER:Dictionary = {
 	"title": "My Site",
 	"content": []
 }
+class Style:
+	var text_align:String
+	var margin_top:int
+	var margin_bottom:int
+	var scale:int
 
 var file_saves_directory:String = "user://projects"
 var file_assets_directory:String = "user://assets"
@@ -35,6 +40,18 @@ static func save_json_to_file(formatted_data:String, filepath:String) -> bool:
 	file.close()
 	print("Saved")
 	return true
+	
+func read_style(style:Dictionary) -> Style:
+	var parsed = Style.new()
+	if "text-align" in style:
+		parsed.text_align = style["text-align"]
+	if "margin-top" in style:
+		parsed.margin_top = style["margin-top"]
+	if "margin-bottom" in style:
+		parsed.margin_bottom = style["margin-bottom"]
+	if "scale" in style:
+		parsed.scale = style["scale"]
+	return parsed
 	
 static func pagify(content:Dictionary) -> String:
 	var new_dict:Dictionary = HEADER.duplicate()

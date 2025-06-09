@@ -9,14 +9,14 @@ var current_project_filepath: String:
 			)
 var current_page_name: String:
 	get:
-		if "title" in current_page:
-			return current_page["title"]
+		if "title" in current_page_json:
+			return current_page_json["title"]
 		else:
 			return "Empty"
 var current_page_filepath: String
 			
 var pages: Array = []
-var current_page: Dictionary = {}
+var current_page_json: Dictionary = {}
 
 @onready var pd_display: Control = %PDDisplay
 @onready var page_line_edit: LineEdit = %PageLineEdit
@@ -34,15 +34,17 @@ func load_page(filepath) -> void:
 	elif payload["format"] != "particle":
 		l("Loaded page has bad format!")
 	else:
-		current_page = payload
-		for obj in current_page["content"]:
+		current_page_json = payload
+		for obj in current_page_json["content"]:
 			render_content(obj)
 				
 func render_content(obj:Dictionary) -> void:
+	var instance
 	match obj["type"]:
 		"paragraph":
 			l("Found a paragraph!")
 			l(obj["text"])
+			instance = Paragraph.new(obj["text"])
 			
 		"list":
 			l("Found a list!")
@@ -64,9 +66,14 @@ func render_content(obj:Dictionary) -> void:
 		
 		_:
 			push_error("Found an anomoly! Dafuq?")
+	if "style" in obj:
+		if is_instance_valid(instance):
+			if "style" in instance:
+				instance.style = Particles.read_style(obj["style"])
+			pd_display.add_child(instance)
 
 func save_page(filepath) -> void:
-	var formatted = Particles.stringify(current_page)
+	var formatted = Particles.stringify(current_page_json)
 	var result = Particles.save_json_to_file(formatted, filepath)
 	
 func new_page() -> void:
