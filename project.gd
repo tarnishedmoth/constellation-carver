@@ -1,4 +1,4 @@
-class_name ConstellationProject extends Resource
+class_name ConstellationPage extends Resource
 
 const HEADER:Dictionary = {
 	"format": "particle",
