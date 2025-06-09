@@ -1,17 +1,21 @@
 class_name Paragraph extends Control
 
+const FONT = preload("res://objects/paragraph_font.tres")
+
 var text:String
 var style:Style
 
-var font:FontFile
+var _last_global_position:Vector2
+
+func _prepare_text(t:String) -> String:
+	return t
 
 func _init(text:String, style:Style = null) -> void:
 	self.text = text
 	self.style = style
 	
 func _draw() -> void:
-	#draw_string()
-	pass
+	draw_string(FONT, global_position, _prepare_text(text), HORIZONTAL_ALIGNMENT_LEFT, 0, 14, Color.BLACK)
 	
 func to_dict() -> Dictionary:
 	var data:Dictionary = {
