@@ -18,6 +18,7 @@ var current_page_filepath: String
 var pages: Array = []
 var current_page_json: Dictionary = {}
 
+@onready var log_console: RichTextLabel = %LogConsole
 @onready var pd_display: Control = %PDDisplay
 @onready var page_line_edit: LineEdit = %PageLineEdit
 @onready var page_select: OptionButton = %PageSelect
@@ -43,30 +44,30 @@ func render_content(obj:Dictionary) -> void:
 	var instance:Control
 	match obj["type"]:
 		"paragraph":
-			l("Found a paragraph!")
+			l("[b]New paragraph![/b]")
 			l(obj["text"])
-			instance = Paragraph.new(obj["text"])
+			instance = ConstellationParagraph.new(obj["text"])
 			
 		"list":
-			l("Found a list!")
+			l("[b]New list![/b]")
 			l(obj["items"])
 			
 		"blockquote":
-			l("Found a blockquote!")
+			l("[b]New blockquote![/b]")
 			l(obj["text"])
 			
 		"button":
-			l("Found a button!")
+			l("[b]New button![/b]")
 			l(obj["label"])
 			
 		"separator":
-			l("Found a separator!")
+			l("[b]New separator![/b]")
 			
 		"image":
-			l("Found an image!")
-		
+			l("[b]New image![/b]")
+			instance = ConstellationImage.new()
 		_:
-			push_error("Found an anomoly! Dafuq?")
+			push_error("[b]Found an anomoly! Dafuq?[/b]")
 	if instance == null: return
 	pd_display.add_child(instance)
 		
@@ -81,7 +82,28 @@ func save_page(filepath) -> void:
 func new_page() -> void:
 	pass
 	
-func l(text) -> void: print(text)
+func l(item) -> void:
+	print(item)
+	if item is String:
+		log_console.append_text(item)
+	elif item is Dictionary:
+		var s:String = ""
+		for key in item:
+			s += key as String
+			s += ": "
+			s += item[key]
+			s += "\n"
+			log_console.append_text(s)
+			log_console.newline()
+	elif item is Array:
+		for subitem in item:
+			var s:String = ""
+			s += subitem as String
+			log_console.append_text(s)
+			log_console.newline()
+			
+	log_console.newline()
+		
 func _on_load_project_pressed() -> void: load_page(current_page_filepath)
 func _on_save_project_pressed() -> void: save_page(current_page_filepath) ## TODO
 

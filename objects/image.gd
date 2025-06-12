@@ -1,0 +1,1 @@
+class_name ConstellationImage extends Control

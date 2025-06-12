@@ -1,4 +1,4 @@
-class_name Paragraph extends RichTextLabel
+class_name ConstellationParagraph extends RichTextLabel
 
 const FONT = preload("res://objects/paragraph_font.tres")
 
