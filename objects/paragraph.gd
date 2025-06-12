@@ -18,6 +18,41 @@ class Styling:
 			_:
 				push_error("Invalid enum integer")
 				return ""
+	static func replace(t:String, type:TYPES) -> String:
+		var f:String = t
+		
+		var special_character:String
+		if type == TYPES.BOLD:
+			special_character = "*"
+		elif type == TYPES.ITALIC:
+			special_character = "_"
+			
+		
+		var char:int = 0
+		while char != -1:
+			var is_open:bool = false
+			var next_char = f.find(special_character, char)
+			if next_char != -1:
+				# Note that length returns the number of characters but string[0] is character 1.
+				if f.length()-1 > next_char: # If this isn't the end
+					if f[next_char] == f[next_char+1]: # If the next character is also 
+						# Escaped
+						char = next_char + 2 # Skip past these characters
+						continue
+						
+				char = next_char
+				
+				var insert:String = Styling.do(type, is_open)
+				is_open = !is_open # Toggle
+				
+				# Replace the stuff
+				f = f.erase(next_char)
+				f = f.insert(next_char, insert)
+				
+				char += insert.length() - 1 # Math cus we erase one character before adding our insert
+				continue # Keep looping
+			char = -1
+		return f
 
 var _text:String:
 	set(value):
@@ -28,30 +63,9 @@ var style:Style
 func _prepare_text(t:String) -> String:
 	var f:String = t
 	
-	var char:int = 0
-	while char != -1: # Set to -1 manually to exit
-		var is_bold:bool = false
-		var next_bold = f.find("*", char)
-		if next_bold != -1:
-			# Note that length returns the number of characters but string[0] is character 1.
-			if f.length()-1 > next_bold: # If this isn't the end
-				if f[next_bold] == f[next_bold+1]: # If the next character is also 
-					# Escaped
-					char = next_bold + 2 # Skip past these characters
-					continue
-					
-			char = next_bold
-			
-			var insert:String = Styling.do(Styling.TYPES.BOLD, is_bold)
-			is_bold = !is_bold # Toggle
-			
-			# Replace the stuff
-			f = f.erase(next_bold)
-			f = f.insert(next_bold, insert)
-			
-			char += insert.length() - 1 # Math cus we erase one character before adding our insert
-			continue # Keep looping
-		char = -1
+	f = Styling.replace(f, Styling.TYPES.BOLD)
+	f = Styling.replace(f, Styling.TYPES.ITALIC)
+	
 	return f
 
 func _init(titties:String, style:Style = null) -> void:
