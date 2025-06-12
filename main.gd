@@ -17,6 +17,8 @@ var current_page_filepath: String
 var pages: Dictionary = {} # Key is filepath, value is json dictionary
 var current_page_json: Dictionary = {}
 
+var selected_editable:Control
+
 @onready var log_console: RichTextLabel = %LogConsole:
 	set(value):
 		log_console = value
@@ -25,6 +27,8 @@ var current_page_json: Dictionary = {}
 @onready var page_line_edit: LineEdit = %PageLineEdit
 @onready var page_select: OptionButton = %PageSelect
 @onready var new_object_menu: MenuButton = %NewObjectMenu
+
+@onready var text_edit: TextEdit = %TextEdit
 
 func _ready() -> void: Utils.log_console = log_console
 
@@ -89,6 +93,9 @@ func _render_content(obj:Dictionary) -> void:
 		_:
 			push_error("[b]Found an anomoly! Dafuq?[/b]")
 	if not is_instance_valid(instance): return
+	
+	instance.focus_entered.connect(open_edit_content.bind(instance))
+	
 	pd_display.add_child(instance)
 		
 	if "style" in obj:
@@ -119,6 +126,11 @@ func add_content(content:Dictionary, index:int = -1) -> void:
 func remove_content_at(index:int) -> void:
 	pass
 	
+func open_edit_content(instance:Control) -> void:
+	selected_editable = instance
+	if "_text" in instance:
+		text_edit.text = instance["_text"]
+	
 func l(item) -> void: Utils.l(item)
 
 func _on_load_project_pressed() -> void: load_page(current_page_filepath)
@@ -139,3 +151,7 @@ func _on_save_page_pressed() -> void: save_page(current_page_filepath)
 
 
 func _on_force_refresh_pressed() -> void: render_current_page_content()
+
+
+func _on_save_text_edits_pressed() -> void:
+	selected_editable._text = text_edit.text

@@ -1,5 +1,7 @@
 class_name ConstellationParagraph extends RichTextLabel
 
+signal selected
+
 const FONT = preload("res://objects/paragraph_font.tres")
 
 const TEMPLATE = {
@@ -32,6 +34,8 @@ func _prepare_text(t:String) -> String:
 	return f
 
 func _init(titties:String, style:Style = null) -> void:
+	self.focus_mode = Control.FOCUS_CLICK
+	
 	self._text = titties
 	self.style = style
 	
@@ -42,6 +46,10 @@ func _init(titties:String, style:Style = null) -> void:
 	self.context_menu_enabled = true ## TODO
 	self.meta_underlined = false
 	self.hint_underlined = false
+	
+#func _ready() -> void:
+	#focus_entered.connect(_on_focus_entered)
+	#focus_exited.connect(_on_focus_exited)
 
 func refresh_visuals() -> void:
 	text = _prepare_text(_text) # Because special formatting on PD
