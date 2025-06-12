@@ -11,20 +11,16 @@ const TEXT_ALIGN_OPTIONS:Array[String] = [
 	"right"
 ]
 
-var text_align:String:
+var text_align:String = DEFAULT_TEXT_ALIGN:
 	set(value):
 		if value in TEXT_ALIGN_OPTIONS:
 			text_align = value
 		else:
 			push_error("Invalid text alignment assigned to style")
-	get:
-		if text_align:
-			return text_align
-		else:
-			return DEFAULT_TEXT_ALIGN
-var margin_top:int
-var margin_bottom:int
-var scale:int
+			
+var margin_top:int = DEFAULT_MARGIN_TOP
+var margin_bottom:int = DEFAULT_MARGIN_BOTTOM
+var scale:int = DEFAULT_SCALE
 
 func to_dict() -> Dictionary:
 	var write:Dictionary = {}

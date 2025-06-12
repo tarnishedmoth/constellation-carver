@@ -58,7 +58,7 @@ func refresh_visuals() -> void:
 func to_dict() -> Dictionary:
 	var data:Dictionary = {
 		"type": "paragraph",
-		"text": text,
+		"text": _text,
 	}
 	
 	var style_output = style.to_dict()
