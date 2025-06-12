@@ -36,7 +36,9 @@ func load_page(filepath) -> void:
 	elif payload["format"] != "particle":
 		l("Loaded page has bad format!")
 	else:
+		l("Loading page...")
 		current_page_json = payload
+		l("Page name: [b]"+current_page_json["title"]+"[/b]")
 		for obj in current_page_json["content"]:
 			render_content(obj)
 				
@@ -45,20 +47,23 @@ func render_content(obj:Dictionary) -> void:
 	match obj["type"]:
 		"paragraph":
 			l("[b]New paragraph![/b]")
-			l(obj["text"])
+			var len:int = obj["text"].length()
+			l(str(len) + " characters inside.")
 			instance = ConstellationParagraph.new(obj["text"])
 			
 		"list":
 			l("[b]New list![/b]")
-			l(obj["items"])
+			var count:int = obj["items"].size()
+			l(str(count) + " items listed.")
 			
 		"blockquote":
 			l("[b]New blockquote![/b]")
-			l(obj["text"])
+			var len:int = obj["text"].length()
+			l(str(len) + " characters inside.")
 			
 		"button":
 			l("[b]New button![/b]")
-			l(obj["label"])
+			l("Label reads " + obj["label"])
 			
 		"separator":
 			l("[b]New separator![/b]")
@@ -84,6 +89,7 @@ func new_page() -> void:
 	
 func l(item) -> void:
 	print(item)
+	log_console.newline()
 	if item is String:
 		log_console.append_text(item)
 	elif item is Dictionary:
@@ -101,8 +107,6 @@ func l(item) -> void:
 			s += subitem as String
 			log_console.append_text(s)
 			log_console.newline()
-			
-	log_console.newline()
 		
 func _on_load_project_pressed() -> void: load_page(current_page_filepath)
 func _on_save_project_pressed() -> void: save_page(current_page_filepath) ## TODO
