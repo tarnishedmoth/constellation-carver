@@ -24,9 +24,10 @@ var style:Style:
 		style = value
 		refresh_visuals()
 
-func _init(width:int, height:int) -> void:
+func _init(width:int, height:int, pixels:String) -> void:
 	self._width = maxi(width, 0)
 	self._height = maxi(height, 0)
+	self._pixels = pixels
 	
 	self.focus_mode = Control.FOCUS_CLICK
 	
@@ -60,9 +61,10 @@ func to_dict() -> Dictionary:
 		"pixels": _pixels
 	}
 	
-	var style_output = style.to_dict()
-	if not style_output.is_empty():
-		data.merge({"style": style_output})
+	if style:
+		var style_output = style.to_dict()
+		if not style_output.is_empty():
+			data.merge({"style": style_output})
 	return data
 
 func _to_string() -> String:

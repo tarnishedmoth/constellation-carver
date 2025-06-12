@@ -59,9 +59,10 @@ func to_dict() -> Dictionary:
 		"text": _text,
 	}
 	
-	var style_output = style.to_dict()
-	if not style_output.is_empty():
-		data.merge({"style": style_output})
+	if style:
+		var style_output = style.to_dict()
+		if not style_output.is_empty():
+			data.merge({"style": style_output})
 	return data
 
 func _to_string() -> String:
