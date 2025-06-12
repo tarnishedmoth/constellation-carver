@@ -60,6 +60,14 @@ text = "Load Project"
 layout_mode = 2
 text = "Save Project"
 
+[node name="Label" type="Label" parent="VBoxContainer/PanelContainer/TabContainer/Project"]
+layout_mode = 2
+size_flags_vertical = 6
+text = "This menu non-functional.
+Please use the Page tab to edit pages."
+horizontal_alignment = 1
+vertical_alignment = 1
+
 [node name="Page" type="VBoxContainer" parent="VBoxContainer/PanelContainer/TabContainer"]
 layout_mode = 2
 metadata/_tab_index = 1

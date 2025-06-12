@@ -151,14 +151,14 @@ func open_edit_content(instance:Control) -> void:
 	
 func l(item) -> void: Utils.l(item)
 
-func _on_load_project_pressed() -> void: load_page(current_page_filepath)
-func _on_save_project_pressed() -> void: save_page(current_page_filepath) ## TODO
+func _on_load_project_pressed() -> void: pass
+func _on_save_project_pressed() -> void: pass
+func _on_new_project_pressed() -> void: pass ## TODO
 
 func _on_page_select_item_selected(index: int) -> void:
 	## TODO
 	pass
 
-func _on_new_project_pressed() -> void: pass ## TODO
 func _on_new_page_pressed() -> void: new_page()
 
 func _on_load_page_pressed() -> void:
