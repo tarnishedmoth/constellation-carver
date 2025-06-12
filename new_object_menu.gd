@@ -1,5 +1,7 @@
 extends MenuButton
 
+@export var Main:MainScreen
+
 @onready var _popup:PopupMenu = self.get_popup()
 
 func _ready() -> void:
@@ -9,6 +11,7 @@ func _on_popup_id_pressed(id:int) -> void:
 	match id:
 		0: # Paragraph
 			Utils.l(Utils.bold("--New Paragraph"))
+			Main.add_content(ConstellationParagraph.TEMPLATE)
 		1: # List
 			Utils.l(Utils.bold("--New List"))
 		2: # Blockquote

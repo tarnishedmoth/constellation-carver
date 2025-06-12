@@ -2,6 +2,11 @@ class_name ConstellationParagraph extends RichTextLabel
 
 const FONT = preload("res://objects/paragraph_font.tres")
 
+const TEMPLATE = {
+	"type": "paragraph",
+	"text": "Lorem ipsum dolor sit amet consectetur adipiscing elit."
+}
+
 var _text:String:
 	set(value):
 		_text = value

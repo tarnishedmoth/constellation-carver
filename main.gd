@@ -1,4 +1,4 @@
-extends Control
+class_name MainScreen extends Control
 
 var current_project_name: String = "Project1"
 var current_project_filepath: String:
@@ -43,11 +43,17 @@ func load_page(filepath) -> void:
 	else:
 		l("Loading page...")
 		current_page_json = payload
-		l("Page name: [b]"+current_page_json["title"]+"[/b]")
-		for obj in current_page_json["content"]:
-			render_content(obj)
+		render_current_page_content()
 				
-func render_content(obj:Dictionary) -> void:
+func render_current_page_content() -> void:
+	for child in pd_display.get_children():
+		child.queue_free()
+	
+	l("Page name: [b]"+current_page_json["title"]+"[/b]")
+	for obj in current_page_json["content"]:
+		_render_content(obj)
+
+func _render_content(obj:Dictionary) -> void:
 	var instance:Control
 	match obj["type"]:
 		"paragraph":
@@ -92,6 +98,23 @@ func save_page(filepath) -> void:
 func new_page() -> void:
 	pass
 	
+func add_content(content:Dictionary, index:int = -1) -> void:
+	if not current_page_json:
+		Utils.l(Utils.ital("--Can't make a new object without a page selected!"))
+		return
+	var arr:Array = current_page_json["content"]
+	if index >= 0:
+		arr.insert(index, content)
+	else:
+		index = arr.size()
+		arr.append(content)
+	Utils.l(Utils.ital("Object inserted at index " + str(index) + ", refreshing..."))
+	
+	render_current_page_content()
+
+func remove_content_at(index:int) -> void:
+	pass
+	
 func l(item) -> void: Utils.l(item)
 
 func _on_load_project_pressed() -> void: load_page(current_page_filepath)
@@ -109,3 +132,6 @@ func _on_load_page_pressed() -> void:
 
 
 func _on_save_page_pressed() -> void: save_page(current_page_filepath)
+
+
+func _on_force_refresh_pressed() -> void: render_current_page_content()
