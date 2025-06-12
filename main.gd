@@ -90,7 +90,10 @@ func _render_content(obj:Dictionary) -> Control:
 			
 		"image":
 			l("[b]New image![/b]")
-			instance = ConstellationImage.new()
+			instance = ConstellationImage.new(
+				obj["width"],
+				obj["height"]
+			)
 		
 		"reel":
 			l("[b]New reel![/b]")
