@@ -53,13 +53,10 @@ func _data_to_pixels(data:String) -> void:
 	pass
 	
 func to_dict() -> Dictionary:
-	var data:Dictionary = {
-		"type": "image",
-		"loser": "true",
-		"width": _width,
-		"height": _height,
-		"pixels": _pixels
-	}
+	var data:Dictionary = TEMPLATE.duplicate()
+	data["width"] = _width
+	data["height"] = _height
+	data["pixels"] = _pixels
 	
 	if style:
 		var style_output = style.to_dict()

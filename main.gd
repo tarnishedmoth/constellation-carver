@@ -80,6 +80,7 @@ func _render_content(obj:Dictionary) -> Control:
 			l("[b]New blockquote![/b]")
 			var len:int = obj["text"].length()
 			l(str(len) + " characters inside.")
+			instance = ConstellationBlockquote.new(obj["text"])
 			
 		"button":
 			l("[b]New button![/b]")

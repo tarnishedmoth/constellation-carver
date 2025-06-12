@@ -1,9 +1,9 @@
-class_name ConstellationParagraph extends RichTextLabel
+class_name ConstellationBlockquote extends RichTextLabel
 
 const FONT = preload("res://objects/paragraph_font.tres")
 
 const TEMPLATE = {
-	"type": "paragraph",
+	"type": "blockquote",
 	"text": "Lorem ipsum dolor sit amet consectetur adipiscing elit."
 }
 

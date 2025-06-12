@@ -20,7 +20,7 @@ func _draw() -> void:
 	)
 	
 func to_dict() -> Dictionary:
-	return TEMPLATE
+	return TEMPLATE.duplicate()
 
 func _to_string() -> String:
 	return JSON.stringify(to_dict())
