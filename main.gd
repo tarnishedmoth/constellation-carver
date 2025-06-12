@@ -16,6 +16,7 @@ var current_page_name: String:
 var current_page_filepath: String
 var pages: Dictionary = {} # Key is filepath, value is json dictionary
 var current_page_json: Dictionary = {}
+var current_page_content: Array = []
 
 var selected_editable:Control
 
@@ -53,11 +54,14 @@ func render_current_page_content() -> void:
 	for child in pd_display.get_children():
 		child.queue_free()
 	
+	current_page_content.clear()
+	
 	l("Page name: [b]"+current_page_json["title"]+"[/b]")
 	for obj in current_page_json["content"]:
-		_render_content(obj)
+		var instance = _render_content(obj)
+		current_page_content.append(instance)
 
-func _render_content(obj:Dictionary) -> void:
+func _render_content(obj:Dictionary) -> Control:
 	var instance:Control
 	match obj["type"]:
 		"paragraph":
@@ -92,7 +96,7 @@ func _render_content(obj:Dictionary) -> void:
 			l("[b]New reel![/b]")
 		_:
 			push_error("[b]Found an anomoly! Dafuq?[/b]")
-	if not is_instance_valid(instance): return
+	if not is_instance_valid(instance): return null
 	
 	instance.focus_entered.connect(open_edit_content.bind(instance))
 	
@@ -101,8 +105,16 @@ func _render_content(obj:Dictionary) -> void:
 	if "style" in obj:
 		if "style" in instance:
 			instance.style = Particles.read_style(obj["style"])
+	return instance
 
 func save_page(filepath) -> void:
+	var index:int = 0
+	for item:Control in current_page_content:
+		if not item == null:
+			if item.has_method("to_dict"):
+				current_page_json.content[index] = item.to_dict()
+		index += 1
+	
 	var formatted = Particles.stringify(current_page_json)
 	var result = Particles.save_json_to_file(formatted, filepath)
 	
