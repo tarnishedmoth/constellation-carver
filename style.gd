@@ -5,7 +5,23 @@ const DEFAULT_MARGIN_BOTTOM:int = 20
 const DEFAULT_TEXT_ALIGN:String = "left"
 const DEFAULT_SCALE:int = 1
 
-var text_align:String
+const TEXT_ALIGN_OPTIONS = [
+	"left",
+	"center",
+	"right"
+]
+
+var text_align:String:
+	set(value):
+		if value in TEXT_ALIGN_OPTIONS:
+			text_align = value
+		else:
+			push_error("Invalid text alignment assigned to style")
+	get:
+		if text_align:
+			return text_align
+		else:
+			return DEFAULT_TEXT_ALIGN
 var margin_top:int
 var margin_bottom:int
 var scale:int

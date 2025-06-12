@@ -54,14 +54,28 @@ class Styling:
 			char = -1
 		return f
 
+var is_visual_current:bool = true
+
 var _text:String:
 	set(value):
 		_text = value
-		text = _prepare_text(value) # Because special formatting on PD
-var style:Style
+		is_visual_current = false
+		refresh_visuals()
+var style:Style:
+	set(value):
+		style = value
+		is_visual_current = false
+		refresh_visuals()
 
 func _prepare_text(t:String) -> String:
 	var f:String = t
+	
+	# RichTextLabel uses bbcode for text alignment
+	if style:
+		if style.text_align == "center":
+			f = f.insert(0, "[center]")
+		elif style.text_align == "right":
+			f = f.insert(0, "[right]")
 	
 	f = Styling.replace(f, Styling.TYPES.BOLD)
 	f = Styling.replace(f, Styling.TYPES.ITALIC)
@@ -79,11 +93,10 @@ func _init(titties:String, style:Style = null) -> void:
 	self.context_menu_enabled = true ## TODO
 	self.meta_underlined = false
 	self.hint_underlined = false
-	
-	
-#func _draw() -> void:
-	#var location = Vector2(global_position.x, global_position.y - 14)
-	#draw_string(FONT, location, _prepare_text(_text), HORIZONTAL_ALIGNMENT_LEFT, 0, 14, Color.BLACK)
+
+func refresh_visuals() -> void:
+	text = _prepare_text(_text) # Because special formatting on PD
+	is_visual_current = true
 	
 func to_dict() -> Dictionary:
 	var data:Dictionary = {

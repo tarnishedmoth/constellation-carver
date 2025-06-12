@@ -25,6 +25,7 @@ var current_page_json: Dictionary = {}
 
 func load_page(filepath) -> void:
 	var _filepath:String = current_project_filepath + "/" + filepath
+	current_page_filepath = _filepath
 	var payload = Particles.load_json_from_file(_filepath)
 	
 	if payload.is_empty():
@@ -72,7 +73,6 @@ func render_content(obj:Dictionary) -> void:
 	if "style" in obj:
 		if "style" in instance:
 			instance.style = Particles.read_style(obj["style"])
-	
 
 func save_page(filepath) -> void:
 	var formatted = Particles.stringify(current_page_json)
@@ -83,13 +83,17 @@ func new_page() -> void:
 	
 func l(text) -> void: print(text)
 func _on_load_project_pressed() -> void: load_page(current_page_filepath)
-func _on_save_project_pressed() -> void: save_page(current_page_filepath)
+func _on_save_project_pressed() -> void: save_page(current_page_filepath) ## TODO
 
 func _on_page_select_item_selected(index: int) -> void:
+	## TODO
 	pass
 
-func _on_new_project_pressed() -> void: pass
+func _on_new_project_pressed() -> void: pass ## TODO
 func _on_new_page_pressed() -> void: new_page()
 
 func _on_load_page_pressed() -> void:
 	load_page(page_line_edit.text)
+
+
+func _on_save_page_pressed() -> void: save_page(current_page_filepath)

@@ -112,3 +112,4 @@ theme = ExtResource("2_0xm2m")
 [connection signal="pressed" from="VBoxContainer/PanelContainer/TabContainer/Page/NewPage" to="." method="_on_new_page_pressed"]
 [connection signal="item_selected" from="VBoxContainer/PanelContainer/TabContainer/Page/PageSelect" to="." method="_on_page_select_item_selected"]
 [connection signal="pressed" from="VBoxContainer/PanelContainer/TabContainer/Page/LoadPage" to="." method="_on_load_page_pressed"]
+[connection signal="pressed" from="VBoxContainer/PanelContainer/TabContainer/Page/SavePage" to="." method="_on_save_page_pressed"]
