@@ -39,7 +39,7 @@ func load_page(filepath) -> void:
 			render_content(obj)
 				
 func render_content(obj:Dictionary) -> void:
-	var instance
+	var instance:Control
 	match obj["type"]:
 		"paragraph":
 			l("Found a paragraph!")
@@ -66,11 +66,13 @@ func render_content(obj:Dictionary) -> void:
 		
 		_:
 			push_error("Found an anomoly! Dafuq?")
+	if instance == null: return
+	pd_display.add_child(instance)
+		
 	if "style" in obj:
-		if is_instance_valid(instance):
-			if "style" in instance:
-				instance.style = Particles.read_style(obj["style"])
-			pd_display.add_child(instance)
+		if "style" in instance:
+			instance.style = Particles.read_style(obj["style"])
+	
 
 func save_page(filepath) -> void:
 	var formatted = Particles.stringify(current_page_json)

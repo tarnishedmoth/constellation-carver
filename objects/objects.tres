@@ -26,3 +26,4 @@ anti_aliasing = false
 Button/styles/normal = SubResource("StyleBoxFlat_1po3d")
 Panel/styles/panel = SubResource("StyleBoxFlat_e7sc1")
 PanelContainer/styles/panel = SubResource("StyleBoxFlat_dlith")
+RichTextLabel/colors/default_color = Color(0, 0, 0, 1)
