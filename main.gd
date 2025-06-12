@@ -18,11 +18,16 @@ var current_page_filepath: String
 var pages: Array = []
 var current_page_json: Dictionary = {}
 
-@onready var log_console: RichTextLabel = %LogConsole
+@onready var log_console: RichTextLabel = %LogConsole:
+	set(value):
+		log_console = value
+		Utils.log_console = log_console
 @onready var pd_display: Control = %PDDisplay
 @onready var page_line_edit: LineEdit = %PageLineEdit
 @onready var page_select: OptionButton = %PageSelect
+@onready var new_object_menu: MenuButton = %NewObjectMenu
 
+func _ready() -> void: Utils.log_console = log_console
 
 func load_page(filepath) -> void:
 	var _filepath:String = current_project_filepath + "/" + filepath
@@ -87,27 +92,8 @@ func save_page(filepath) -> void:
 func new_page() -> void:
 	pass
 	
-func l(item) -> void:
-	print(item)
-	log_console.newline()
-	if item is String:
-		log_console.append_text(item)
-	elif item is Dictionary:
-		var s:String = ""
-		for key in item:
-			s += key as String
-			s += ": "
-			s += item[key]
-			s += "\n"
-			log_console.append_text(s)
-			log_console.newline()
-	elif item is Array:
-		for subitem in item:
-			var s:String = ""
-			s += subitem as String
-			log_console.append_text(s)
-			log_console.newline()
-		
+func l(item) -> void: Utils.l(item)
+
 func _on_load_project_pressed() -> void: load_page(current_page_filepath)
 func _on_save_project_pressed() -> void: save_page(current_page_filepath) ## TODO
 

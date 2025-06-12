@@ -22,6 +22,7 @@ config/icon="res://icon.svg"
 [autoload]
 
 Particles="*res://particles.gd"
+Utils="*res://utils.gd"
 
 [debug]
 
