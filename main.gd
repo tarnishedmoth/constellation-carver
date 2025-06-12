@@ -14,7 +14,7 @@ var current_page_name: String:
 		else:
 			return "Empty"
 var current_page_filepath: String
-var pages: Dictionary = {}
+var pages: Dictionary = {} # Key is filepath, value is json dictionary
 var current_page_json: Dictionary = {}
 
 @onready var log_console: RichTextLabel = %LogConsole:
@@ -78,13 +78,17 @@ func _render_content(obj:Dictionary) -> void:
 			
 		"separator":
 			l("[b]New separator![/b]")
+			instance = ConstellationSeparator.new()
 			
 		"image":
 			l("[b]New image![/b]")
 			instance = ConstellationImage.new()
+		
+		"reel":
+			l("[b]New reel![/b]")
 		_:
 			push_error("[b]Found an anomoly! Dafuq?[/b]")
-	if instance == null: return
+	if not is_instance_valid(instance): return
 	pd_display.add_child(instance)
 		
 	if "style" in obj:

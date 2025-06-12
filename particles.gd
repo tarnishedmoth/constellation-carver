@@ -14,9 +14,9 @@ func _ready() -> void:
 	
 static func load_json_from_file(filepath:String) -> Dictionary:
 	if FileAccess.file_exists(filepath):
-		var load = FileAccess.open(filepath, FileAccess.READ)
-		var parsed = JSON.parse_string(load.get_as_text())
-		load.close()
+		var file:FileAccess = FileAccess.open(filepath, FileAccess.READ)
+		var parsed = JSON.parse_string(file.get_as_text())
+		file.close()
 		if parsed is Dictionary:
 			return parsed
 		else:
@@ -27,14 +27,16 @@ static func load_json_from_file(filepath:String) -> Dictionary:
 ## Returns true for successful save, false otherwise.
 static func save_json_to_file(formatted_data:String, filepath:String) -> bool:
 	var dirpath = filepath.get_base_dir()
-	if DirAccess.open(dirpath) == null:
-		DirAccess.make_dir_recursive_absolute(dirpath)
-		print_debug("Made a new directory!")
-	var file = FileAccess.open(filepath, FileAccess.WRITE)
-	file.store_string(formatted_data)
-	file.close()
-	print("Saved")
-	return true
+	if not dirpath.is_empty():
+		if DirAccess.open(dirpath) == null:
+			DirAccess.make_dir_recursive_absolute(dirpath)
+			print_debug("Made a new directory!")
+		var file = FileAccess.open(filepath, FileAccess.WRITE)
+		file.store_string(formatted_data)
+		file.close()
+		print("Saved")
+		return true
+	return false
 	
 func read_style(style:Dictionary) -> Style:
 	var parsed = Style.new()

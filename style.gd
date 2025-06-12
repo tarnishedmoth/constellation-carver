@@ -5,7 +5,7 @@ const DEFAULT_MARGIN_BOTTOM:int = 20
 const DEFAULT_TEXT_ALIGN:String = "left"
 const DEFAULT_SCALE:int = 1
 
-const TEXT_ALIGN_OPTIONS = [
+const TEXT_ALIGN_OPTIONS:Array[String] = [
 	"left",
 	"center",
 	"right"
