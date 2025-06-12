@@ -14,8 +14,7 @@ var current_page_name: String:
 		else:
 			return "Empty"
 var current_page_filepath: String
-			
-var pages: Array = []
+var pages: Dictionary = {}
 var current_page_json: Dictionary = {}
 
 @onready var log_console: RichTextLabel = %LogConsole:
@@ -43,6 +42,7 @@ func load_page(filepath) -> void:
 	else:
 		l("Loading page...")
 		current_page_json = payload
+		pages[current_page_filepath] = current_page_json
 		render_current_page_content()
 				
 func render_current_page_content() -> void:

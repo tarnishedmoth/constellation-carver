@@ -150,12 +150,20 @@ hint_underlined = false
 layout_mode = 2
 text = "Force Refresh"
 
-[node name="PDDisplay" type="VBoxContainer" parent="VBoxContainer"]
+[node name="ScrollContainer" type="ScrollContainer" parent="VBoxContainer"]
+custom_minimum_size = Vector2(400, 240)
+layout_mode = 2
+size_flags_horizontal = 4
+horizontal_scroll_mode = 0
+vertical_scroll_mode = 3
+
+[node name="PDDisplay" type="VBoxContainer" parent="VBoxContainer/ScrollContainer"]
 unique_name_in_owner = true
 clip_contents = true
 custom_minimum_size = Vector2(400, 240)
 layout_mode = 2
-size_flags_vertical = 3
+size_flags_horizontal = 4
+size_flags_vertical = 4
 theme = ExtResource("2_0xm2m")
 
 [node name="PanelContainer2" type="PanelContainer" parent="VBoxContainer"]
