@@ -15,6 +15,7 @@ static func do(type:TYPES, is_open:bool = false) -> String:
 		_:
 			push_error("Invalid enum integer")
 			return ""
+			
 static func replace(t:String, type:TYPES) -> String:
 	var f:String = t
 	
@@ -26,8 +27,8 @@ static func replace(t:String, type:TYPES) -> String:
 		
 	
 	var char:int = 0
+	var is_open:bool = false
 	while char != -1:
-		var is_open:bool = false
 		var next_char = f.find(special_character, char)
 		if next_char != -1:
 			# Note that length returns the number of characters but string[0] is character 1.

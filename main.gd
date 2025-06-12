@@ -74,6 +74,7 @@ func _render_content(obj:Dictionary) -> Control:
 			l("[b]New list![/b]")
 			var count:int = obj["items"].size()
 			l(str(count) + " items listed.")
+			instance = ConstellationList.new(obj["items"])
 			
 		"blockquote":
 			l("[b]New blockquote![/b]")

@@ -1,15 +1,15 @@
-class_name ConstellationParagraph extends RichTextLabel
+class_name ConstellationList extends RichTextLabel
 
 const FONT = preload("res://objects/paragraph_font.tres")
 
 const TEMPLATE = {
-	"type": "paragraph",
-	"text": "Lorem ipsum dolor sit amet consectetur adipiscing elit."
+	"type": "list",
+	"items": ["Lorem ipsum dolor sit amet consectetur adipiscing elit."]
 }
 
-var _text:String:
+var _items:Array:
 	set(value):
-		_text = value
+		_items = value
 		refresh_visuals()
 var style:Style:
 	set(value):
@@ -31,10 +31,10 @@ func _prepare_text(t:String) -> String:
 	
 	return f
 
-func _init(titties:String, style:Style = null) -> void:
+func _init(items:Array, style:Style = null) -> void:
 	self.focus_mode = Control.FOCUS_CLICK
 	
-	self._text = titties
+	self._items = items
 	self.style = style
 	
 	self.fit_content = true
@@ -50,14 +50,18 @@ func _init(titties:String, style:Style = null) -> void:
 	#focus_exited.connect(_on_focus_exited)
 
 func refresh_visuals() -> void:
-	text = _prepare_text(_text) # Because special formatting on PD
+	text = ""
+	var new_line:bool = false
+	for item:String in _items:
+		if new_line: newline()
+		var entry:String = _prepare_text(item)
+		append_text(entry)
+		new_line = true
 	
 	
 func to_dict() -> Dictionary:
-	var data:Dictionary = {
-		"type": "paragraph",
-		"text": _text,
-	}
+	var data:Dictionary = TEMPLATE
+	data["items"] = _items
 	
 	var style_output = style.to_dict()
 	if not style_output.is_empty():
