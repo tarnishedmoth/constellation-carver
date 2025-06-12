@@ -2,6 +2,23 @@ class_name Paragraph extends RichTextLabel
 
 const FONT = preload("res://objects/paragraph_font.tres")
 
+class Styling:
+	enum TYPES {
+		BOLD,
+		ITALIC
+	}
+	static func do(type:TYPES, is_open:bool = false) -> String:
+		match type:
+			TYPES.BOLD:
+				if is_open: return "[/b]"
+				else: return "[b]"
+			TYPES.ITALIC:
+				if is_open: return "[/i]"
+				else: return "[i]"
+			_:
+				push_error("Invalid enum integer")
+				return ""
+
 var _text:String:
 	set(value):
 		_text = value
@@ -22,17 +39,18 @@ func _prepare_text(t:String) -> String:
 					# Escaped
 					char = next_bold + 2 # Skip past these characters
 					continue
+					
 			char = next_bold
-			var insert:String
 			
-			if is_bold: insert = "[/b]"
-			else: insert = "[b]"
+			var insert:String = Styling.do(Styling.TYPES.BOLD, is_bold)
+			is_bold = !is_bold # Toggle
 			
+			# Replace the stuff
 			f = f.erase(next_bold)
 			f = f.insert(next_bold, insert)
-			is_bold = !is_bold # Toggle
+			
 			char += insert.length() - 1 # Math cus we erase one character before adding our insert
-			continue
+			continue # Keep looping
 		char = -1
 	return f
 
