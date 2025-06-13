@@ -1,5 +1,9 @@
 class_name MainScreen extends Control
 
+const PAGE_TEMPLATE:Array = [
+	ConstellationParagraph.TEMPLATE
+]
+
 var current_project_name: String = "Project1"
 var current_project_filepath: String:
 	get:
@@ -20,6 +24,7 @@ var current_page_content: Array = []
 
 var selected_editable:Control
 
+@onready var special_popup_window: SpecialPopupWindow = $SpecialPopupWindow
 @onready var log_console: RichTextLabel = %LogConsole:
 	set(value):
 		log_console = value
@@ -151,8 +156,22 @@ func save_page(filepath) -> void:
 	var formatted = Particles.stringify(current_page_json)
 	var result = Particles.save_json_to_file(formatted, filepath)
 	
-func new_page() -> void:
-	pass
+func new_page(title:String, dirpath:String, overwrite:bool = false) -> void:
+	var new_page_json:String = ParticleParser.pagify(PAGE_TEMPLATE)
+	var filepath = Utils.endify(dirpath) + Utils.endify(title, ".json")
+	var file_exists:bool = FileAccess.file_exists(filepath)
+	if not overwrite:
+		if file_exists:
+			# Warn the user
+			var result = await special_popup_window.popup(
+				"File already exists.\nErase and overwrite?\n\n(You will permanently lose this data!)",
+				"Warning",
+				true
+			)
+			if not result: # Cancel
+				return
+	
+	ParticleParser.save_json_to_file(new_page_json, filepath)
 	
 func add_content(content:Dictionary, index:int = -1) -> void:
 	if not current_page_json:
@@ -213,11 +232,12 @@ func _on_page_select_item_selected(index: int) -> void:
 	## TODO
 	pass
 
-func _on_new_page_pressed() -> void: new_page()
+func _on_new_page_pressed() -> void: new_page(page_line_edit.text, current_project_filepath)
 
 func _on_load_page_pressed() -> void:
+	page_line_edit.text = Utils.endify(page_line_edit.text, ".json")
 	load_page(page_line_edit.text)
-
+	
 
 func _on_save_page_pressed() -> void: save_page(current_page_filepath)
 

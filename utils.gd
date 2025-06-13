@@ -28,3 +28,7 @@ static func bold(text:String) -> String: return "[b]" + text + "[/b]"
 static func ital(text:String) -> String: return "[i]" + text + "[/i]"
 static func center(text:String) -> String: return "[center]" + text + "[/center]"
 static func underl(text:String) -> String: return "[u]" + text + "[/u]"
+
+static func endify(path:String, end_with:String = "/") -> String:
+	if path.ends_with(end_with): return path
+	else: return (path + end_with)

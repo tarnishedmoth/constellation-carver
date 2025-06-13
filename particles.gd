@@ -50,9 +50,9 @@ func read_style(style:Dictionary) -> Style:
 		parsed.scale = style["scale"]
 	return parsed
 	
-static func pagify(content:Dictionary) -> String:
-	var new_dict:Dictionary = HEADER.duplicate()
-	new_dict["content"] = content
+static func pagify(content:Array) -> String:
+	var new_dict:Dictionary = HEADER.duplicate(true)
+	new_dict["content"] = content.duplicate(true)
 	return stringify(new_dict)
 	
 static func stringify(data:Dictionary) -> String:
