@@ -1,6 +1,7 @@
 class_name ConstellationReel extends Control
 
-const TEXTURE = preload("res://icon.svg")
+const PLACEHOLDER_SCENE = preload("res://objects/placeholder.tscn")
+var placeholder:Control # Instance
 
 const TEMPLATE = {
 	"type": "reel",
@@ -9,7 +10,9 @@ const TEMPLATE = {
 	"frames": []
 	#frame-duration default 2, irange 1-1800. Divide 30 by this for framerate
 }
-
+var _size:Vector2i:
+	get:
+		return Vector2i(_width, _height)
 var _width:int:
 	set(value):
 		_width = value
@@ -38,18 +41,31 @@ func _init(width:int, height:int, frames:Array, rescale:int = 2) -> void:
 	
 	self.focus_mode = Control.FOCUS_CLICK
 	
-func _draw() -> void:
-	draw_texture_rect(
-		TEXTURE,
-		Rect2i(
-			centered(_width*style.scale),
-			0,
-			_width*style.scale,
-			_height*style.scale
-		),
-		false
-		#Color.YELLOW
-	)
+func _ready() -> void:
+	toggle_placeholder(true)
+
+#func _draw() -> void:
+	#draw_texture_rect(
+		#TEXTURE,
+		#Rect2i(
+			#centered(_width*style.scale),
+			#0,
+			#_width*style.scale,
+			#_height*style.scale
+		#),
+		#false
+		##Color.YELLOW
+	#)
+
+func toggle_placeholder(on=true) -> void:
+	if on:
+		placeholder = PLACEHOLDER_SCENE.instantiate()
+		#placeholder.size = _size
+		placeholder.text = "Reel\n%s frames | %s x %s" % [_frames.size(), _width, _height] # Label
+		add_child(placeholder)
+	else:
+		if placeholder:
+			placeholder.queue_free()
 	
 func centered(width:int) -> int: return 400/2 - width/2
 

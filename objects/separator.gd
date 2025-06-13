@@ -12,8 +12,8 @@ func _init() -> void:
 func _draw() -> void:
 	# TODO figure out exactly where this has to be
 	draw_line(
-		Vector2i(0, 10),
-		Vector2i(400, 10),
+		Vector2i(0, 6),
+		Vector2i(400, 6),
 		Color.BLACK
 	)
 	
