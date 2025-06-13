@@ -22,6 +22,12 @@ var margin_top:int = DEFAULT_MARGIN_TOP
 var margin_bottom:int = DEFAULT_MARGIN_BOTTOM
 var scale:int = DEFAULT_SCALE
 
+func get_align_int() -> int:
+	match text_align:
+		"center": return 1
+		"right": return 2
+		_: return 0
+
 func to_dict() -> Dictionary:
 	var write:Dictionary = {}
 	

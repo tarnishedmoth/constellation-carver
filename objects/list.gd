@@ -68,4 +68,4 @@ func to_dict() -> Dictionary:
 	return data
 
 func _to_string() -> String:
-	return JSON.stringify(to_dict())
+	return JSON.stringify(to_dict(), "\t", false)

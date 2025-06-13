@@ -29,7 +29,11 @@ var selected_editable:Control
 @onready var page_select: OptionButton = %PageSelect
 @onready var new_object_menu: MenuButton = %NewObjectMenu
 
-@onready var text_edit: TextEdit = %TextEdit
+@onready var content_text_edit: TextEdit = %ContentTextEdit
+@onready var content_line_edit: LineEdit = %ContentLineEdit
+
+@onready var json_edit: CodeEdit = %JSONEdit
+
 
 func _ready() -> void: Utils.log_console = log_console
 
@@ -51,6 +55,9 @@ func load_page(filepath) -> void:
 		render_current_page_content()
 				
 func render_current_page_content() -> void:
+	selected_editable = null
+	reset_editables()
+	
 	for child in pd_display.get_children():
 		child.queue_free()
 	
@@ -112,6 +119,11 @@ func _render_content(obj:Dictionary) -> Control:
 		if "style" in instance:
 			instance.style = Particles.read_style(obj["style"])
 	return instance
+	
+func reset_editables() -> void:
+	%ContentEmptyLabel.show()
+	content_line_edit.hide()
+	content_text_edit.hide()
 
 func save_page(filepath) -> void:
 	var index:int = 0
@@ -145,9 +157,25 @@ func remove_content_at(index:int) -> void:
 	pass
 	
 func open_edit_content(instance:Control) -> void:
+	reset_editables()
 	selected_editable = instance
-	if "_text" in instance:
-		text_edit.text = instance["_text"]
+	json_edit.text = str(selected_editable) # Uses _to_string() of instance
+	
+	#if selected_editable is ConstellationButton:
+		#%ContentEmptyLabel.hide()
+		#content_line_edit.text = selected_editable["_label"]
+		#content_line_edit.show()
+	
+	if "_text" in selected_editable:
+		%ContentEmptyLabel.hide()
+		content_text_edit.text = selected_editable["_text"]
+		content_text_edit.show()
+	
+	if "style" in selected_editable:
+		if is_instance_valid(selected_editable.style):
+			%StyleEmptyLabel.hide()
+			%StyleTextAlignContainer.show()
+			%StyleTextAlign.select(selected_editable.style.get_align_int())
 	
 func l(item) -> void: Utils.l(item)
 
@@ -172,4 +200,4 @@ func _on_force_refresh_pressed() -> void: render_current_page_content()
 
 
 func _on_save_text_edits_pressed() -> void:
-	selected_editable._text = text_edit.text
+	selected_editable._text = content_text_edit.text
