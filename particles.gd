@@ -34,7 +34,6 @@ static func save_json_to_file(formatted_data:String, filepath:String) -> bool:
 		var file = FileAccess.open(filepath, FileAccess.WRITE)
 		file.store_string(formatted_data)
 		file.close()
-		print("Saved")
 		return true
 	return false
 	

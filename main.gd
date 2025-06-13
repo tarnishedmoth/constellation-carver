@@ -90,7 +90,7 @@ func _ready() -> void:
 #region PAGES
 
 func load_page(filepath) -> void:
-	var _filepath:String = current_project_filepath + "/" + filepath
+	var _filepath:String = Utils.endify(current_project_filepath) + Utils.endify(filepath, ".json")
 	current_page_filepath = _filepath
 	var payload = Particles.load_json_from_file(_filepath)
 	
@@ -193,15 +193,39 @@ func _render_content(obj:Dictionary) -> Control:
 
 func save_page(filepath) -> void:
 	cache_changes()
+	var _filepath = Utils.endify(current_project_filepath) + Utils.endify(filepath, ".json")
+	
+	if _filepath != current_page_filepath:
+		# Overwriting a different filename
+		var duplicate = await special_popup_window.popup(
+			"Saving location has been changed.\n\nAre you sure you want to save to a different file?",
+			"Save Page  -  Changed filepath",
+			true
+		)
+		if not duplicate:
+			l("User cancelled save.")
+			return
+			
+		if FileAccess.file_exists(_filepath):
+			var overwrite = await special_popup_window.popup(
+				"The file you're trying to save to already exists, and isn't the file you loaded for editing.\n\nOverwrite? The other file's data will be lost.",
+				"Save Page  -  Name conflict",
+				true
+			)
+			if not overwrite:
+				l("User cancelled save.")
+				return
+		
+	
 	l("Saving page...")
 	var formatted = Particles.stringify(current_page_json)
-	var result = Particles.save_json_to_file(formatted, filepath)
+	var result = Particles.save_json_to_file(formatted, _filepath)
 	
 	if result == true:
-		l("Save success!")
+		l("--Saved page to " + _filepath)
 		%ApplicationName.text = APP_NAME
 	else:
-		l(Utils.bold("Save failed!"))
+		l(Utils.bold("--Failed to save page to " + _filepath))
 	
 func cache_changes(refresh:bool = false):
 	var index:int = 0
@@ -217,7 +241,7 @@ func cache_changes(refresh:bool = false):
 	
 	if refresh: render_current_page_content()
 	
-func new_page(title:String, dirpath:String, overwrite:bool = false) -> void:
+func new_page(title:String, overwrite:bool = false, dirpath:String = current_project_filepath) -> void:
 	var new_page_json:String = ParticleParser.pagify(PAGE_TEMPLATE)
 	var filepath = Utils.endify(dirpath) + Utils.endify(title, ".json")
 	var file_exists:bool = FileAccess.file_exists(filepath)
@@ -234,7 +258,7 @@ func new_page(title:String, dirpath:String, overwrite:bool = false) -> void:
 	
 	ParticleParser.save_json_to_file(new_page_json, filepath)
 	l(Utils.bold("New page created and saved!"))
-	await  get_tree().process_frame
+	await get_tree().process_frame
 	load_page(filepath)
 	
 func add_content(content:Dictionary, index:int = -1) -> void:
@@ -338,13 +362,15 @@ func _on_new_project_pressed() -> void: pass ## TODO
 
 func _on_page_select_item_selected(index: int) -> void: pass ## TODO
 
-func _on_new_page_pressed() -> void: new_page(page_filename_edit.text, current_project_filepath)
+func _on_new_page_pressed() -> void:
+	new_page(page_filename_edit.text)
 
 func _on_load_page_pressed() -> void:
 	page_filename_edit.text = Utils.endify(page_filename_edit.text, ".json")
 	load_page(page_filename_edit.text)
 	
-func _on_save_page_pressed() -> void: save_page(current_page_filepath)
+func _on_save_page_pressed() -> void:
+	save_page(page_filename_edit.text)
 
 func _on_force_refresh_pressed() -> void: render_current_page_content()
 
