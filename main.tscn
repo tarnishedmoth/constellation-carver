@@ -40,28 +40,51 @@ layout_mode = 2
 size_flags_vertical = 3
 theme = ExtResource("3_h2yge")
 
-[node name="TabContainer" type="TabContainer" parent="VBoxContainer/PanelContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/PanelContainer"]
 layout_mode = 2
-current_tab = 2
 
-[node name="Project" type="VBoxContainer" parent="VBoxContainer/PanelContainer/TabContainer"]
+[node name="ApplicationName" type="RichTextLabel" parent="VBoxContainer/PanelContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 8
+bbcode_enabled = true
+text = "[i]Constellation Carver v0.1[/i]"
+fit_content = true
+scroll_active = false
+autowrap_mode = 0
+horizontal_alignment = 1
+
+[node name="Spacer" type="Control" parent="VBoxContainer/PanelContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="TabContainer" type="TabContainer" parent="VBoxContainer/PanelContainer/VBoxContainer"]
+layout_mode = 2
+current_tab = 1
+tabs_position = 1
+
+[node name="Project" type="VBoxContainer" parent="VBoxContainer/PanelContainer/VBoxContainer/TabContainer"]
 visible = false
 layout_mode = 2
 metadata/_tab_index = 0
 
-[node name="NewProject" type="Button" parent="VBoxContainer/PanelContainer/TabContainer/Project"]
+[node name="NewProject" type="Button" parent="VBoxContainer/PanelContainer/VBoxContainer/TabContainer/Project"]
+visible = false
 layout_mode = 2
 text = "New Project"
 
-[node name="LoadProject" type="Button" parent="VBoxContainer/PanelContainer/TabContainer/Project"]
+[node name="LoadProject" type="Button" parent="VBoxContainer/PanelContainer/VBoxContainer/TabContainer/Project"]
+visible = false
 layout_mode = 2
 text = "Load Project"
 
-[node name="SaveProject" type="Button" parent="VBoxContainer/PanelContainer/TabContainer/Project"]
+[node name="SaveProject" type="Button" parent="VBoxContainer/PanelContainer/VBoxContainer/TabContainer/Project"]
+visible = false
 layout_mode = 2
 text = "Save Project"
 
-[node name="Label" type="Label" parent="VBoxContainer/PanelContainer/TabContainer/Project"]
+[node name="Label" type="Label" parent="VBoxContainer/PanelContainer/VBoxContainer/TabContainer/Project"]
 layout_mode = 2
 size_flags_vertical = 6
 text = "This menu non-functional.
@@ -69,46 +92,48 @@ Please use the Page tab to edit pages."
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Page" type="VBoxContainer" parent="VBoxContainer/PanelContainer/TabContainer"]
-visible = false
+[node name="Page" type="VBoxContainer" parent="VBoxContainer/PanelContainer/VBoxContainer/TabContainer"]
 layout_mode = 2
+alignment = 2
 metadata/_tab_index = 1
 
-[node name="NewPage" type="Button" parent="VBoxContainer/PanelContainer/TabContainer/Page"]
+[node name="NewPage" type="Button" parent="VBoxContainer/PanelContainer/VBoxContainer/TabContainer/Page"]
 layout_mode = 2
 text = "New Page"
 
-[node name="Spacer" type="Control" parent="VBoxContainer/PanelContainer/TabContainer/Page"]
-layout_mode = 2
-size_flags_vertical = 3
-
-[node name="PageSelect" type="OptionButton" parent="VBoxContainer/PanelContainer/TabContainer/Page"]
+[node name="PageSelect" type="OptionButton" parent="VBoxContainer/PanelContainer/VBoxContainer/TabContainer/Page"]
 unique_name_in_owner = true
 layout_mode = 2
+disabled = true
 selected = 0
 item_count = 1
-popup/item_0/text = "index"
+popup/item_0/text = "page select"
 popup/item_0/id = 0
 popup/item_0/separator = true
 
-[node name="PageLineEdit" type="LineEdit" parent="VBoxContainer/PanelContainer/TabContainer/Page"]
+[node name="PageLineEdit" type="LineEdit" parent="VBoxContainer/PanelContainer/VBoxContainer/TabContainer/Page"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "index.json"
+placeholder_text = "Filename"
+alignment = 1
+emoji_menu_enabled = false
+caret_blink = true
 
-[node name="LoadPage" type="Button" parent="VBoxContainer/PanelContainer/TabContainer/Page"]
+[node name="LoadPage" type="Button" parent="VBoxContainer/PanelContainer/VBoxContainer/TabContainer/Page"]
 layout_mode = 2
 text = "Load Page"
 
-[node name="SavePage" type="Button" parent="VBoxContainer/PanelContainer/TabContainer/Page"]
+[node name="SavePage" type="Button" parent="VBoxContainer/PanelContainer/VBoxContainer/TabContainer/Page"]
 layout_mode = 2
 text = "Save Page"
 
-[node name="Objects" type="VBoxContainer" parent="VBoxContainer/PanelContainer/TabContainer"]
+[node name="Objects" type="VBoxContainer" parent="VBoxContainer/PanelContainer/VBoxContainer/TabContainer"]
+visible = false
 layout_mode = 2
 metadata/_tab_index = 2
 
-[node name="NewObjectMenu" type="MenuButton" parent="VBoxContainer/PanelContainer/TabContainer/Objects" node_paths=PackedStringArray("Main")]
+[node name="NewObjectMenu" type="MenuButton" parent="VBoxContainer/PanelContainer/VBoxContainer/TabContainer/Objects" node_paths=PackedStringArray("Main")]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Create New Object..."
@@ -129,18 +154,18 @@ popup/item_5/id = 5
 popup/item_6/text = "Reel"
 popup/item_6/id = 6
 script = ExtResource("4_1bvp3")
-Main = NodePath("../../../../..")
+Main = NodePath("../../../../../..")
 
-[node name="Debug" type="VBoxContainer" parent="VBoxContainer/PanelContainer/TabContainer"]
+[node name="Debug" type="VBoxContainer" parent="VBoxContainer/PanelContainer/VBoxContainer/TabContainer"]
 visible = false
 layout_mode = 2
 metadata/_tab_index = 3
 
-[node name="PanelContainer" type="PanelContainer" parent="VBoxContainer/PanelContainer/TabContainer/Debug"]
+[node name="PanelContainer" type="PanelContainer" parent="VBoxContainer/PanelContainer/VBoxContainer/TabContainer/Debug"]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="LogConsole" type="RichTextLabel" parent="VBoxContainer/PanelContainer/TabContainer/Debug/PanelContainer"]
+[node name="LogConsole" type="RichTextLabel" parent="VBoxContainer/PanelContainer/VBoxContainer/TabContainer/Debug/PanelContainer"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 128)
 layout_mode = 2
@@ -155,7 +180,7 @@ scroll_following = true
 meta_underlined = false
 hint_underlined = false
 
-[node name="ForceRefresh" type="Button" parent="VBoxContainer/PanelContainer/TabContainer/Debug"]
+[node name="ForceRefresh" type="Button" parent="VBoxContainer/PanelContainer/VBoxContainer/TabContainer/Debug"]
 layout_mode = 2
 text = "Force Refresh"
 
@@ -182,10 +207,9 @@ theme = ExtResource("3_h2yge")
 
 [node name="TabContainer" type="TabContainer" parent="VBoxContainer/PanelContainer2"]
 layout_mode = 2
-current_tab = 1
+current_tab = 0
 
 [node name="Content" type="VBoxContainer" parent="VBoxContainer/PanelContainer2/TabContainer"]
-visible = false
 layout_mode = 2
 metadata/_tab_index = 0
 
@@ -233,12 +257,10 @@ visible = false
 layout_mode = 2
 text = "Cancel"
 
-[node name="ApplicationName" type="RichTextLabel" parent="VBoxContainer/PanelContainer2/TabContainer/Content/HBoxContainer"]
+[node name="Spacer" type="Control" parent="VBoxContainer/PanelContainer2/TabContainer/Content/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
-bbcode_enabled = true
-text = "[center][i]Constellation Carver v0.1[/i]"
-fit_content = true
+size_flags_vertical = 8
 
 [node name="SaveTextEdits" type="Button" parent="VBoxContainer/PanelContainer2/TabContainer/Content/HBoxContainer"]
 layout_mode = 2
@@ -246,6 +268,7 @@ size_flags_horizontal = 3
 text = "Save Changes"
 
 [node name="Style" type="MarginContainer" parent="VBoxContainer/PanelContainer2/TabContainer" node_paths=PackedStringArray("main")]
+visible = false
 layout_mode = 2
 script = ExtResource("5_lquwl")
 main = NodePath("../../../..")
@@ -375,19 +398,17 @@ suffix = "x"
 custom_arrow_step = 1.0
 select_all_on_focus = true
 
-[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/PanelContainer2/TabContainer/Style/VBoxContainer"]
+[node name="BottomRow" type="HBoxContainer" parent="VBoxContainer/PanelContainer2/TabContainer/Style/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
 alignment = 2
 
-[node name="Label" type="Label" parent="VBoxContainer/PanelContainer2/TabContainer/Style/VBoxContainer/HBoxContainer"]
+[node name="Control" type="Control" parent="VBoxContainer/PanelContainer2/TabContainer/Style/VBoxContainer/BottomRow"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 8
-text = "Constellation Carver"
-horizontal_alignment = 1
 
-[node name="StyleSaveButton" type="Button" parent="VBoxContainer/PanelContainer2/TabContainer/Style/VBoxContainer/HBoxContainer"]
+[node name="StyleSaveButton" type="Button" parent="VBoxContainer/PanelContainer2/TabContainer/Style/VBoxContainer/BottomRow"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 8
@@ -415,12 +436,9 @@ auto_brace_completion_highlight_matching = true
 [node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/PanelContainer2/TabContainer/JSON"]
 layout_mode = 2
 
-[node name="ApplicationName" type="RichTextLabel" parent="VBoxContainer/PanelContainer2/TabContainer/JSON/HBoxContainer"]
+[node name="Spacer" type="Control" parent="VBoxContainer/PanelContainer2/TabContainer/JSON/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
-bbcode_enabled = true
-text = "[center][i]Constellation Carver v0.1[/i]"
-fit_content = true
 
 [node name="SaveJSONEdits" type="Button" parent="VBoxContainer/PanelContainer2/TabContainer/JSON/HBoxContainer"]
 visible = false
@@ -428,12 +446,12 @@ layout_mode = 2
 size_flags_horizontal = 3
 text = "Save Changes"
 
-[connection signal="pressed" from="VBoxContainer/PanelContainer/TabContainer/Project/NewProject" to="." method="_on_new_project_pressed"]
-[connection signal="pressed" from="VBoxContainer/PanelContainer/TabContainer/Project/LoadProject" to="." method="_on_load_project_pressed"]
-[connection signal="pressed" from="VBoxContainer/PanelContainer/TabContainer/Project/SaveProject" to="." method="_on_save_project_pressed"]
-[connection signal="pressed" from="VBoxContainer/PanelContainer/TabContainer/Page/NewPage" to="." method="_on_new_page_pressed"]
-[connection signal="item_selected" from="VBoxContainer/PanelContainer/TabContainer/Page/PageSelect" to="." method="_on_page_select_item_selected"]
-[connection signal="pressed" from="VBoxContainer/PanelContainer/TabContainer/Page/LoadPage" to="." method="_on_load_page_pressed"]
-[connection signal="pressed" from="VBoxContainer/PanelContainer/TabContainer/Page/SavePage" to="." method="_on_save_page_pressed"]
-[connection signal="pressed" from="VBoxContainer/PanelContainer/TabContainer/Debug/ForceRefresh" to="." method="_on_force_refresh_pressed"]
+[connection signal="pressed" from="VBoxContainer/PanelContainer/VBoxContainer/TabContainer/Project/NewProject" to="." method="_on_new_project_pressed"]
+[connection signal="pressed" from="VBoxContainer/PanelContainer/VBoxContainer/TabContainer/Project/LoadProject" to="." method="_on_load_project_pressed"]
+[connection signal="pressed" from="VBoxContainer/PanelContainer/VBoxContainer/TabContainer/Project/SaveProject" to="." method="_on_save_project_pressed"]
+[connection signal="pressed" from="VBoxContainer/PanelContainer/VBoxContainer/TabContainer/Page/NewPage" to="." method="_on_new_page_pressed"]
+[connection signal="item_selected" from="VBoxContainer/PanelContainer/VBoxContainer/TabContainer/Page/PageSelect" to="." method="_on_page_select_item_selected"]
+[connection signal="pressed" from="VBoxContainer/PanelContainer/VBoxContainer/TabContainer/Page/LoadPage" to="." method="_on_load_page_pressed"]
+[connection signal="pressed" from="VBoxContainer/PanelContainer/VBoxContainer/TabContainer/Page/SavePage" to="." method="_on_save_page_pressed"]
+[connection signal="pressed" from="VBoxContainer/PanelContainer/VBoxContainer/TabContainer/Debug/ForceRefresh" to="." method="_on_force_refresh_pressed"]
 [connection signal="pressed" from="VBoxContainer/PanelContainer2/TabContainer/Content/HBoxContainer/SaveTextEdits" to="." method="_on_save_text_edits_pressed"]
