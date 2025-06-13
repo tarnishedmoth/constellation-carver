@@ -70,7 +70,7 @@ horizontal_alignment = 1
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
-current_tab = 2
+current_tab = 1
 tabs_position = 1
 
 [node name="Project" type="VBoxContainer" parent="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer"]
@@ -102,7 +102,6 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="Page" type="VBoxContainer" parent="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer"]
-visible = false
 layout_mode = 2
 alignment = 2
 metadata/_tab_index = 1
@@ -130,16 +129,17 @@ layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 0.25
 text = "Filename"
-horizontal_alignment = 1
+horizontal_alignment = 2
 vertical_alignment = 1
 
-[node name="PageLineEdit" type="LineEdit" parent="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Page/FileContainer"]
+[node name="PageFilenameEdit" type="LineEdit" parent="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Page/FileContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
+tooltip_text = "File name for this page.
+Used by Buttons in its \"action\" for navigating the website on PD."
 text = "index.json"
 placeholder_text = "Filename"
-alignment = 1
 emoji_menu_enabled = false
 select_all_on_focus = true
 caret_blink = true
@@ -151,10 +151,8 @@ layout_mode = 2
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 0.25
-tooltip_text = "This is shown in the header when users load your webpage."
-mouse_filter = 1
 text = "Page Title"
-horizontal_alignment = 1
+horizontal_alignment = 2
 vertical_alignment = 1
 
 [node name="PageTitleEdit" type="LineEdit" parent="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Page/TitleContainer"]
@@ -164,7 +162,6 @@ size_flags_horizontal = 3
 tooltip_text = "This is shown in the header when users load your webpage."
 text = "My Constellation"
 placeholder_text = "Title"
-alignment = 1
 select_all_on_focus = true
 caret_blink = true
 
@@ -177,6 +174,7 @@ layout_mode = 2
 text = "Save Page"
 
 [node name="Objects" type="VBoxContainer" parent="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer"]
+visible = false
 layout_mode = 2
 metadata/_tab_index = 2
 

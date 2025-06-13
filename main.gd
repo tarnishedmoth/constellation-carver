@@ -52,7 +52,8 @@ var selected_editable:Control
 @onready var bottom_tab_container: TabContainer = %BottomTabContainer
 
 # PAGE
-@onready var page_line_edit: LineEdit = %PageLineEdit
+@onready var page_filename_edit: LineEdit = %PageFilenameEdit
+@onready var page_title_edit: LineEdit = %PageTitleEdit
 @onready var page_select: OptionButton = %PageSelect
 # OBJECT
 @onready var new_object_menu: MenuButton = %NewObjectMenu
@@ -115,15 +116,18 @@ func render_current_page_content() -> void:
 	current_page_content.clear()
 	
 	l("Rendering page: [b]"+current_page_json["title"]+"[/b]")
-	%PageTitleEdit.text = current_page_json["title"]
+	page_title_edit.text = current_page_json["title"]
 	
-	var tree_root = object_tree.create_item()
+	var tree_root:TreeItem = object_tree.create_item()
 	tree_root.set_text(0, current_page_json["title"])
+	tree_root.set_metadata(0, "title")
 	for obj in current_page_json["content"]:
 		var instance = _render_content(obj)
 		current_page_content.append(instance)
-		var tree_item = object_tree.create_item(tree_root)
+		
+		var tree_item:TreeItem = tree_root.create_child()
 		tree_item.set_text(0, obj["type"])
+		tree_item.set_metadata(0, obj["type"])
 
 func _render_content(obj:Dictionary) -> Control:
 	var instance:Control
@@ -334,11 +338,11 @@ func _on_new_project_pressed() -> void: pass ## TODO
 
 func _on_page_select_item_selected(index: int) -> void: pass ## TODO
 
-func _on_new_page_pressed() -> void: new_page(page_line_edit.text, current_project_filepath)
+func _on_new_page_pressed() -> void: new_page(page_filename_edit.text, current_project_filepath)
 
 func _on_load_page_pressed() -> void:
-	page_line_edit.text = Utils.endify(page_line_edit.text, ".json")
-	load_page(page_line_edit.text)
+	page_filename_edit.text = Utils.endify(page_filename_edit.text, ".json")
+	load_page(page_filename_edit.text)
 	
 func _on_save_page_pressed() -> void: save_page(current_page_filepath)
 
@@ -379,8 +383,15 @@ func _on_save_text_edits_pressed() -> void:
 	cache_changes(true)
 
 func _on_object_tree_cell_selected() -> void:
-	var i = object_tree.get_selected().get_index()
-	open_edit_content(get_content_at(i))
+	var tree_item:TreeItem = object_tree.get_selected()
+	match tree_item.get_metadata(0):
+		"title":
+			top_tab_container.current_tab = TOP_TABS.PAGE_T
+			page_title_edit.grab_focus()
+			return
+		_:
+			var i:int = tree_item.get_index()
+			open_edit_content(get_content_at(i))
 	
 ## BOTTOM TAB
 func _on_json_edit_context_menu_pressed(id:int, trigger_id:int) -> void:
