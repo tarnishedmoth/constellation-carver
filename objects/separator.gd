@@ -3,7 +3,7 @@ class_name ConstellationSeparator extends Control
 const TEMPLATE = {
 	"type": "separator"
 }
-
+const _type:String = "separator"
 func _init() -> void:
 	# TODO figure out exactly how big this has to be
 	self.custom_minimum_size = Vector2i(240, 12)

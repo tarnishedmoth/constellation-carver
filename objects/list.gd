@@ -4,7 +4,7 @@ const TEMPLATE = {
 	"type": "list",
 	"items": ["Lorem ipsum dolor sit amet consectetur adipiscing elit."]
 }
-
+const _type:String = "list"
 var _items:Array:
 	set(value):
 		_items = value
@@ -16,6 +16,7 @@ var style:Style:
 
 func _prepare_text(t:String) -> String:
 	var f:String = t
+	f = f.insert(0, char(8226) + " ") # Bullet point
 	
 	# RichTextLabel uses bbcode for text alignment
 	if style:
@@ -23,7 +24,6 @@ func _prepare_text(t:String) -> String:
 			f = f.insert(0, "[center]")
 		elif style.text_align == "right":
 			f = f.insert(0, "[right]")
-	
 	f = TextFormatting.replace(f, TextFormatting.TYPES.BOLD)
 	f = TextFormatting.replace(f, TextFormatting.TYPES.ITALIC)
 	

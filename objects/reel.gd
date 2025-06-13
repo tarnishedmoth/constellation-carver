@@ -10,6 +10,7 @@ const TEMPLATE = {
 	"frames": []
 	#frame-duration default 2, irange 1-1800. Divide 30 by this for framerate
 }
+const _type:String = "reel"
 var _size:Vector2i:
 	get:
 		return Vector2i(_width, _height)

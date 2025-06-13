@@ -1,5 +1,7 @@
 class_name MainScreen extends Control
 
+const APP_NAME:String = "Constellation Carver v0.1"
+
 const PAGE_TEMPLATE:Array = [
 	ConstellationParagraph.TEMPLATE
 ]
@@ -30,17 +32,24 @@ var selected_editable:Control
 		log_console = value
 		Utils.log_console = log_console
 @onready var pd_display: Control = %PDDisplay
+# PAGE
 @onready var page_line_edit: LineEdit = %PageLineEdit
 @onready var page_select: OptionButton = %PageSelect
+# OBJECT
 @onready var new_object_menu: MenuButton = %NewObjectMenu
-
+@onready var selected_object_type: Label = %ObjectType
+@onready var object_tree: Tree = %ObjectTree
+# CONTENT
 @onready var content_text_edit: TextEdit = %ContentTextEdit
 @onready var content_line_edit: LineEdit = %ContentLineEdit
-
+@onready var content_tree: Tree = %ContentTree
+@onready var content_empty_label: Label = %ContentEmptyLabel
+# JSON
 @onready var json_edit: CodeEdit = %JSONEdit
 var json_edit_is_word_wrap:bool = false
 
 func _ready() -> void:
+	%ApplicationName.text = APP_NAME
 	# Menu initial states
 	%TopTabContainer.current_tab = 1 # Page tab
 	%BottomTabContainer.current_tab = 2 # JSON tab
@@ -69,8 +78,8 @@ func load_page(filepath) -> void:
 		render_current_page_content()
 				
 func render_current_page_content() -> void:
-	cache_changes()
 	selected_editable = null
+	object_tree.clear()
 	reset_editables()
 	
 	for child in pd_display.get_children():
@@ -79,9 +88,13 @@ func render_current_page_content() -> void:
 	current_page_content.clear()
 	
 	l("Page name: [b]"+current_page_json["title"]+"[/b]")
+	var tree_root = object_tree.create_item()
+	tree_root.set_text(0, current_page_json["title"])
 	for obj in current_page_json["content"]:
 		var instance = _render_content(obj)
 		current_page_content.append(instance)
+		var tree_item = object_tree.create_item(tree_root)
+		tree_item.set_text(0, obj["type"])
 
 func _render_content(obj:Dictionary) -> Control:
 	var instance:Control
@@ -146,9 +159,19 @@ func _render_content(obj:Dictionary) -> Control:
 	return instance
 	
 func reset_editables() -> void:
-	%ContentEmptyLabel.show()
+	#if selected_editable: selected_editable.self_modulate = Color.WHITE
+	
+	selected_object_type.text = "No object selected."
+	content_empty_label.show()
+	
 	content_line_edit.hide()
+	content_line_edit.clear()
+	
 	content_text_edit.hide()
+	content_text_edit.clear()
+	
+	content_tree.hide()
+	content_tree.clear()
 
 func save_page(filepath) -> void:
 	cache_changes()
@@ -156,13 +179,20 @@ func save_page(filepath) -> void:
 	var formatted = Particles.stringify(current_page_json)
 	var result = Particles.save_json_to_file(formatted, filepath)
 	
-func cache_changes():
+	if result == true:
+		%ApplicationName.text = APP_NAME
+	
+func cache_changes(refresh:bool = false):
 	var index:int = 0
 	for item:Control in current_page_content:
 		if not item == null:
 			if item.has_method("to_dict"):
 				current_page_json.content[index] = item.to_dict()
 		index += 1
+	
+	%ApplicationName.text = APP_NAME + " - unsaved changes"
+	
+	if refresh: render_current_page_content()
 	
 func new_page(title:String, dirpath:String, overwrite:bool = false) -> void:
 	var new_page_json:String = ParticleParser.pagify(PAGE_TEMPLATE)
@@ -180,6 +210,8 @@ func new_page(title:String, dirpath:String, overwrite:bool = false) -> void:
 				return
 	
 	ParticleParser.save_json_to_file(new_page_json, filepath)
+	await  get_tree().process_frame
+	load_page(filepath)
 	
 func add_content(content:Dictionary, index:int = -1) -> void:
 	if not current_page_json:
@@ -205,16 +237,33 @@ func open_edit_content(instance:Control) -> void:
 	reset_editables()
 	# Show Objects tab
 	%TopTabContainer.current_tab = 2
+	
 	selected_editable = instance
 	json_edit.text = str(selected_editable) # Uses _to_string() of instance
+	if "_type" in selected_editable:
+		selected_object_type.text = "Now editing: " + selected_editable._type + "  -  "
+		selected_object_type.text += "Indexed at %s / %s." % [current_page_content.find(selected_editable), current_page_content.size()-1]
 	
-	#if selected_editable is ConstellationButton:
-		#%ContentEmptyLabel.hide()
-		#content_line_edit.text = selected_editable["_label"]
-		#content_line_edit.show()
+	if selected_editable is ConstellationButton:
+		content_empty_label.hide()
+		content_line_edit.text = selected_editable["_label"]
+		content_line_edit.show()
+	
+	if selected_editable is ConstellationList:
+		content_empty_label.hide()
+		content_text_edit.show()
+		content_tree.show()
+		content_tree.clear()
+		var root = content_tree.create_item()
+		root.set_text(0, "List")
+		var index:int = 0
+		for item in selected_editable._items:
+			var tree_item = content_tree.create_item(root, index)
+			tree_item.set_text(0, item)
+			index += 1
 	
 	if "_text" in selected_editable:
-		%ContentEmptyLabel.hide()
+		content_empty_label.hide()
 		content_text_edit.text = selected_editable["_text"]
 		content_text_edit.show()
 	
@@ -234,6 +283,9 @@ func _on_json_edit_context_menu_pressed(id:int, trigger_id:int) -> void:
 			json_edit.wrap_mode = TextEdit.LINE_WRAPPING_BOUNDARY
 		else:
 			json_edit.wrap_mode = TextEdit.LINE_WRAPPING_NONE
+	
+func _on_content_tree_item_selected() -> void:
+	content_text_edit.text = content_tree.get_selected().get_text(0)
 	
 func l(item) -> void: Utils.l(item)
 
@@ -259,9 +311,21 @@ func _on_force_refresh_pressed() -> void: render_current_page_content()
 
 
 func _on_save_text_edits_pressed() -> void:
-	selected_editable._text = content_text_edit.text
-
+	if selected_editable is ConstellationParagraph:
+		selected_editable._text = content_text_edit.text
+	elif selected_editable is ConstellationBlockquote:
+		selected_editable._text = content_text_edit.text
+		
+	elif selected_editable is ConstellationList:
+		var tree_item = content_tree.get_selected()
+		tree_item.set_text(0, content_text_edit.text)
+		selected_editable._items[tree_item.get_index()] = tree_item.get_text(0)
+	
+	#selected_editable._text = content_text_edit.text
+	cache_changes(true)
 
 func _on_delete_selected_pressed() -> void:
 	current_page_content.erase(selected_editable)
 	selected_editable.queue_free()
+	await get_tree().process_frame
+	cache_changes()

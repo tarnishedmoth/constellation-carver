@@ -10,6 +10,8 @@ const TEMPLATE = {
 	"pixels": ""
 }
 
+const _type:String = "image"
+
 var _width:int:
 	set(value):
 		_width = value

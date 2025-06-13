@@ -6,6 +6,8 @@ const TEMPLATE = {
 	"action": "."
 }
 
+const _type:String = "button"
+
 var _label:String:
 	set(value):
 		_label = value

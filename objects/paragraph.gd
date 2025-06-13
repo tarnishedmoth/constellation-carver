@@ -4,7 +4,7 @@ const TEMPLATE = {
 	"type": "paragraph",
 	"text": "Lorem ipsum dolor sit amet consectetur adipiscing elit."
 }
-
+const _type:String = "paragraph"
 var _text:String:
 	set(value):
 		_text = value

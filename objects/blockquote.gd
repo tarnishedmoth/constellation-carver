@@ -4,6 +4,7 @@ const TEMPLATE = {
 	"type": "blockquote",
 	"text": "Lorem ipsum dolor sit amet consectetur adipiscing elit."
 }
+const _type:String = "blockquote"
 
 var _text:String:
 	set(value):
