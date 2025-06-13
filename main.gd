@@ -1,6 +1,20 @@
 class_name MainScreen extends Control
 
+#region MEMORY
 const APP_NAME:String = "Constellation Carver v0.1"
+
+enum TOP_TABS {
+	PROJECT_T = 0,
+	PAGE_T = 1,
+	OBJECTS_T = 2,
+	DEBUG_T = 3
+}
+enum BOTTOM_TABS {
+	CONTENT_T = 0,
+	STYLE_T = 1,
+	JSON_T = 2
+}
+
 
 const PAGE_TEMPLATE:Array = [
 	ConstellationParagraph.TEMPLATE
@@ -26,12 +40,17 @@ var current_page_content: Array = []
 
 var selected_editable:Control
 
+# SPACES
 @onready var special_popup_window: SpecialPopupWindow = $SpecialPopupWindow
 @onready var log_console: RichTextLabel = %LogConsole:
 	set(value):
 		log_console = value
 		Utils.log_console = log_console
+		
+@onready var top_tab_container: TabContainer = %TopTabContainer
 @onready var pd_display: Control = %PDDisplay
+@onready var bottom_tab_container: TabContainer = %BottomTabContainer
+
 # PAGE
 @onready var page_line_edit: LineEdit = %PageLineEdit
 @onready var page_select: OptionButton = %PageSelect
@@ -48,11 +67,14 @@ var selected_editable:Control
 @onready var json_edit: CodeEdit = %JSONEdit
 var json_edit_is_word_wrap:bool = false
 
+#endregion
+#region VIRTUALS
+
 func _ready() -> void:
 	%ApplicationName.text = APP_NAME
 	# Menu initial states
-	%TopTabContainer.current_tab = 1 # Page tab
-	%BottomTabContainer.current_tab = 2 # JSON tab
+	%TopTabContainer.current_tab = TOP_TABS.PAGE_T # Page tab
+	%BottomTabContainer.current_tab = BOTTOM_TABS.JSON_T # JSON tab
 	
 	Utils.log_console = log_console
 	
@@ -62,6 +84,9 @@ func _ready() -> void:
 	context_menu.id_pressed.connect(_on_json_edit_context_menu_pressed.bind(id))
 	
 	l("Application initialized.")
+	
+#endregion
+#region PAGES
 
 func load_page(filepath) -> void:
 	var _filepath:String = current_project_filepath + "/" + filepath
@@ -161,22 +186,6 @@ func _render_content(obj:Dictionary) -> Control:
 		if "style" in instance:
 			instance.style = Particles.read_style(obj["style"])
 	return instance
-	
-func reset_editables() -> void:
-	if selected_editable: l("Deselected.")
-	selected_editable = null
-	
-	selected_object_type.text = "No object selected."
-	content_empty_label.show()
-	
-	content_line_edit.hide()
-	content_line_edit.clear()
-	
-	content_text_edit.hide()
-	content_text_edit.clear()
-	
-	content_tree.hide()
-	content_tree.clear()
 
 func save_page(filepath) -> void:
 	cache_changes()
@@ -244,10 +253,29 @@ func add_content(content:Dictionary, index:int = -1) -> void:
 func remove_content_at(index:int) -> void:
 	pass
 	
+#endregion
+#region EDITING
+
+func reset_editables() -> void: ## Called typically by changing focus with mouse click, or saving and loading.
+	if selected_editable: l("Deselected.")
+	selected_editable = null
+	
+	selected_object_type.text = "No object selected."
+	content_empty_label.show()
+	
+	content_line_edit.hide()
+	content_line_edit.clear()
+	
+	content_text_edit.hide()
+	content_text_edit.clear()
+	
+	content_tree.hide()
+	content_tree.clear()
+
 func open_edit_content(instance:Control) -> void:
 	reset_editables()
 	# Show Objects tab
-	%TopTabContainer.current_tab = 2
+	%TopTabContainer.current_tab = TOP_TABS.OBJECTS_T
 	
 	selected_editable = instance
 	json_edit.text = str(selected_editable) # Uses _to_string() of instance
@@ -286,6 +314,9 @@ func open_edit_content(instance:Control) -> void:
 			%StyleTextAlignContainer.show()
 			%StyleTextAlign.select(selected_editable.style.get_align_int())
 			
+#endregion
+#region SIGNAL HANDLERS
+
 func _on_json_edit_context_menu_pressed(id:int, trigger_id:int) -> void:
 	if id == trigger_id:
 		json_edit_is_word_wrap = !json_edit_is_word_wrap
@@ -306,9 +337,7 @@ func _on_load_project_pressed() -> void: pass
 func _on_save_project_pressed() -> void: pass
 func _on_new_project_pressed() -> void: pass ## TODO
 
-func _on_page_select_item_selected(index: int) -> void:
-	## TODO
-	pass
+func _on_page_select_item_selected(index: int) -> void: pass ## TODO
 
 func _on_new_page_pressed() -> void: new_page(page_line_edit.text, current_project_filepath)
 
@@ -316,12 +345,21 @@ func _on_load_page_pressed() -> void:
 	page_line_edit.text = Utils.endify(page_line_edit.text, ".json")
 	load_page(page_line_edit.text)
 	
-
 func _on_save_page_pressed() -> void: save_page(current_page_filepath)
-
 
 func _on_force_refresh_pressed() -> void: render_current_page_content()
 
+## Deletes selected editable object
+func _on_delete_selected_pressed() -> void:
+	current_page_content.erase(selected_editable)
+	selected_editable.queue_free()
+	await get_tree().process_frame
+	cache_changes()
+
+func _on_page_title_edit_text_changed(new_text: String) -> void:
+	current_page_json["title"] = new_text
+	l("Page title modified.")
+	cache_changes()
 
 func _on_save_text_edits_pressed() -> void:
 	if selected_editable is ConstellationParagraph:
@@ -336,15 +374,3 @@ func _on_save_text_edits_pressed() -> void:
 	
 	#selected_editable._text = content_text_edit.text
 	cache_changes(true)
-
-func _on_delete_selected_pressed() -> void:
-	current_page_content.erase(selected_editable)
-	selected_editable.queue_free()
-	await get_tree().process_frame
-	cache_changes()
-
-
-func _on_page_title_edit_text_changed(new_text: String) -> void:
-	current_page_json["title"] = new_text
-	l("Page title modified.")
-	cache_changes()
