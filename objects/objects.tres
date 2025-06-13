@@ -1,4 +1,9 @@
-[gd_resource type="Theme" load_steps=10 format=3 uid="uid://ct03hqqci348h"]
+[gd_resource type="Theme" load_steps=14 format=3 uid="uid://ct03hqqci348h"]
+
+[ext_resource type="FontFile" uid="uid://bec1e5bv27s6c" path="res://assets/fonts/Roboto-Bold.ttf" id="1_vcnri"]
+[ext_resource type="FontFile" uid="uid://7yjs7lvchc7i" path="res://assets/fonts/Roboto-BoldItalic.ttf" id="2_yynoe"]
+[ext_resource type="FontFile" uid="uid://q2oe418emaa6" path="res://assets/fonts/Roboto-Italic.ttf" id="3_k4ace"]
+[ext_resource type="FontFile" uid="uid://bs0a5sycrdrkv" path="res://assets/fonts/Roboto-Regular.ttf" id="4_2vsu8"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_g6vmp"]
 bg_color = Color(0.219501, 0.219501, 0.219501, 1)
@@ -82,6 +87,7 @@ content_margin_left = 20.0
 content_margin_right = 20.0
 
 [resource]
+default_font = ExtResource("4_2vsu8")
 default_font_size = 14
 Button/colors/font_color = Color(1, 1, 1, 1)
 Button/colors/font_focus_color = Color(1, 1, 1, 1)
@@ -99,5 +105,9 @@ Panel/styles/panel = SubResource("StyleBoxFlat_e7sc1")
 PanelContainer/styles/panel = SubResource("StyleBoxFlat_dlith")
 RichTextLabel/colors/default_color = Color(0, 0, 0, 1)
 RichTextLabel/constants/line_separation = 10
+RichTextLabel/fonts/bold_font = ExtResource("1_vcnri")
+RichTextLabel/fonts/bold_italics_font = ExtResource("2_yynoe")
+RichTextLabel/fonts/italics_font = ExtResource("3_k4ace")
+RichTextLabel/fonts/normal_font = ExtResource("4_2vsu8")
 RichTextLabel/styles/focus = SubResource("StyleBoxFlat_yynoe")
 RichTextLabel/styles/normal = SubResource("StyleBoxEmpty_k4ace")

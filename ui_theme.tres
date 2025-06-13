@@ -1,4 +1,9 @@
-[gd_resource type="Theme" load_steps=23 format=3 uid="uid://c1753t6oa0y8j"]
+[gd_resource type="Theme" load_steps=27 format=3 uid="uid://c1753t6oa0y8j"]
+
+[ext_resource type="FontFile" uid="uid://bec1e5bv27s6c" path="res://assets/fonts/Roboto-Bold.ttf" id="1_mk0s6"]
+[ext_resource type="FontFile" uid="uid://bs0a5sycrdrkv" path="res://assets/fonts/Roboto-Regular.ttf" id="1_touxu"]
+[ext_resource type="FontFile" uid="uid://7yjs7lvchc7i" path="res://assets/fonts/Roboto-BoldItalic.ttf" id="2_5kxjo"]
+[ext_resource type="FontFile" uid="uid://q2oe418emaa6" path="res://assets/fonts/Roboto-Italic.ttf" id="3_g7fvb"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_touxu"]
 content_margin_left = 4.0
@@ -145,19 +150,12 @@ anti_aliasing = false
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dmjyp"]
 bg_color = Color(0, 0, 0, 1)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
 border_color = Color(1, 1, 1, 1)
+corner_detail = 6
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_uo360"]
 bg_color = Color(0, 0, 0, 1)
 border_color = Color(1, 1, 1, 1)
-corner_radius_top_left = 3
-corner_radius_top_right = 3
-corner_radius_bottom_right = 3
-corner_radius_bottom_left = 3
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_dmjyp"]
 
@@ -171,7 +169,12 @@ border_color = Color(1, 1, 1, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_wtrrt"]
 bg_color = Color(0.154876, 0.154876, 0.154876, 1)
+border_width_top = 20
+border_width_bottom = 4
+border_color = Color(0, 0, 0, 1)
+border_blend = true
 corner_detail = 5
+anti_aliasing = false
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_5y56j"]
 bg_color = Color(0, 0, 0, 1)
@@ -224,6 +227,7 @@ content_margin_right = 2.0
 content_margin_bottom = 8.0
 
 [resource]
+default_font = ExtResource("1_touxu")
 default_font_size = 14
 BoxContainer/constants/separation = 2
 Button/colors/font_color = Color(0.875, 0.875, 0.875, 1)
@@ -259,7 +263,10 @@ LineEdit/styles/focus = SubResource("StyleBoxFlat_wgsb3")
 LineEdit/styles/normal = SubResource("StyleBoxFlat_g4wr8")
 Panel/styles/panel = SubResource("StyleBoxFlat_dmjyp")
 PanelContainer/styles/panel = SubResource("StyleBoxFlat_uo360")
-RichTextLabel/fonts/italics_font = null
+RichTextLabel/fonts/bold_font = ExtResource("1_mk0s6")
+RichTextLabel/fonts/bold_italics_font = ExtResource("2_5kxjo")
+RichTextLabel/fonts/italics_font = ExtResource("3_g7fvb")
+RichTextLabel/fonts/normal_font = ExtResource("1_touxu")
 TabContainer/colors/font_hovered_color = Color(1, 1, 1, 1)
 TabContainer/colors/font_selected_color = Color(1, 1, 1, 1)
 TabContainer/constants/side_margin = 20

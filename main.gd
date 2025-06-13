@@ -33,9 +33,14 @@ var selected_editable:Control
 @onready var content_line_edit: LineEdit = %ContentLineEdit
 
 @onready var json_edit: CodeEdit = %JSONEdit
+var json_edit_is_word_wrap:bool = false
 
-
-func _ready() -> void: Utils.log_console = log_console
+func _ready() -> void:
+	Utils.log_console = log_console
+	var context_menu:PopupMenu = json_edit.get_menu()
+	var id:int = context_menu.item_count + 1
+	context_menu.add_check_item("Word Wrap", id)
+	context_menu.id_pressed.connect(_on_json_edit_context_menu_pressed.bind(id))
 
 func load_page(filepath) -> void:
 	var _filepath:String = current_project_filepath + "/" + filepath
@@ -186,6 +191,17 @@ func open_edit_content(instance:Control) -> void:
 			%StyleEmptyLabel.hide()
 			%StyleTextAlignContainer.show()
 			%StyleTextAlign.select(selected_editable.style.get_align_int())
+			
+func _on_json_edit_context_menu_pressed(id:int, trigger_id:int) -> void:
+	if id == trigger_id:
+		json_edit_is_word_wrap = !json_edit_is_word_wrap
+		var index:int = json_edit.get_menu().get_item_index(trigger_id)
+		json_edit.get_menu().set_item_checked(index, json_edit_is_word_wrap)
+		
+		if json_edit_is_word_wrap:
+			json_edit.wrap_mode = TextEdit.LINE_WRAPPING_BOUNDARY
+		else:
+			json_edit.wrap_mode = TextEdit.LINE_WRAPPING_NONE
 	
 func l(item) -> void: Utils.l(item)
 
