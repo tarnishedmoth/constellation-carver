@@ -354,6 +354,14 @@ func _on_force_refresh_pressed() -> void: render_current_page_content()
 
 ## Deletes selected editable object
 func _on_delete_selected_pressed() -> void:
+	var result = await special_popup_window.popup(
+		"Are you sure you want to delete this content?",
+		"Delete Selected Content",
+		true
+	)
+	if not result: # Cancel
+		return
+	
 	current_page_content.erase(selected_editable)
 	selected_editable.queue_free()
 	await get_tree().process_frame
