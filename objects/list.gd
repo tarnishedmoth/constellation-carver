@@ -1,7 +1,5 @@
 class_name ConstellationList extends RichTextLabel
 
-const FONT = preload("res://objects/paragraph_font.tres")
-
 const TEMPLATE = {
 	"type": "list",
 	"items": ["Lorem ipsum dolor sit amet consectetur adipiscing elit."]

@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://dle4w1sl7v6dy" path="res://main.gd" id="1_ig7tw"]
 [ext_resource type="Theme" uid="uid://ct03hqqci348h" path="res://objects/objects.tres" id="2_0xm2m"]
-[ext_resource type="Theme" uid="uid://cqehbobkyys36" path="res://ui_theme.tres" id="3_h2yge"]
+[ext_resource type="Theme" uid="uid://c1753t6oa0y8j" path="res://ui_theme.tres" id="3_h2yge"]
 [ext_resource type="Script" uid="uid://s8wdifckchem" path="res://new_object_menu.gd" id="4_1bvp3"]
 
 [node name="Main" type="Control"]
@@ -162,6 +162,7 @@ text = "Force Refresh"
 custom_minimum_size = Vector2(400, 240)
 layout_mode = 2
 size_flags_horizontal = 4
+theme = ExtResource("2_0xm2m")
 horizontal_scroll_mode = 0
 vertical_scroll_mode = 3
 
@@ -172,12 +173,11 @@ custom_minimum_size = Vector2(400, 240)
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
-theme = ExtResource("2_0xm2m")
 
 [node name="PanelContainer2" type="PanelContainer" parent="VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
-theme = ExtResource("2_0xm2m")
+theme = ExtResource("3_h2yge")
 
 [node name="TabContainer" type="TabContainer" parent="VBoxContainer/PanelContainer2"]
 layout_mode = 2
@@ -205,14 +205,21 @@ visible = false
 layout_mode = 2
 text = "Cancel"
 
-[node name="Spacer" type="Control" parent="VBoxContainer/PanelContainer2/TabContainer/Text/HBoxContainer"]
+[node name="ApplicationName" type="RichTextLabel" parent="VBoxContainer/PanelContainer2/TabContainer/Text/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
+bbcode_enabled = true
+text = "[center][i]Constellation Carver v0.1[/i]"
 
 [node name="SaveTextEdits" type="Button" parent="VBoxContainer/PanelContainer2/TabContainer/Text/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 8
 text = "Save Changes"
+
+[node name="JSON" type="VBoxContainer" parent="VBoxContainer/PanelContainer2/TabContainer"]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 1
 
 [connection signal="pressed" from="VBoxContainer/PanelContainer/TabContainer/Project/NewProject" to="." method="_on_new_project_pressed"]
 [connection signal="pressed" from="VBoxContainer/PanelContainer/TabContainer/Project/LoadProject" to="." method="_on_load_project_pressed"]

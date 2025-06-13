@@ -1,7 +1,5 @@
 class_name ConstellationSeparator extends Control
 
-const FONT = preload("res://objects/paragraph_font.tres")
-
 const TEMPLATE = {
 	"type": "separator"
 }
