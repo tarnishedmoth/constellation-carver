@@ -1,4 +1,4 @@
-[gd_resource type="Theme" load_steps=15 format=3 uid="uid://c1753t6oa0y8j"]
+[gd_resource type="Theme" load_steps=20 format=3 uid="uid://c1753t6oa0y8j"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_touxu"]
 content_margin_left = 4.0
@@ -187,6 +187,34 @@ corner_radius_bottom_right = 20
 corner_radius_bottom_left = 20
 anti_aliasing = false
 
+[sub_resource type="StyleBoxLine" id="StyleBoxLine_dmjyp"]
+color = Color(1, 1, 1, 1)
+thickness = 4
+vertical = true
+
+[sub_resource type="StyleBoxLine" id="StyleBoxLine_touxu"]
+content_margin_right = 5.0
+color = Color(1, 1, 1, 1)
+thickness = 5
+vertical = true
+
+[sub_resource type="StyleBoxLine" id="StyleBoxLine_2pn01"]
+color = Color(1, 1, 1, 1)
+thickness = 6
+vertical = true
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_2pn01"]
+content_margin_left = 2.0
+content_margin_top = 8.0
+content_margin_right = 2.0
+content_margin_bottom = 8.0
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_tbeor"]
+content_margin_left = 2.0
+content_margin_top = 8.0
+content_margin_right = 2.0
+content_margin_bottom = 8.0
+
 [resource]
 default_font_size = 14
 BoxContainer/constants/separation = 2
@@ -225,3 +253,8 @@ RichTextLabel/fonts/italics_font = null
 TextEdit/constants/line_spacing = 10
 TextEdit/styles/focus = SubResource("StyleBoxFlat_5y56j")
 TextEdit/styles/normal = SubResource("StyleBoxFlat_tpf0h")
+VScrollBar/styles/grabber = SubResource("StyleBoxLine_dmjyp")
+VScrollBar/styles/grabber_highlight = SubResource("StyleBoxLine_touxu")
+VScrollBar/styles/grabber_pressed = SubResource("StyleBoxLine_2pn01")
+VScrollBar/styles/scroll = SubResource("StyleBoxEmpty_2pn01")
+VScrollBar/styles/scroll_focus = SubResource("StyleBoxEmpty_tbeor")

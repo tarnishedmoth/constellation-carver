@@ -92,6 +92,8 @@ func _render_content(obj:Dictionary) -> Control:
 		"button":
 			l("[b]New button![/b]")
 			l("Label reads " + obj["label"])
+			instance = ConstellationButton.new(obj["label"], obj["action"])
+			if "prelabel" in obj: instance._prelabel = obj["prelabel"]
 			
 		"separator":
 			l("[b]New separator![/b]")
@@ -107,6 +109,14 @@ func _render_content(obj:Dictionary) -> Control:
 		
 		"reel":
 			l("[b]New reel![/b]")
+			instance = ConstellationReel.new(
+				obj["width"],
+				obj["height"],
+				obj["frames"]
+			)
+			if "frame-duration" in obj:
+				instance._frame_duration = obj["frame-duration"]
+				
 		_:
 			push_error("[b]Found an anomoly! Dafuq?[/b]")
 	if not is_instance_valid(instance): return null
