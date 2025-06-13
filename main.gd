@@ -316,25 +316,17 @@ func open_edit_content(instance:Control) -> void:
 			
 func get_index_of(content:Object) -> int: ## Returns -1 for bad value
 	return current_page_content.find(content)
+	
+## Returns instance from [member current_page_content]
+func get_content_at(index:int) -> Object:
+	return current_page_content[index]
 		
 #endregion
+
+func l(item) -> void: Utils.l(item)
 #region SIGNAL HANDLERS
 
-func _on_json_edit_context_menu_pressed(id:int, trigger_id:int) -> void:
-	if id == trigger_id:
-		json_edit_is_word_wrap = !json_edit_is_word_wrap
-		var index:int = json_edit.get_menu().get_item_index(trigger_id)
-		json_edit.get_menu().set_item_checked(index, json_edit_is_word_wrap)
-		
-		if json_edit_is_word_wrap:
-			json_edit.wrap_mode = TextEdit.LINE_WRAPPING_BOUNDARY
-		else:
-			json_edit.wrap_mode = TextEdit.LINE_WRAPPING_NONE
-	
-func _on_content_tree_item_selected() -> void:
-	content_text_edit.text = content_tree.get_selected().get_text(0)
-	
-func l(item) -> void: Utils.l(item)
+## TOP TAB
 
 func _on_load_project_pressed() -> void: pass
 func _on_save_project_pressed() -> void: pass
@@ -385,3 +377,22 @@ func _on_save_text_edits_pressed() -> void:
 	
 	#selected_editable._text = content_text_edit.text
 	cache_changes(true)
+
+func _on_object_tree_cell_selected() -> void:
+	var i = object_tree.get_selected().get_index()
+	open_edit_content(get_content_at(i))
+	
+## BOTTOM TAB
+func _on_json_edit_context_menu_pressed(id:int, trigger_id:int) -> void:
+	if id == trigger_id:
+		json_edit_is_word_wrap = !json_edit_is_word_wrap
+		var index:int = json_edit.get_menu().get_item_index(trigger_id)
+		json_edit.get_menu().set_item_checked(index, json_edit_is_word_wrap)
+		
+		if json_edit_is_word_wrap:
+			json_edit.wrap_mode = TextEdit.LINE_WRAPPING_BOUNDARY
+		else:
+			json_edit.wrap_mode = TextEdit.LINE_WRAPPING_NONE
+
+func _on_content_tree_item_selected() -> void:
+	content_text_edit.text = content_tree.get_selected().get_text(0)
