@@ -88,6 +88,8 @@ func render_current_page_content() -> void:
 	current_page_content.clear()
 	
 	l("Page name: [b]"+current_page_json["title"]+"[/b]")
+	%PageTitleEdit.text = current_page_json["title"]
+	
 	var tree_root = object_tree.create_item()
 	tree_root.set_text(0, current_page_json["title"])
 	for obj in current_page_json["content"]:
@@ -329,3 +331,7 @@ func _on_delete_selected_pressed() -> void:
 	selected_editable.queue_free()
 	await get_tree().process_frame
 	cache_changes()
+
+
+func _on_page_title_edit_text_changed(new_text: String) -> void:
+	current_page_json["title"] = new_text
