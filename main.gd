@@ -55,10 +55,13 @@ func _ready() -> void:
 	%BottomTabContainer.current_tab = 2 # JSON tab
 	
 	Utils.log_console = log_console
+	
 	var context_menu:PopupMenu = json_edit.get_menu()
 	var id:int = context_menu.item_count + 1
 	context_menu.add_check_item("Word Wrap", id)
 	context_menu.id_pressed.connect(_on_json_edit_context_menu_pressed.bind(id))
+	
+	l("Application initialized.")
 
 func load_page(filepath) -> void:
 	var _filepath:String = current_project_filepath + "/" + filepath
@@ -78,7 +81,6 @@ func load_page(filepath) -> void:
 		render_current_page_content()
 				
 func render_current_page_content() -> void:
-	selected_editable = null
 	object_tree.clear()
 	reset_editables()
 	
@@ -87,7 +89,7 @@ func render_current_page_content() -> void:
 	
 	current_page_content.clear()
 	
-	l("Page name: [b]"+current_page_json["title"]+"[/b]")
+	l("Rendering page: [b]"+current_page_json["title"]+"[/b]")
 	%PageTitleEdit.text = current_page_json["title"]
 	
 	var tree_root = object_tree.create_item()
@@ -161,7 +163,8 @@ func _render_content(obj:Dictionary) -> Control:
 	return instance
 	
 func reset_editables() -> void:
-	#if selected_editable: selected_editable.self_modulate = Color.WHITE
+	if selected_editable: l("Deselected.")
+	selected_editable = null
 	
 	selected_object_type.text = "No object selected."
 	content_empty_label.show()
@@ -177,12 +180,15 @@ func reset_editables() -> void:
 
 func save_page(filepath) -> void:
 	cache_changes()
-	
+	l("Saving page...")
 	var formatted = Particles.stringify(current_page_json)
 	var result = Particles.save_json_to_file(formatted, filepath)
 	
 	if result == true:
+		l("Save success!")
 		%ApplicationName.text = APP_NAME
+	else:
+		l(Utils.bold("Save failed!"))
 	
 func cache_changes(refresh:bool = false):
 	var index:int = 0
@@ -191,6 +197,8 @@ func cache_changes(refresh:bool = false):
 			if item.has_method("to_dict"):
 				current_page_json.content[index] = item.to_dict()
 		index += 1
+	
+	l("Cached %s items." % [index])
 	
 	%ApplicationName.text = APP_NAME + " - unsaved changes"
 	
@@ -205,13 +213,14 @@ func new_page(title:String, dirpath:String, overwrite:bool = false) -> void:
 			# Warn the user
 			var result = await special_popup_window.popup(
 				"File already exists.\nErase and overwrite?\n\n(You will permanently lose this data!)",
-				"Warning",
+				"New Page - Warning",
 				true
 			)
 			if not result: # Cancel
 				return
 	
 	ParticleParser.save_json_to_file(new_page_json, filepath)
+	l(Utils.bold("New page created and saved!"))
 	await  get_tree().process_frame
 	load_page(filepath)
 	
@@ -243,8 +252,10 @@ func open_edit_content(instance:Control) -> void:
 	selected_editable = instance
 	json_edit.text = str(selected_editable) # Uses _to_string() of instance
 	if "_type" in selected_editable:
+		var index = current_page_content.find(selected_editable)
+		l("Selected %s to edit at index %s" % [selected_editable._type, index])
 		selected_object_type.text = "Now editing: " + selected_editable._type + "  -  "
-		selected_object_type.text += "Indexed at %s / %s." % [current_page_content.find(selected_editable), current_page_content.size()-1]
+		selected_object_type.text += "Indexed at %s / %s." % [index, current_page_content.size()-1]
 	
 	if selected_editable is ConstellationButton:
 		content_empty_label.hide()
@@ -335,3 +346,5 @@ func _on_delete_selected_pressed() -> void:
 
 func _on_page_title_edit_text_changed(new_text: String) -> void:
 	current_page_json["title"] = new_text
+	l("Page title modified.")
+	cache_changes()
