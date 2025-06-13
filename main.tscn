@@ -48,15 +48,15 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="PanelContainer" type="PanelContainer" parent="VBoxContainer"]
+[node name="TopContainer" type="PanelContainer" parent="VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
 theme = ExtResource("3_h2yge")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/PanelContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/TopContainer"]
 layout_mode = 2
 
-[node name="ApplicationName" type="RichTextLabel" parent="VBoxContainer/PanelContainer/VBoxContainer"]
+[node name="ApplicationName" type="RichTextLabel" parent="VBoxContainer/TopContainer/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
@@ -68,34 +68,34 @@ scroll_active = false
 autowrap_mode = 0
 horizontal_alignment = 1
 
-[node name="TopTabContainer" type="TabContainer" parent="VBoxContainer/PanelContainer/VBoxContainer"]
+[node name="TopTabContainer" type="TabContainer" parent="VBoxContainer/TopContainer/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
-current_tab = 3
+current_tab = 2
 tabs_position = 1
 
-[node name="Project" type="VBoxContainer" parent="VBoxContainer/PanelContainer/VBoxContainer/TopTabContainer"]
+[node name="Project" type="VBoxContainer" parent="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer"]
 visible = false
 layout_mode = 2
 metadata/_tab_index = 0
 
-[node name="NewProject" type="Button" parent="VBoxContainer/PanelContainer/VBoxContainer/TopTabContainer/Project"]
+[node name="NewProject" type="Button" parent="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Project"]
 visible = false
 layout_mode = 2
 text = "New Project"
 
-[node name="LoadProject" type="Button" parent="VBoxContainer/PanelContainer/VBoxContainer/TopTabContainer/Project"]
+[node name="LoadProject" type="Button" parent="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Project"]
 visible = false
 layout_mode = 2
 text = "Load Project"
 
-[node name="SaveProject" type="Button" parent="VBoxContainer/PanelContainer/VBoxContainer/TopTabContainer/Project"]
+[node name="SaveProject" type="Button" parent="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Project"]
 visible = false
 layout_mode = 2
 text = "Save Project"
 
-[node name="Label" type="Label" parent="VBoxContainer/PanelContainer/VBoxContainer/TopTabContainer/Project"]
+[node name="Label" type="Label" parent="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Project"]
 layout_mode = 2
 size_flags_vertical = 6
 text = "This menu non-functional.
@@ -103,17 +103,17 @@ Please use the Page tab to edit pages."
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Page" type="VBoxContainer" parent="VBoxContainer/PanelContainer/VBoxContainer/TopTabContainer"]
+[node name="Page" type="VBoxContainer" parent="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer"]
 visible = false
 layout_mode = 2
 alignment = 2
 metadata/_tab_index = 1
 
-[node name="NewPage" type="Button" parent="VBoxContainer/PanelContainer/VBoxContainer/TopTabContainer/Page"]
+[node name="NewPage" type="Button" parent="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Page"]
 layout_mode = 2
 text = "New Page"
 
-[node name="PageSelect" type="OptionButton" parent="VBoxContainer/PanelContainer/VBoxContainer/TopTabContainer/Page"]
+[node name="PageSelect" type="OptionButton" parent="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Page"]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
@@ -124,10 +124,10 @@ popup/item_0/text = "page select"
 popup/item_0/id = 0
 popup/item_0/separator = true
 
-[node name="FileContainer" type="HBoxContainer" parent="VBoxContainer/PanelContainer/VBoxContainer/TopTabContainer/Page"]
+[node name="FileContainer" type="HBoxContainer" parent="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Page"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="VBoxContainer/PanelContainer/VBoxContainer/TopTabContainer/Page/FileContainer"]
+[node name="Label" type="Label" parent="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Page/FileContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 0.25
@@ -135,7 +135,7 @@ text = "Filename"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="PageLineEdit" type="LineEdit" parent="VBoxContainer/PanelContainer/VBoxContainer/TopTabContainer/Page/FileContainer"]
+[node name="PageLineEdit" type="LineEdit" parent="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Page/FileContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
@@ -146,10 +146,10 @@ emoji_menu_enabled = false
 select_all_on_focus = true
 caret_blink = true
 
-[node name="TitleContainer" type="HBoxContainer" parent="VBoxContainer/PanelContainer/VBoxContainer/TopTabContainer/Page"]
+[node name="TitleContainer" type="HBoxContainer" parent="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Page"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="VBoxContainer/PanelContainer/VBoxContainer/TopTabContainer/Page/TitleContainer"]
+[node name="Label" type="Label" parent="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Page/TitleContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 0.25
@@ -159,7 +159,7 @@ text = "Page Title"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="PageTitleEdit" type="LineEdit" parent="VBoxContainer/PanelContainer/VBoxContainer/TopTabContainer/Page/TitleContainer"]
+[node name="PageTitleEdit" type="LineEdit" parent="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Page/TitleContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
@@ -170,20 +170,19 @@ alignment = 1
 select_all_on_focus = true
 caret_blink = true
 
-[node name="LoadPage" type="Button" parent="VBoxContainer/PanelContainer/VBoxContainer/TopTabContainer/Page"]
+[node name="LoadPage" type="Button" parent="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Page"]
 layout_mode = 2
 text = "Load Page"
 
-[node name="SavePage" type="Button" parent="VBoxContainer/PanelContainer/VBoxContainer/TopTabContainer/Page"]
+[node name="SavePage" type="Button" parent="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Page"]
 layout_mode = 2
 text = "Save Page"
 
-[node name="Objects" type="VBoxContainer" parent="VBoxContainer/PanelContainer/VBoxContainer/TopTabContainer"]
-visible = false
+[node name="Objects" type="VBoxContainer" parent="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer"]
 layout_mode = 2
 metadata/_tab_index = 2
 
-[node name="ObjectTree" type="Tree" parent="VBoxContainer/PanelContainer/VBoxContainer/TopTabContainer/Objects"]
+[node name="ObjectTree" type="Tree" parent="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Objects"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
@@ -191,7 +190,7 @@ allow_search = false
 hide_folding = true
 scroll_horizontal_enabled = false
 
-[node name="ObjectType" type="Label" parent="VBoxContainer/PanelContainer/VBoxContainer/TopTabContainer/Objects"]
+[node name="ObjectType" type="Label" parent="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Objects"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 24)
 layout_mode = 2
@@ -199,16 +198,16 @@ text = "No object selected."
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/PanelContainer/VBoxContainer/TopTabContainer/Objects"]
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Objects"]
 layout_mode = 2
 
-[node name="DeleteSelected" type="Button" parent="VBoxContainer/PanelContainer/VBoxContainer/TopTabContainer/Objects/HBoxContainer"]
+[node name="DeleteSelected" type="Button" parent="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Objects/HBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Delete Selected Object"
 
-[node name="NewObjectMenu" type="MenuButton" parent="VBoxContainer/PanelContainer/VBoxContainer/TopTabContainer/Objects/HBoxContainer" node_paths=PackedStringArray("Main")]
+[node name="NewObjectMenu" type="MenuButton" parent="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Objects/HBoxContainer" node_paths=PackedStringArray("Main")]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
@@ -232,15 +231,16 @@ popup/item_6/id = 6
 script = ExtResource("4_1bvp3")
 Main = NodePath("../../../../../../..")
 
-[node name="Debug" type="VBoxContainer" parent="VBoxContainer/PanelContainer/VBoxContainer/TopTabContainer"]
+[node name="Debug" type="VBoxContainer" parent="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer"]
+visible = false
 layout_mode = 2
 metadata/_tab_index = 3
 
-[node name="PanelContainer" type="PanelContainer" parent="VBoxContainer/PanelContainer/VBoxContainer/TopTabContainer/Debug"]
+[node name="PanelContainer" type="PanelContainer" parent="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Debug"]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="LogConsole" type="RichTextLabel" parent="VBoxContainer/PanelContainer/VBoxContainer/TopTabContainer/Debug/PanelContainer"]
+[node name="LogConsole" type="RichTextLabel" parent="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Debug/PanelContainer"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 128)
 layout_mode = 2
@@ -255,11 +255,11 @@ scroll_following = true
 meta_underlined = false
 hint_underlined = false
 
-[node name="ForceRefresh" type="Button" parent="VBoxContainer/PanelContainer/VBoxContainer/TopTabContainer/Debug"]
+[node name="ForceRefresh" type="Button" parent="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Debug"]
 layout_mode = 2
 text = "Force Refresh"
 
-[node name="ScrollContainer" type="ScrollContainer" parent="VBoxContainer"]
+[node name="MiddleContainer" type="ScrollContainer" parent="VBoxContainer"]
 custom_minimum_size = Vector2(400, 240)
 layout_mode = 2
 size_flags_horizontal = 4
@@ -267,7 +267,7 @@ theme = ExtResource("2_0xm2m")
 horizontal_scroll_mode = 0
 vertical_scroll_mode = 3
 
-[node name="PDDisplay" type="VBoxContainer" parent="VBoxContainer/ScrollContainer"]
+[node name="PDDisplay" type="VBoxContainer" parent="VBoxContainer/MiddleContainer"]
 unique_name_in_owner = true
 clip_contents = true
 custom_minimum_size = Vector2(400, 240)
@@ -275,21 +275,21 @@ layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
 
-[node name="PanelContainer2" type="PanelContainer" parent="VBoxContainer"]
+[node name="BottomContainer" type="PanelContainer" parent="VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
 theme = ExtResource("3_h2yge")
 
-[node name="BottomTabContainer" type="TabContainer" parent="VBoxContainer/PanelContainer2"]
+[node name="BottomTabContainer" type="TabContainer" parent="VBoxContainer/BottomContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 current_tab = 0
 
-[node name="Content" type="VBoxContainer" parent="VBoxContainer/PanelContainer2/BottomTabContainer"]
+[node name="Content" type="VBoxContainer" parent="VBoxContainer/BottomContainer/BottomTabContainer"]
 layout_mode = 2
 metadata/_tab_index = 0
 
-[node name="ContentTree" type="Tree" parent="VBoxContainer/PanelContainer2/BottomTabContainer/Content"]
+[node name="ContentTree" type="Tree" parent="VBoxContainer/BottomContainer/BottomTabContainer/Content"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
@@ -299,7 +299,7 @@ hide_folding = true
 hide_root = true
 auto_tooltip = false
 
-[node name="ContentLineEdit" type="LineEdit" parent="VBoxContainer/PanelContainer2/BottomTabContainer/Content"]
+[node name="ContentLineEdit" type="LineEdit" parent="VBoxContainer/BottomContainer/BottomTabContainer/Content"]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
@@ -309,7 +309,7 @@ clear_button_enabled = true
 select_all_on_focus = true
 caret_blink = true
 
-[node name="ContentTextEdit" type="TextEdit" parent="VBoxContainer/PanelContainer2/BottomTabContainer/Content"]
+[node name="ContentTextEdit" type="TextEdit" parent="VBoxContainer/BottomContainer/BottomTabContainer/Content"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
@@ -324,7 +324,7 @@ scroll_smooth = true
 scroll_v_scroll_speed = 8.0
 caret_blink = true
 
-[node name="ContentEmptyLabel" type="Label" parent="VBoxContainer/PanelContainer2/BottomTabContainer/Content"]
+[node name="ContentEmptyLabel" type="Label" parent="VBoxContainer/BottomContainer/BottomTabContainer/Content"]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
@@ -335,35 +335,35 @@ text = "There's nothing here...
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/PanelContainer2/BottomTabContainer/Content"]
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/BottomContainer/BottomTabContainer/Content"]
 layout_mode = 2
 
-[node name="CancelTextEdits" type="Button" parent="VBoxContainer/PanelContainer2/BottomTabContainer/Content/HBoxContainer"]
+[node name="CancelTextEdits" type="Button" parent="VBoxContainer/BottomContainer/BottomTabContainer/Content/HBoxContainer"]
 visible = false
 layout_mode = 2
 text = "Cancel"
 
-[node name="Spacer" type="Control" parent="VBoxContainer/PanelContainer2/BottomTabContainer/Content/HBoxContainer"]
+[node name="Spacer" type="Control" parent="VBoxContainer/BottomContainer/BottomTabContainer/Content/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 8
 
-[node name="SaveTextEdits" type="Button" parent="VBoxContainer/PanelContainer2/BottomTabContainer/Content/HBoxContainer"]
+[node name="SaveTextEdits" type="Button" parent="VBoxContainer/BottomContainer/BottomTabContainer/Content/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Save Changes"
 
-[node name="Style" type="MarginContainer" parent="VBoxContainer/PanelContainer2/BottomTabContainer" node_paths=PackedStringArray("main")]
+[node name="Style" type="MarginContainer" parent="VBoxContainer/BottomContainer/BottomTabContainer" node_paths=PackedStringArray("main")]
 visible = false
 layout_mode = 2
 script = ExtResource("5_lquwl")
 main = NodePath("../../../..")
 metadata/_tab_index = 1
 
-[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/PanelContainer2/BottomTabContainer/Style"]
+[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/BottomContainer/BottomTabContainer/Style"]
 layout_mode = 2
 
-[node name="StyleAddMenu" type="MenuButton" parent="VBoxContainer/PanelContainer2/BottomTabContainer/Style/VBoxContainer"]
+[node name="StyleAddMenu" type="MenuButton" parent="VBoxContainer/BottomContainer/BottomTabContainer/Style/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Add a Style parameter..."
@@ -382,24 +382,24 @@ popup/item_3/text = "Scale"
 popup/item_3/checkable = 1
 popup/item_3/id = 3
 
-[node name="StyleEmptyLabel" type="Label" parent="VBoxContainer/PanelContainer2/BottomTabContainer/Style/VBoxContainer"]
+[node name="StyleEmptyLabel" type="Label" parent="VBoxContainer/BottomContainer/BottomTabContainer/Style/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 horizontal_alignment = 1
 
-[node name="StyleTextAlignContainer" type="HBoxContainer" parent="VBoxContainer/PanelContainer2/BottomTabContainer/Style/VBoxContainer"]
+[node name="StyleTextAlignContainer" type="HBoxContainer" parent="VBoxContainer/BottomContainer/BottomTabContainer/Style/VBoxContainer"]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
 
-[node name="Label" type="Label" parent="VBoxContainer/PanelContainer2/BottomTabContainer/Style/VBoxContainer/StyleTextAlignContainer"]
+[node name="Label" type="Label" parent="VBoxContainer/BottomContainer/BottomTabContainer/Style/VBoxContainer/StyleTextAlignContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Text Align"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="StyleTextAlign" type="OptionButton" parent="VBoxContainer/PanelContainer2/BottomTabContainer/Style/VBoxContainer/StyleTextAlignContainer"]
+[node name="StyleTextAlign" type="OptionButton" parent="VBoxContainer/BottomContainer/BottomTabContainer/Style/VBoxContainer/StyleTextAlignContainer"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(128, 0)
 layout_mode = 2
@@ -414,19 +414,19 @@ popup/item_1/id = 1
 popup/item_2/text = "Right"
 popup/item_2/id = 2
 
-[node name="StyleMarginsTopContainer" type="HBoxContainer" parent="VBoxContainer/PanelContainer2/BottomTabContainer/Style/VBoxContainer"]
+[node name="StyleMarginsTopContainer" type="HBoxContainer" parent="VBoxContainer/BottomContainer/BottomTabContainer/Style/VBoxContainer"]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
 
-[node name="Label" type="Label" parent="VBoxContainer/PanelContainer2/BottomTabContainer/Style/VBoxContainer/StyleMarginsTopContainer"]
+[node name="Label" type="Label" parent="VBoxContainer/BottomContainer/BottomTabContainer/Style/VBoxContainer/StyleMarginsTopContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Margin Top"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="StyleMarginTop" type="SpinBox" parent="VBoxContainer/PanelContainer2/BottomTabContainer/Style/VBoxContainer/StyleMarginsTopContainer"]
+[node name="StyleMarginTop" type="SpinBox" parent="VBoxContainer/BottomContainer/BottomTabContainer/Style/VBoxContainer/StyleMarginsTopContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 max_value = 240.0
@@ -437,19 +437,19 @@ suffix = "pixels"
 custom_arrow_step = 1.0
 select_all_on_focus = true
 
-[node name="StyleMarginsBottomContainer" type="HBoxContainer" parent="VBoxContainer/PanelContainer2/BottomTabContainer/Style/VBoxContainer"]
+[node name="StyleMarginsBottomContainer" type="HBoxContainer" parent="VBoxContainer/BottomContainer/BottomTabContainer/Style/VBoxContainer"]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
 
-[node name="Label" type="Label" parent="VBoxContainer/PanelContainer2/BottomTabContainer/Style/VBoxContainer/StyleMarginsBottomContainer"]
+[node name="Label" type="Label" parent="VBoxContainer/BottomContainer/BottomTabContainer/Style/VBoxContainer/StyleMarginsBottomContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Margin Bottom"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="StyleMarginBottom" type="SpinBox" parent="VBoxContainer/PanelContainer2/BottomTabContainer/Style/VBoxContainer/StyleMarginsBottomContainer"]
+[node name="StyleMarginBottom" type="SpinBox" parent="VBoxContainer/BottomContainer/BottomTabContainer/Style/VBoxContainer/StyleMarginsBottomContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 max_value = 240.0
@@ -460,19 +460,19 @@ suffix = "pixels"
 custom_arrow_step = 1.0
 select_all_on_focus = true
 
-[node name="StyleScaleContainer" type="HBoxContainer" parent="VBoxContainer/PanelContainer2/BottomTabContainer/Style/VBoxContainer"]
+[node name="StyleScaleContainer" type="HBoxContainer" parent="VBoxContainer/BottomContainer/BottomTabContainer/Style/VBoxContainer"]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
 
-[node name="Label" type="Label" parent="VBoxContainer/PanelContainer2/BottomTabContainer/Style/VBoxContainer/StyleScaleContainer"]
+[node name="Label" type="Label" parent="VBoxContainer/BottomContainer/BottomTabContainer/Style/VBoxContainer/StyleScaleContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Scale"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="StyleScale" type="SpinBox" parent="VBoxContainer/PanelContainer2/BottomTabContainer/Style/VBoxContainer/StyleScaleContainer"]
+[node name="StyleScale" type="SpinBox" parent="VBoxContainer/BottomContainer/BottomTabContainer/Style/VBoxContainer/StyleScaleContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 min_value = 1.0
@@ -484,28 +484,28 @@ suffix = "x"
 custom_arrow_step = 1.0
 select_all_on_focus = true
 
-[node name="BottomRow" type="HBoxContainer" parent="VBoxContainer/PanelContainer2/BottomTabContainer/Style/VBoxContainer"]
+[node name="BottomRow" type="HBoxContainer" parent="VBoxContainer/BottomContainer/BottomTabContainer/Style/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
 alignment = 2
 
-[node name="Control" type="Control" parent="VBoxContainer/PanelContainer2/BottomTabContainer/Style/VBoxContainer/BottomRow"]
+[node name="Control" type="Control" parent="VBoxContainer/BottomContainer/BottomTabContainer/Style/VBoxContainer/BottomRow"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 8
 
-[node name="StyleSaveButton" type="Button" parent="VBoxContainer/PanelContainer2/BottomTabContainer/Style/VBoxContainer/BottomRow"]
+[node name="StyleSaveButton" type="Button" parent="VBoxContainer/BottomContainer/BottomTabContainer/Style/VBoxContainer/BottomRow"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 8
 text = "Apply Changes"
 
-[node name="JSON" type="VBoxContainer" parent="VBoxContainer/PanelContainer2/BottomTabContainer"]
+[node name="JSON" type="VBoxContainer" parent="VBoxContainer/BottomContainer/BottomTabContainer"]
 visible = false
 layout_mode = 2
 metadata/_tab_index = 2
 
-[node name="JSONEdit" type="CodeEdit" parent="VBoxContainer/PanelContainer2/BottomTabContainer/JSON"]
+[node name="JSONEdit" type="CodeEdit" parent="VBoxContainer/BottomContainer/BottomTabContainer/JSON"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
@@ -519,14 +519,14 @@ gutters_draw_line_numbers = true
 auto_brace_completion_enabled = true
 auto_brace_completion_highlight_matching = true
 
-[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/PanelContainer2/BottomTabContainer/JSON"]
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/BottomContainer/BottomTabContainer/JSON"]
 layout_mode = 2
 
-[node name="Spacer" type="Control" parent="VBoxContainer/PanelContainer2/BottomTabContainer/JSON/HBoxContainer"]
+[node name="Spacer" type="Control" parent="VBoxContainer/BottomContainer/BottomTabContainer/JSON/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="SaveJSONEdits" type="Button" parent="VBoxContainer/PanelContainer2/BottomTabContainer/JSON/HBoxContainer"]
+[node name="SaveJSONEdits" type="Button" parent="VBoxContainer/BottomContainer/BottomTabContainer/JSON/HBoxContainer"]
 visible = false
 layout_mode = 2
 size_flags_horizontal = 3
@@ -592,18 +592,18 @@ size_flags_vertical = 4
 theme_override_font_sizes/font_size = 18
 text = "Confirm"
 
-[connection signal="pressed" from="VBoxContainer/PanelContainer/VBoxContainer/TopTabContainer/Project/NewProject" to="." method="_on_new_project_pressed"]
-[connection signal="pressed" from="VBoxContainer/PanelContainer/VBoxContainer/TopTabContainer/Project/LoadProject" to="." method="_on_load_project_pressed"]
-[connection signal="pressed" from="VBoxContainer/PanelContainer/VBoxContainer/TopTabContainer/Project/SaveProject" to="." method="_on_save_project_pressed"]
-[connection signal="pressed" from="VBoxContainer/PanelContainer/VBoxContainer/TopTabContainer/Page/NewPage" to="." method="_on_new_page_pressed"]
-[connection signal="item_selected" from="VBoxContainer/PanelContainer/VBoxContainer/TopTabContainer/Page/PageSelect" to="." method="_on_page_select_item_selected"]
-[connection signal="text_changed" from="VBoxContainer/PanelContainer/VBoxContainer/TopTabContainer/Page/TitleContainer/PageTitleEdit" to="." method="_on_page_title_edit_text_changed"]
-[connection signal="pressed" from="VBoxContainer/PanelContainer/VBoxContainer/TopTabContainer/Page/LoadPage" to="." method="_on_load_page_pressed"]
-[connection signal="pressed" from="VBoxContainer/PanelContainer/VBoxContainer/TopTabContainer/Page/SavePage" to="." method="_on_save_page_pressed"]
-[connection signal="pressed" from="VBoxContainer/PanelContainer/VBoxContainer/TopTabContainer/Objects/HBoxContainer/DeleteSelected" to="." method="_on_delete_selected_pressed"]
-[connection signal="pressed" from="VBoxContainer/PanelContainer/VBoxContainer/TopTabContainer/Debug/ForceRefresh" to="." method="_on_force_refresh_pressed"]
-[connection signal="item_selected" from="VBoxContainer/PanelContainer2/BottomTabContainer/Content/ContentTree" to="." method="_on_content_tree_item_selected"]
-[connection signal="pressed" from="VBoxContainer/PanelContainer2/BottomTabContainer/Content/HBoxContainer/SaveTextEdits" to="." method="_on_save_text_edits_pressed"]
+[connection signal="pressed" from="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Project/NewProject" to="." method="_on_new_project_pressed"]
+[connection signal="pressed" from="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Project/LoadProject" to="." method="_on_load_project_pressed"]
+[connection signal="pressed" from="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Project/SaveProject" to="." method="_on_save_project_pressed"]
+[connection signal="pressed" from="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Page/NewPage" to="." method="_on_new_page_pressed"]
+[connection signal="item_selected" from="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Page/PageSelect" to="." method="_on_page_select_item_selected"]
+[connection signal="text_changed" from="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Page/TitleContainer/PageTitleEdit" to="." method="_on_page_title_edit_text_changed"]
+[connection signal="pressed" from="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Page/LoadPage" to="." method="_on_load_page_pressed"]
+[connection signal="pressed" from="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Page/SavePage" to="." method="_on_save_page_pressed"]
+[connection signal="pressed" from="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Objects/HBoxContainer/DeleteSelected" to="." method="_on_delete_selected_pressed"]
+[connection signal="pressed" from="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Debug/ForceRefresh" to="." method="_on_force_refresh_pressed"]
+[connection signal="item_selected" from="VBoxContainer/BottomContainer/BottomTabContainer/Content/ContentTree" to="." method="_on_content_tree_item_selected"]
+[connection signal="pressed" from="VBoxContainer/BottomContainer/BottomTabContainer/Content/HBoxContainer/SaveTextEdits" to="." method="_on_save_text_edits_pressed"]
 [connection signal="pressed" from="SpecialPopupWindow/VBoxContainer/ButtonsHBoxContainer/Cancel" to="SpecialPopupWindow" method="_on_cancel_pressed"]
 [connection signal="pressed" from="SpecialPopupWindow/VBoxContainer/ButtonsHBoxContainer/OK" to="SpecialPopupWindow" method="_on_confirm_pressed"]
 [connection signal="pressed" from="SpecialPopupWindow/VBoxContainer/ButtonsHBoxContainer/Confirm" to="SpecialPopupWindow" method="_on_confirm_pressed"]

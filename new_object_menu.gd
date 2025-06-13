@@ -30,4 +30,8 @@ func _on_popup_id_pressed(id:int) -> void:
 		6: # Reel
 			Utils.l(Utils.bold("--New Reel"))
 	
-	Main.add_content(content.duplicate(true))
+	if is_instance_valid(Main.selected_editable):
+		Main.add_content(
+			content.duplicate(true),
+			Main.get_index_of(Main.selected_editable)
+			)

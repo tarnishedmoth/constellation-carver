@@ -314,6 +314,9 @@ func open_edit_content(instance:Control) -> void:
 			%StyleTextAlignContainer.show()
 			%StyleTextAlign.select(selected_editable.style.get_align_int())
 			
+func get_index_of(content:Object) -> int: ## Returns -1 for bad value
+	return current_page_content.find(content)
+		
 #endregion
 #region SIGNAL HANDLERS
 
