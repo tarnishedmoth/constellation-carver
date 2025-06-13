@@ -41,6 +41,10 @@ var selected_editable:Control
 var json_edit_is_word_wrap:bool = false
 
 func _ready() -> void:
+	# Menu initial states
+	%TopTabContainer.current_tab = 1 # Page tab
+	%BottomTabContainer.current_tab = 2 # JSON tab
+	
 	Utils.log_console = log_console
 	var context_menu:PopupMenu = json_edit.get_menu()
 	var id:int = context_menu.item_count + 1
@@ -65,6 +69,7 @@ func load_page(filepath) -> void:
 		render_current_page_content()
 				
 func render_current_page_content() -> void:
+	cache_changes()
 	selected_editable = null
 	reset_editables()
 	
@@ -146,15 +151,18 @@ func reset_editables() -> void:
 	content_text_edit.hide()
 
 func save_page(filepath) -> void:
+	cache_changes()
+	
+	var formatted = Particles.stringify(current_page_json)
+	var result = Particles.save_json_to_file(formatted, filepath)
+	
+func cache_changes():
 	var index:int = 0
 	for item:Control in current_page_content:
 		if not item == null:
 			if item.has_method("to_dict"):
 				current_page_json.content[index] = item.to_dict()
 		index += 1
-	
-	var formatted = Particles.stringify(current_page_json)
-	var result = Particles.save_json_to_file(formatted, filepath)
 	
 func new_page(title:String, dirpath:String, overwrite:bool = false) -> void:
 	var new_page_json:String = ParticleParser.pagify(PAGE_TEMPLATE)
@@ -177,6 +185,9 @@ func add_content(content:Dictionary, index:int = -1) -> void:
 	if not current_page_json:
 		Utils.l(Utils.ital("--Can't make a new object without a page selected!"))
 		return
+		
+	cache_changes()
+	
 	var arr:Array = current_page_json["content"]
 	if index >= 0:
 		arr.insert(index, content)
@@ -192,6 +203,8 @@ func remove_content_at(index:int) -> void:
 	
 func open_edit_content(instance:Control) -> void:
 	reset_editables()
+	# Show Objects tab
+	%TopTabContainer.current_tab = 2
 	selected_editable = instance
 	json_edit.text = str(selected_editable) # Uses _to_string() of instance
 	
@@ -247,3 +260,8 @@ func _on_force_refresh_pressed() -> void: render_current_page_content()
 
 func _on_save_text_edits_pressed() -> void:
 	selected_editable._text = content_text_edit.text
+
+
+func _on_delete_selected_pressed() -> void:
+	current_page_content.erase(selected_editable)
+	selected_editable.queue_free()
