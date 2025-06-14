@@ -539,8 +539,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 text = "Save Changes"
 
-[node name="SpecialPopupWindow" type="PanelContainer" parent="." node_paths=PackedStringArray("header", "details", "confirm_button", "ok_button", "cancel_button", "main")]
-visible = false
+[node name="SpecialPopupWindow" type="PanelContainer" parent="." node_paths=PackedStringArray("header", "line_edit", "details", "confirm_button", "ok_button", "cancel_button", "main")]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -551,6 +550,7 @@ theme = ExtResource("3_h2yge")
 theme_override_styles/panel = SubResource("StyleBoxFlat_lquwl")
 script = ExtResource("6_7mycd")
 header = NodePath("VBoxContainer/Header")
+line_edit = NodePath("VBoxContainer/LineEdit")
 details = NodePath("VBoxContainer/Details")
 confirm_button = NodePath("VBoxContainer/ButtonsHBoxContainer/Confirm")
 ok_button = NodePath("VBoxContainer/ButtonsHBoxContainer/OK")
@@ -564,6 +564,15 @@ layout_mode = 2
 layout_mode = 2
 text = "Warning"
 horizontal_alignment = 1
+
+[node name="LineEdit" type="LineEdit" parent="SpecialPopupWindow/VBoxContainer"]
+visible = false
+layout_mode = 2
+size_flags_vertical = 4
+placeholder_text = "Project Name"
+alignment = 1
+emoji_menu_enabled = false
+caret_blink = true
 
 [node name="Details" type="Label" parent="SpecialPopupWindow/VBoxContainer"]
 layout_mode = 2

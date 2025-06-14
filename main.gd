@@ -18,7 +18,10 @@ enum BOTTOM_TABS {
 
 
 const PAGE_TEMPLATE:Array = [
-	ConstellationParagraph.TEMPLATE
+	ConstellationImage.TEMPLATE,
+	ConstellationParagraph.TEMPLATE,
+	ConstellationSeparator.TEMPLATE,
+	ConstellationButton.TEMPLATE,
 ]
 
 var current_project_name: String = ""
@@ -119,14 +122,18 @@ func repopulate_project_list() -> void:
 func load_project(project_dir_path:String) -> void:
 	# TODO load assets, etc etc etc extramarital features
 	load_page(U.cat([project_dir_path, "index"]), false)
+	
+func new_project(project_name:String) -> void:
+	current_project_name = project_name
+	new_page("index")
 
 #endregion
 
 #region PAGES
 
-func load_page(filepath, in_current_project:bool = true) -> void:
+func load_page(filepath, relative:bool = true) -> void:
 	var _filepath:String
-	if in_current_project:
+	if relative:
 		_filepath = U.endify(current_project_filepath) + U.endify(filepath, ".json")
 	else:
 		_filepath = U.endify(filepath, ".json")
@@ -280,9 +287,9 @@ func cache_changes(refresh:bool = false):
 	
 	if refresh: render_current_page_content()
 	
-func new_page(title:String, overwrite:bool = false, dirpath:String = current_project_filepath) -> void:
+func new_page(filename:String, overwrite:bool = false, dirpath:String = current_project_filepath) -> void:
 	var new_page_json:String = ParticleParser.pagify(PAGE_TEMPLATE)
-	var filepath = U.endify(dirpath) + U.endify(title, ".json")
+	var filepath = U.endify(dirpath) + U.endify(filename, ".json")
 	var file_exists:bool = FileAccess.file_exists(filepath)
 	if not overwrite:
 		if file_exists:
@@ -297,8 +304,9 @@ func new_page(title:String, overwrite:bool = false, dirpath:String = current_pro
 	
 	ParticleParser.save_json_to_file(new_page_json, filepath)
 	l(U.bold("New page created and saved!"))
+	
 	await get_tree().process_frame
-	load_page(filepath)
+	load_page(filepath, false)
 	
 func add_content(content:Dictionary, index:int = -1) -> void:
 	if not current_page_json:
@@ -401,7 +409,17 @@ func _on_top_tab_container_tab_selected(tab: int) -> void:
 func _on_project_option_button_popup_id_pressed(id:int) -> void:
 	if id == 0:
 		# New project
-		pass
+		var project_name:String = await special_popup_window.popup_text_entry(
+			"Name your project:",
+			"New Project",
+			true
+		)
+		if project_name.is_empty():
+			l("User cancelled new project.")
+			return
+		else:
+			new_project(project_name)
+		
 	elif id != 1:
 		# Load project
 		var selected_project_path:String = project_option_button.get_item_metadata(project_option_button.get_item_index(id))
@@ -413,8 +431,8 @@ func _on_open_user_folder_button_pressed() -> void:
 	OS.shell_show_in_file_manager(d)
 
 #func _on_load_project_pressed() -> void: load_project(current_project_filepath)
-func _on_save_project_pressed() -> void: pass
-func _on_new_project_pressed() -> void: pass ## TODO
+#func _on_save_project_pressed() -> void: pass
+#func _on_new_project_pressed() -> void: new_project()
 
 func _on_page_select_item_selected(index: int) -> void: pass ## TODO
 
@@ -423,7 +441,7 @@ func _on_new_page_pressed() -> void:
 
 func _on_load_page_pressed() -> void:
 	page_filename_edit.text = U.endify(page_filename_edit.text, ".json")
-	load_page(page_filename_edit.text)
+	load_page(page_filename_edit.text, true)
 	
 func _on_save_page_pressed() -> void:
 	save_page(page_filename_edit.text)

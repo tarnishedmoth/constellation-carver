@@ -5,8 +5,8 @@ var placeholder:Control # Instance
 
 const TEMPLATE = {
 	"type": "image",
-	"width": "0",
-	"height": "0",
+	"width": "16",
+	"height": "16",
 	"pixels": ""
 }
 
@@ -29,9 +29,9 @@ var style:Style = Style.new():
 		style = value
 		refresh_visuals()
 
-func _init(width:int, height:int, pixels:String, rescale:int = 1) -> void:
-	self._width = maxi(width, 0)
-	self._height = maxi(height, 0)
+func _init(width, height, pixels:String, rescale:int = 1) -> void:
+	self._width = maxi(int(width), 0)
+	self._height = maxi(int(height), 0)
 	self._pixels = pixels
 	
 	if rescale > 1: self.style.scale = rescale
