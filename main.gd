@@ -35,7 +35,7 @@ var current_page_name: String: ## Abstract
 		else:
 			return "Empty"
 var current_page_filepath: String ## Manually set
-var pages: Dictionary = {} # Key is filepath, value is json dictionary
+var pages: Dictionary[String,Dictionary] = {} # Key is filepath, value is json dictionary
 var current_page_json: Dictionary = {}
 var current_page_content: Array = []
 
@@ -64,7 +64,12 @@ var selected_editable:Control
 @onready var object_tree: Tree = %ObjectTree
 # CONTENT
 @onready var content_text_edit: TextEdit = %ContentTextEdit
-@onready var content_line_edit: LineEdit = %ContentLineEdit
+
+@onready var button_edit_container: VBoxContainer = %ButtonEditContainer
+@onready var button_prelabel_line_edit: LineEdit = %ButtonPrelabelLineEdit
+@onready var button_label_line_edit: LineEdit = %ButtonLabelLineEdit
+@onready var button_action_menu: MenuButton = %ActionMenuButton
+
 @onready var content_tree: Tree = %ContentTree
 @onready var content_empty_label: Label = %ContentEmptyLabel
 # JSON
@@ -75,11 +80,6 @@ var json_edit_is_word_wrap:bool = false
 #region VIRTUALS
 
 func _ready() -> void:
-	%ApplicationName.text = APP_NAME
-	# Menu initial states
-	top_tab_container.current_tab = TOP_TABS.PROJECT_T # Project tab
-	bottom_tab_container.current_tab = BOTTOM_TABS.CONTENT_T # Content tab
-
 	U.log_console = log_console
 
 	var context_menu:PopupMenu = json_edit.get_menu()
@@ -89,8 +89,16 @@ func _ready() -> void:
 
 	project_option_button.get_popup().id_pressed.connect(_on_project_option_button_popup_id_pressed)
 
-	repopulate_project_list()
+	set_starting_ui_state()
 	l("Application initialized.")
+
+func set_starting_ui_state() -> void:
+	%ApplicationName.text = APP_NAME
+	# Menu initial states
+	top_tab_container.current_tab = TOP_TABS.PROJECT_T # Project tab
+	bottom_tab_container.current_tab = BOTTOM_TABS.CONTENT_T # Content tab
+
+	repopulate_project_list()
 
 #endregion
 #region PROJECT
@@ -126,14 +134,25 @@ func repopulate_project_list() -> void:
 
 
 func load_project(project_dir_path:String) -> void:
-	# TODO load assets, etc etc etc extramarital features
-	var result:bool = load_page(U.cat([project_dir_path, "index"]), false)
-	if result == true:
-		# this "rsplit" method is cool because it automatically discards a trailing delimiter when "allow_empty"=false
-		var load_project_name:String = project_dir_path.rsplit("/", false, 1)[1]
-		current_project_name = load_project_name
+	#var filepath = U.cat([project_dir_path, "index"], "/", ".json")
+	if DirAccess.dir_exists_absolute(project_dir_path):
+		set_starting_ui_state()
+		pages.clear()
+		var result:bool = load_page(U.cat([project_dir_path, "index"]), false)
+		if result == true:
+			# this "rsplit" method is cool because it automatically discards a trailing delimiter when "allow_empty"=false
+			var load_project_name:String = project_dir_path.rsplit("/", false, 1)[1]
+			current_project_name = load_project_name
+	else:
+		special_popup_window.popup(
+			"Project directory is missing!",
+			"Load Project  -  Directory Doesn't Exist"
+		)
+		return
 
 func new_project(project_name:String) -> void:
+	set_starting_ui_state()
+	pages.clear()
 	current_project_name = project_name
 	new_page("index")
 	top_tab_container.current_tab = TOP_TABS.PROJECT_T
@@ -359,8 +378,9 @@ func reset_editables() -> void: ## Called typically by changing focus with mouse
 	selected_object_type.text = "No object selected."
 	content_empty_label.show()
 
-	content_line_edit.hide()
-	content_line_edit.clear()
+	button_edit_container.hide()
+	button_prelabel_line_edit.clear()
+	button_label_line_edit.clear()
 
 	content_text_edit.hide()
 	content_text_edit.clear()
@@ -383,8 +403,10 @@ func open_edit_content(instance:Control) -> void:
 
 	if selected_editable is ConstellationButton:
 		content_empty_label.hide()
-		content_line_edit.text = selected_editable["_label"]
-		content_line_edit.show()
+		button_edit_container.show()
+
+		button_prelabel_line_edit.text = selected_editable["_prelabel"]
+		button_label_line_edit.text = selected_editable["_label"]
 
 	if selected_editable is ConstellationList:
 		content_empty_label.hide()
@@ -525,7 +547,7 @@ func _on_page_title_edit_text_changed(new_text: String) -> void:
 	l("Page title modified.")
 	cache_changes()
 
-func _on_save_text_edits_pressed() -> void:
+func _on_save_edits_button_pressed() -> void:
 	if selected_editable is ConstellationParagraph:
 		selected_editable._text = content_text_edit.text
 	elif selected_editable is ConstellationBlockquote:
@@ -539,6 +561,9 @@ func _on_save_text_edits_pressed() -> void:
 	#selected_editable._text = content_text_edit.text
 	cache_changes(true)
 
+func _on_cancel_edits_button_pressed() -> void:
+	reset_editables()
+
 func _on_object_tree_cell_selected() -> void:
 	var tree_item:TreeItem = object_tree.get_selected()
 	match tree_item.get_metadata(0):
@@ -551,6 +576,19 @@ func _on_object_tree_cell_selected() -> void:
 			open_edit_content(get_content_at(i))
 
 ## BOTTOM TAB
+func _on_action_menu_button_about_to_popup() -> void:
+	# Populate the list
+	var popup = button_action_menu.get_popup()
+	popup.clear(true)
+
+	popup.add_icon_item(TILE_0233, "URL / Enter Manually", 0)
+	popup.add_separator("Project Pages:", 1)
+	var index_id = 2
+	for page:String in pages:
+		var relative_path:String = page.trim_prefix(current_project_filepath)
+		popup.add_item(relative_path, index_id)
+		index_id += 1
+
 func _on_json_edit_context_menu_pressed(id:int, trigger_id:int) -> void:
 	if id == trigger_id:
 		json_edit_is_word_wrap = !json_edit_is_word_wrap
