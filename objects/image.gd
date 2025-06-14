@@ -33,14 +33,16 @@ func _init(width, height, pixels:String, rescale:int = 1) -> void:
 	self._width = maxi(int(width), 0)
 	self._height = maxi(int(height), 0)
 	self._pixels = pixels
-	
+
 	if rescale > 1: self.style.scale = rescale
-	
+
 	self.focus_mode = Control.FOCUS_CLICK
-	
+
+	self.tooltip_text = "Image"
+
 func _ready() -> void:
 	toggle_placeholder(true)
-	
+
 #func _draw() -> void:
 	#draw_texture_rect(
 		#TEXTURE,
@@ -53,7 +55,7 @@ func _ready() -> void:
 		#false
 		##Color.YELLOW
 	#)
-	
+
 func toggle_placeholder(on=true) -> void:
 	if on:
 		placeholder = PLACEHOLDER_SCENE.instantiate()
@@ -62,23 +64,23 @@ func toggle_placeholder(on=true) -> void:
 	else:
 		if placeholder:
 			placeholder.queue_free()
-	
+
 func centered(width:int) -> int: return 400/2 - width/2
 
 func refresh_visuals() -> void:
 	custom_minimum_size = Vector2i(_width*style.scale, _height*style.scale)
 	queue_redraw()
 	#_data_to_pixels()
-	
+
 func _data_to_pixels(data:String) -> void:
 	pass
-	
+
 func to_dict() -> Dictionary:
 	var data:Dictionary = TEMPLATE.duplicate()
 	data["width"] = _width
 	data["height"] = _height
 	data["pixels"] = _pixels
-	
+
 	if style:
 		var style_output = style.to_dict()
 		if not style_output.is_empty():

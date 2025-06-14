@@ -37,7 +37,9 @@ func _init(label:String, action:String = ".", style:Style = null) -> void:
 	self._label = label
 	self._action = action
 	self.style = style
-	
+
+	self.tooltip_text = "Button"
+
 #func _ready() -> void:
 	#focus_entered.connect(_on_focus_entered)
 	#focus_exited.connect(_on_focus_exited)
@@ -45,12 +47,12 @@ func _init(label:String, action:String = ".", style:Style = null) -> void:
 func refresh_visuals() -> void:
 	text = _label
 	#othertext = _prelabel
-	
+
 func to_dict() -> Dictionary:
 	var data:Dictionary = TEMPLATE.duplicate()
 	data["label"] = _label
 	data["action"] = _action
-	
+
 	if style:
 		var style_output = style.to_dict()
 		if not style_output.is_empty():

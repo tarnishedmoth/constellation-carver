@@ -39,9 +39,11 @@ func _init(width:int, height:int, frames:Array, rescale:int = 2) -> void:
 	self._width = maxi(width, 0)
 	self._height = maxi(height, 0)
 	self._frames = frames
-	
+
 	self.focus_mode = Control.FOCUS_CLICK
-	
+
+	self.tooltip_text = "Reel"
+
 func _ready() -> void:
 	toggle_placeholder(true)
 
@@ -67,7 +69,7 @@ func toggle_placeholder(on=true) -> void:
 	else:
 		if placeholder:
 			placeholder.queue_free()
-	
+
 func centered(width:int) -> int: return 400/2 - width/2
 
 func refresh_visuals() -> void:
@@ -77,10 +79,10 @@ func refresh_visuals() -> void:
 		)
 	queue_redraw()
 	#_data_to_pixels()
-	
+
 func _data_to_pixels(data:String) -> void:
 	pass
-	
+
 func to_dict() -> Dictionary:
 	var data:Dictionary = TEMPLATE.duplicate()
 	data["width"] = _width
@@ -88,7 +90,7 @@ func to_dict() -> Dictionary:
 	data["frames"] = _frames
 	if _frame_duration:
 		data["frame-duration"] = _frame_duration
-	
+
 	if style:
 		var style_output = style.to_dict()
 		if not style_output.is_empty():

@@ -7,7 +7,7 @@ extends MarginContainer
 
 func _ready() -> void:
 	_popup.id_pressed.connect(_on_popup_id_pressed)
-	
+
 func _on_popup_id_pressed(id:int) -> void:
 	var editable = main.selected_editable
 	if not "style" in editable:
@@ -15,7 +15,7 @@ func _on_popup_id_pressed(id:int) -> void:
 	else:
 		if not is_instance_valid(editable.style):
 			editable.style = Style.new()
-			
+
 	match id:
 		0: # Text Align
 			editable.style.text_align = "left"

@@ -17,7 +17,7 @@ var style:Style:
 func _prepare_text(t:String) -> String:
 	var f:String = t
 	f = f.insert(0, char(8226) + " ") # Bullet point
-	
+
 	# RichTextLabel uses bbcode for text alignment
 	if style:
 		if style.text_align == "center":
@@ -26,15 +26,15 @@ func _prepare_text(t:String) -> String:
 			f = f.insert(0, "[right]")
 	f = TextFormatting.replace(f, TextFormatting.TYPES.BOLD)
 	f = TextFormatting.replace(f, TextFormatting.TYPES.ITALIC)
-	
+
 	return f
 
 func _init(items:Array, style:Style = null) -> void:
 	self.focus_mode = Control.FOCUS_CLICK
-	
+
 	self._items = items
 	self.style = style
-	
+
 	self.fit_content = true
 	self.bbcode_enabled = true
 	self.scroll_active = false
@@ -42,7 +42,9 @@ func _init(items:Array, style:Style = null) -> void:
 	self.context_menu_enabled = true ## TODO
 	self.meta_underlined = false
 	self.hint_underlined = false
-	
+
+	self.tooltip_text = "List"
+
 #func _ready() -> void:
 	#focus_entered.connect(_on_focus_entered)
 	#focus_exited.connect(_on_focus_exited)
@@ -55,12 +57,12 @@ func refresh_visuals() -> void:
 		var entry:String = _prepare_text(item)
 		append_text(entry)
 		new_line = true
-	
-	
+
+
 func to_dict() -> Dictionary:
 	var data:Dictionary = TEMPLATE.duplicate()
 	data["items"] = _items
-	
+
 	if style:
 		var style_output = style.to_dict()
 		if not style_output.is_empty():

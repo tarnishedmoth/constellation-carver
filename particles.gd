@@ -11,7 +11,7 @@ var file_assets_directory:String = "user://assets"
 
 func _ready() -> void:
 	pass
-	
+
 static func load_json_from_file(filepath:String) -> Dictionary:
 	if FileAccess.file_exists(filepath):
 		var file:FileAccess = FileAccess.open(filepath, FileAccess.READ)
@@ -36,7 +36,7 @@ static func save_json_to_file(formatted_data:String, filepath:String) -> bool:
 		file.close()
 		return true
 	return false
-	
+
 func read_style(style:Dictionary) -> Style:
 	var parsed = Style.new()
 	if "text-align" in style:
@@ -48,11 +48,11 @@ func read_style(style:Dictionary) -> Style:
 	if "scale" in style:
 		parsed.scale = style["scale"]
 	return parsed
-	
+
 static func pagify(content:Array) -> String:
 	var new_dict:Dictionary = HEADER.duplicate(true)
 	new_dict["content"] = content.duplicate(true)
 	return stringify(new_dict)
-	
+
 static func stringify(data:Dictionary) -> String:
 	return JSON.stringify(data, "\t", false, true)

@@ -24,17 +24,17 @@ const PAGE_TEMPLATE:Array = [
 	ConstellationButton.TEMPLATE,
 ]
 
-var current_project_name: String = ""
-var current_project_filepath: String:
+var current_project_name: String = "" ## Manually set
+var current_project_filepath: String: ## Abstract
 	get:
 		return U.cat([Particles.file_saves_directory, current_project_name])
-var current_page_name: String:
+var current_page_name: String: ## Abstract
 	get:
 		if "title" in current_page_json:
 			return current_page_json["title"]
 		else:
 			return "Empty"
-var current_page_filepath: String
+var current_page_filepath: String ## Manually set
 var pages: Dictionary = {} # Key is filepath, value is json dictionary
 var current_page_json: Dictionary = {}
 var current_page_content: Array = []
@@ -47,7 +47,7 @@ var selected_editable:Control
 	set(value):
 		log_console = value
 		U.log_console = log_console
-		
+
 @onready var top_tab_container: TabContainer = %TopTabContainer
 @onready var pd_display: Control = %PDDisplay
 @onready var bottom_tab_container: TabContainer = %BottomTabContainer
@@ -77,23 +77,22 @@ var json_edit_is_word_wrap:bool = false
 func _ready() -> void:
 	%ApplicationName.text = APP_NAME
 	# Menu initial states
-	%TopTabContainer.current_tab = TOP_TABS.PAGE_T # Page tab
-	%BottomTabContainer.current_tab = BOTTOM_TABS.JSON_T # JSON tab
-	
+	top_tab_container.current_tab = TOP_TABS.PROJECT_T # Project tab
+	bottom_tab_container.current_tab = BOTTOM_TABS.CONTENT_T # Content tab
+
 	U.log_console = log_console
-	
+
 	var context_menu:PopupMenu = json_edit.get_menu()
 	var id:int = context_menu.item_count + 1
 	context_menu.add_check_item("Word Wrap", id)
 	context_menu.id_pressed.connect(_on_json_edit_context_menu_pressed.bind(id))
-	
+
 	project_option_button.get_popup().id_pressed.connect(_on_project_option_button_popup_id_pressed)
-	
+
 	repopulate_project_list()
 	l("Application initialized.")
-	
-#endregion
 
+#endregion
 #region PROJECT
 
 func repopulate_project_list() -> void:
@@ -105,41 +104,44 @@ func repopulate_project_list() -> void:
 		0
 	)
 	project_option_button.add_item("~~~~~ ~ ~ ~  ~  ~  ~   ~   ~    ~-.   ~      ~-`       ~    .       `  .", 1)
-	
+
 	# Scanning for files
 	var id_index:int = 2
 	var directories:PackedStringArray = DirAccess.get_directories_at(Particles.file_saves_directory)
 	var current_project_index:int = -1
 	for dir:String in directories:
 		project_option_button.add_item(dir, id_index)
-		
+
 		if current_project_name == dir:
 			current_project_index = id_index
-		
+
 		var dirpath:String = U.cat([Particles.file_saves_directory, dir])
 		project_option_button.set_item_metadata(id_index, dirpath)
 		id_index += 1
-	
+
 	if current_project_index > -1:
 		project_option_button.select(current_project_index)
 	else:
 		project_option_button.select(1)
-	
+
 
 func load_project(project_dir_path:String) -> void:
 	# TODO load assets, etc etc etc extramarital features
-	load_page(U.cat([project_dir_path, "index"]), false)
-	
+	var result:bool = load_page(U.cat([project_dir_path, "index"]), false)
+	if result == true:
+		# this "rsplit" method is cool because it automatically discards a trailing delimiter when "allow_empty"=false
+		var load_project_name:String = project_dir_path.rsplit("/", false, 1)[1]
+		current_project_name = load_project_name
+
 func new_project(project_name:String) -> void:
 	current_project_name = project_name
 	new_page("index")
 	top_tab_container.current_tab = TOP_TABS.PROJECT_T
 
 #endregion
-
 #region PAGES
 
-func load_page(filepath, relative:bool = true) -> void:
+func load_page(filepath, relative:bool = true) -> bool:
 	var _filepath:String
 	if relative:
 		_filepath = U.endify(current_project_filepath) + U.endify(filepath, ".json")
@@ -147,38 +149,42 @@ func load_page(filepath, relative:bool = true) -> void:
 		_filepath = U.endify(filepath, ".json")
 	current_page_filepath = _filepath
 	var payload = Particles.load_json_from_file(_filepath)
-	
+
 	if payload.is_empty():
 		l("Loaded page is empty!")
+		return false
 	elif not "format" in payload:
 		l("Loaded page has bad format!")
+		return false
 	elif payload["format"] != "particle":
 		l("Loaded page has bad format!")
+		return false
 	else:
 		l("Loading page...")
 		current_page_json = payload
 		pages[current_page_filepath] = current_page_json
 		render_current_page_content()
-				
+		return true
+
 func render_current_page_content() -> void:
 	object_tree.clear()
 	reset_editables()
-	
+
 	for child in pd_display.get_children():
 		child.queue_free()
-	
+
 	current_page_content.clear()
-	
+
 	l("Rendering page: [b]"+current_page_json["title"]+"[/b]")
 	page_title_edit.text = current_page_json["title"]
-	
+
 	var tree_root:TreeItem = object_tree.create_item()
 	tree_root.set_text(0, current_page_json["title"])
 	tree_root.set_metadata(0, "title")
 	for obj in current_page_json["content"]:
 		var instance = _render_content(obj)
 		current_page_content.append(instance)
-		
+
 		var tree_item:TreeItem = tree_root.create_child()
 		tree_item.set_text(0, obj["type"])
 		tree_item.set_metadata(0, obj["type"])
@@ -191,29 +197,29 @@ func _render_content(obj:Dictionary) -> Control:
 			var len:int = obj["text"].length()
 			l(str(len) + " characters inside.")
 			instance = ConstellationParagraph.new(obj["text"])
-			
+
 		"list":
 			l("[b]New list![/b]")
 			var count:int = obj["items"].size()
 			l(str(count) + " items listed.")
 			instance = ConstellationList.new(obj["items"])
-			
+
 		"blockquote":
 			l("[b]New blockquote![/b]")
 			var len:int = obj["text"].length()
 			l(str(len) + " characters inside.")
 			instance = ConstellationBlockquote.new(obj["text"])
-			
+
 		"button":
 			l("[b]New button![/b]")
 			l("Label reads " + obj["label"])
 			instance = ConstellationButton.new(obj["label"], obj["action"])
 			if "prelabel" in obj: instance._prelabel = obj["prelabel"]
-			
+
 		"separator":
 			l("[b]New separator![/b]")
 			instance = ConstellationSeparator.new()
-			
+
 		"image":
 			l("[b]New image![/b]")
 			instance = ConstellationImage.new(
@@ -221,7 +227,7 @@ func _render_content(obj:Dictionary) -> Control:
 				obj["height"],
 				obj["pixels"]
 			)
-		
+
 		"reel":
 			l("[b]New reel![/b]")
 			instance = ConstellationReel.new(
@@ -231,15 +237,15 @@ func _render_content(obj:Dictionary) -> Control:
 			)
 			if "frame-duration" in obj:
 				instance._frame_duration = obj["frame-duration"]
-				
+
 		_:
 			push_error("[b]Found an anomoly! Dafuq?[/b]")
 	if not is_instance_valid(instance): return null
-	
+
 	instance.focus_entered.connect(open_edit_content.bind(instance))
-	
+
 	pd_display.add_child(instance)
-		
+
 	if "style" in obj:
 		if "style" in instance:
 			instance.style = Particles.read_style(obj["style"])
@@ -248,7 +254,7 @@ func _render_content(obj:Dictionary) -> Control:
 func save_page(filepath) -> void:
 	cache_changes()
 	var _filepath = U.endify(current_project_filepath) + U.endify(filepath, ".json")
-	
+
 	if _filepath != current_page_filepath:
 		# Overwriting a different filename
 		var duplicate = await special_popup_window.popup(
@@ -259,7 +265,7 @@ func save_page(filepath) -> void:
 		if not duplicate:
 			l("User cancelled save.")
 			return
-			
+
 		if FileAccess.file_exists(_filepath):
 			var overwrite = await special_popup_window.popup(
 				"The file you're trying to save to already exists, and isn't the file you loaded for editing.\n\nOverwrite? The other file's data will be lost.",
@@ -269,18 +275,18 @@ func save_page(filepath) -> void:
 			if not overwrite:
 				l("User cancelled save.")
 				return
-		
-	
+
+
 	l("Saving page...")
 	var formatted = Particles.stringify(current_page_json)
 	var result = Particles.save_json_to_file(formatted, _filepath)
-	
+
 	if result == true:
 		l("--Saved page to " + _filepath)
 		%ApplicationName.text = APP_NAME
 	else:
 		l(U.bold("--Failed to save page to " + _filepath))
-	
+
 func cache_changes(refresh:bool = false):
 	var index:int = 0
 	for item:Control in current_page_content:
@@ -288,14 +294,21 @@ func cache_changes(refresh:bool = false):
 			if item.has_method("to_dict"):
 				current_page_json.content[index] = item.to_dict()
 		index += 1
-	
+
 	l("Cached %s items." % [index])
-	
+
 	%ApplicationName.text = APP_NAME + " - unsaved changes"
-	
+
 	if refresh: render_current_page_content()
-	
+
 func new_page(filename:String, overwrite:bool = false, dirpath:String = current_project_filepath) -> void:
+	if current_project_name.is_empty():
+		special_popup_window.popup(
+			"No project!\n\nLoad or create a Project to edit pages.",
+			"New Page  -  No Project Loaded"
+		)
+		return
+
 	var new_page_json:String = ParticleParser.pagify(PAGE_TEMPLATE)
 	var filepath = U.endify(dirpath) + U.endify(filename, ".json")
 	var file_exists:bool = FileAccess.file_exists(filepath)
@@ -309,20 +322,20 @@ func new_page(filename:String, overwrite:bool = false, dirpath:String = current_
 			)
 			if not result: # Cancel
 				return
-	
+
 	ParticleParser.save_json_to_file(new_page_json, filepath)
 	l(U.bold("New page created and saved!"))
-	
+
 	await get_tree().process_frame
-	load_page(filepath, false)
-	
+	var result:bool = load_page(filepath, false)
+
 func add_content(content:Dictionary, index:int = -1) -> void:
 	if not current_page_json:
 		U.l(U.ital("--Can't make a new object without a page selected!"))
 		return
-		
+
 	cache_changes()
-	
+
 	var arr:Array = current_page_json["content"]
 	if index >= 0:
 		arr.insert(index, content)
@@ -330,36 +343,36 @@ func add_content(content:Dictionary, index:int = -1) -> void:
 		index = arr.size()
 		arr.append(content)
 	U.l(U.ital("Object inserted at index " + str(index) + ", refreshing..."))
-	
+
 	render_current_page_content()
 
 func remove_content_at(index:int) -> void:
 	pass
-	
+
 #endregion
 #region EDITING
 
 func reset_editables() -> void: ## Called typically by changing focus with mouse click, or saving and loading.
 	if selected_editable: l("Deselected.")
 	selected_editable = null
-	
+
 	selected_object_type.text = "No object selected."
 	content_empty_label.show()
-	
+
 	content_line_edit.hide()
 	content_line_edit.clear()
-	
+
 	content_text_edit.hide()
 	content_text_edit.clear()
-	
+
 	content_tree.hide()
 	content_tree.clear()
 
 func open_edit_content(instance:Control) -> void:
 	reset_editables()
-	# Show Objects tab
-	%TopTabContainer.current_tab = TOP_TABS.OBJECTS_T
-	
+	# Top: Show Objects tab
+	top_tab_container.current_tab = TOP_TABS.OBJECTS_T
+
 	selected_editable = instance
 	json_edit.text = str(selected_editable) # Uses _to_string() of instance
 	if "_type" in selected_editable:
@@ -367,12 +380,12 @@ func open_edit_content(instance:Control) -> void:
 		l("Selected %s to edit at index %s" % [selected_editable._type, index])
 		selected_object_type.text = "Now editing: " + selected_editable._type + "  -  "
 		selected_object_type.text += "Indexed at %s / %s." % [index, current_page_content.size()-1]
-	
+
 	if selected_editable is ConstellationButton:
 		content_empty_label.hide()
 		content_line_edit.text = selected_editable["_label"]
 		content_line_edit.show()
-	
+
 	if selected_editable is ConstellationList:
 		content_empty_label.hide()
 		content_text_edit.show()
@@ -385,35 +398,52 @@ func open_edit_content(instance:Control) -> void:
 			var tree_item = content_tree.create_item(root, index)
 			tree_item.set_text(0, item)
 			index += 1
-	
+
 	if "_text" in selected_editable:
 		content_empty_label.hide()
 		content_text_edit.text = selected_editable["_text"]
 		content_text_edit.show()
-	
+
 	if "style" in selected_editable:
 		if is_instance_valid(selected_editable.style):
 			%StyleEmptyLabel.hide()
 			%StyleTextAlignContainer.show()
 			%StyleTextAlign.select(selected_editable.style.get_align_int())
-			
+
 func get_index_of(content:Object) -> int: ## Returns -1 for bad value
 	return current_page_content.find(content)
-	
+
 ## Returns instance from [member current_page_content]
 func get_content_at(index:int) -> Object:
 	return current_page_content[index]
-		
+
 #endregion
+#region HELPERS
 
 func l(item) -> void: U.l(item)
+
+func is_current_project_valid() -> bool:
+	if current_project_name.is_empty(): return false
+	else: return true
+
+func is_current_page_valid() -> bool:
+	if current_page_name == "Empty": return false
+	if current_page_name.is_empty(): return false
+	if not current_page_json: return false
+	if current_page_json.is_empty(): return false
+	if not "title" in current_page_json: return false
+	if not "format" in current_page_json: return false
+	elif current_page_json["format"] != "particle": return false
+
+	return true
+#endregion
 #region SIGNAL HANDLERS
 
 ## TOP TAB
 func _on_top_tab_container_tab_selected(tab: int) -> void:
 	if project_option_button:
 		repopulate_project_list()
-	
+
 func _on_project_option_button_popup_id_pressed(id:int) -> void:
 	if id == 0:
 		# New project
@@ -427,7 +457,7 @@ func _on_project_option_button_popup_id_pressed(id:int) -> void:
 			return
 		else:
 			new_project(project_name)
-		
+
 	elif id != 1:
 		# Load project
 		var selected_project_path:String = project_option_button.get_item_metadata(project_option_button.get_item_index(id))
@@ -449,8 +479,8 @@ func _on_new_page_pressed() -> void:
 
 func _on_load_page_pressed() -> void:
 	page_filename_edit.text = U.endify(page_filename_edit.text, ".json")
-	load_page(page_filename_edit.text, true)
-	
+	var result:bool = load_page(page_filename_edit.text, true)
+
 func _on_save_page_pressed() -> void:
 	save_page(page_filename_edit.text)
 
@@ -458,18 +488,37 @@ func _on_force_refresh_pressed() -> void: render_current_page_content()
 
 ## Deletes selected editable object
 func _on_delete_selected_pressed() -> void:
-	var result = await special_popup_window.popup(
-		"Are you sure you want to delete this content?",
-		"Delete Selected Content",
-		true
-	)
-	if not result: # Cancel
+	if not is_current_project_valid():
+		special_popup_window.popup(
+			"No Project loaded!\n\nPlease load or create a Project to edit content.",
+			"Delete Selected Content  -  No Project"
+		)
 		return
-	
-	current_page_content.erase(selected_editable)
-	selected_editable.queue_free()
-	await get_tree().process_frame
-	cache_changes()
+	elif not is_current_page_valid():
+		special_popup_window.popup(
+			"No Project loaded!\n\nPlease load or create a Project to edit content.",
+			"Delete Selected Content  -  No Project"
+		)
+		return
+	elif not selected_editable:
+		special_popup_window.popup(
+			"No content selected!\n\nSelect a piece of Content by clicking on it in the display, or from the tree in the Objects tab.",
+			"Delete Selected Content  -  No Selection"
+		)
+		return
+	else:
+		var result = await special_popup_window.popup(
+			"Are you sure you want to delete this content?",
+			"Delete Selected Content",
+			true
+		)
+		if not result: # Cancel
+			return
+
+		current_page_content.erase(selected_editable)
+		selected_editable.queue_free()
+		await get_tree().process_frame
+		cache_changes()
 
 func _on_page_title_edit_text_changed(new_text: String) -> void:
 	current_page_json["title"] = new_text
@@ -481,12 +530,12 @@ func _on_save_text_edits_pressed() -> void:
 		selected_editable._text = content_text_edit.text
 	elif selected_editable is ConstellationBlockquote:
 		selected_editable._text = content_text_edit.text
-		
+
 	elif selected_editable is ConstellationList:
 		var tree_item = content_tree.get_selected()
 		tree_item.set_text(0, content_text_edit.text)
 		selected_editable._items[tree_item.get_index()] = tree_item.get_text(0)
-	
+
 	#selected_editable._text = content_text_edit.text
 	cache_changes(true)
 
@@ -500,14 +549,14 @@ func _on_object_tree_cell_selected() -> void:
 		_:
 			var i:int = tree_item.get_index()
 			open_edit_content(get_content_at(i))
-	
+
 ## BOTTOM TAB
 func _on_json_edit_context_menu_pressed(id:int, trigger_id:int) -> void:
 	if id == trigger_id:
 		json_edit_is_word_wrap = !json_edit_is_word_wrap
 		var index:int = json_edit.get_menu().get_item_index(trigger_id)
 		json_edit.get_menu().set_item_checked(index, json_edit_is_word_wrap)
-		
+
 		if json_edit_is_word_wrap:
 			json_edit.wrap_mode = TextEdit.LINE_WRAPPING_BOUNDARY
 		else:
