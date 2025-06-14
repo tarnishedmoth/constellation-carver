@@ -118,20 +118,22 @@ layout_mode = 2
 alignment = 2
 metadata/_tab_index = 1
 
-[node name="NewPage" type="Button" parent="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Page"]
-layout_mode = 2
-text = "New Page"
-
 [node name="PageSelect" type="OptionButton" parent="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Page"]
 unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+tooltip_text = "List of Pages loaded as part of this Project."
+alignment = 1
+text_overrun_behavior = 3
+autowrap_mode = 2
+clip_text = true
+icon_alignment = 2
+selected = 0
+
+[node name="LoadPage" type="Button" parent="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Page"]
 visible = false
 layout_mode = 2
-disabled = true
-selected = 0
-item_count = 1
-popup/item_0/text = "page select"
-popup/item_0/id = 0
-popup/item_0/separator = true
+text = "Load Page"
 
 [node name="FileContainer" type="HBoxContainer" parent="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Page"]
 layout_mode = 2
@@ -175,12 +177,18 @@ placeholder_text = "Header"
 select_all_on_focus = true
 caret_blink = true
 
-[node name="LoadPage" type="Button" parent="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Page"]
+[node name="ButtonsContainer" type="HBoxContainer" parent="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Page"]
 layout_mode = 2
-text = "Load Page"
 
-[node name="SavePage" type="Button" parent="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Page"]
+[node name="NewPage" type="Button" parent="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Page/ButtonsContainer"]
 layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 0
+text = "New Page..."
+
+[node name="SavePage" type="Button" parent="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Page/ButtonsContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
 text = "Save Page"
 
 [node name="Objects" type="VBoxContainer" parent="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer"]
@@ -652,11 +660,11 @@ text = "Confirm"
 [connection signal="pressed" from="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Project/NewProject" to="." method="_on_new_project_pressed"]
 [connection signal="pressed" from="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Project/LoadProject" to="." method="_on_load_project_pressed"]
 [connection signal="pressed" from="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Project/SaveProject" to="." method="_on_save_project_pressed"]
-[connection signal="pressed" from="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Page/NewPage" to="." method="_on_new_page_pressed"]
 [connection signal="item_selected" from="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Page/PageSelect" to="." method="_on_page_select_item_selected"]
-[connection signal="text_changed" from="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Page/TitleContainer/PageTitleEdit" to="." method="_on_page_title_edit_text_changed"]
 [connection signal="pressed" from="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Page/LoadPage" to="." method="_on_load_page_pressed"]
-[connection signal="pressed" from="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Page/SavePage" to="." method="_on_save_page_pressed"]
+[connection signal="text_changed" from="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Page/TitleContainer/PageTitleEdit" to="." method="_on_page_title_edit_text_changed"]
+[connection signal="pressed" from="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Page/ButtonsContainer/NewPage" to="." method="_on_new_page_pressed"]
+[connection signal="pressed" from="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Page/ButtonsContainer/SavePage" to="." method="_on_save_page_pressed"]
 [connection signal="cell_selected" from="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Objects/ObjectTree" to="." method="_on_object_tree_cell_selected"]
 [connection signal="pressed" from="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Objects/HBoxContainer/DeleteSelected" to="." method="_on_delete_selected_pressed"]
 [connection signal="pressed" from="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Debug/ForceRefresh" to="." method="_on_force_refresh_pressed"]

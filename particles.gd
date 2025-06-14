@@ -56,3 +56,33 @@ static func pagify(content:Array) -> String:
 
 static func stringify(data:Dictionary) -> String:
 	return JSON.stringify(data, "\t", false, true)
+
+
+static func find_json_files_in(directory:String) -> Array[String]:
+	if directory.is_absolute_path():
+		if DirAccess.dir_exists_absolute(directory):
+			var _filepaths:Array[String] = []
+			var diraccess = DirAccess.open(directory)
+
+			var total_directories:int = 1
+			for file in diraccess.get_files():
+				if file.get_extension() == "json":
+					_filepaths.append(directory.path_join(file))
+
+			for subfolder in diraccess.get_directories():
+				total_directories += 1
+				var subfolder_files = find_json_files_in(directory.path_join(subfolder))
+				_filepaths.append_array(subfolder_files)
+
+			U.l("Found %s JSON files recursively in %s directories from %s." % [_filepaths.size(), total_directories, directory])
+			return _filepaths
+	push_error("Bad directory given to find_json_files_in")
+	return []
+
+static func is_valid_page(page:Dictionary) -> bool:
+	if page.is_empty(): return false
+	if not "format" in page: return false
+	if not page["format"] == "particle": return false
+	if not "title" in page: return false
+	if not "content" in page: return false
+	return true

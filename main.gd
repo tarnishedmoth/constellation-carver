@@ -177,6 +177,28 @@ func reset_page_tab() -> void:
 		page_filename_edit.text = ""
 	page_title_edit.text = current_page_name if current_page_name != "Empty" else ""
 
+	# Page select menu
+	page_select.clear()
+	if not is_current_project_valid():
+		page_select.add_item("No Current Project")
+		page_select.disabled = true
+		return
+	else:
+		page_select.disabled = false
+		page_select.add_item("Create New Page", 0) # Always id 0
+		page_select.add_separator(current_project_name)
+
+		var id_index:int = 1
+		for json_filepath in ParticleParser.find_json_files_in(current_project_filepath):
+			var json_file = ParticleParser.load_json_from_file(json_filepath)
+			if ParticleParser.is_valid_page(json_file):
+				id_index += 1
+				page_select.add_item(json_filepath, id_index)
+				if current_page_filepath.is_absolute_path():
+					if json_filepath == current_page_filepath:
+						page_select.select(id_index)
+
+
 func load_page(filepath, relative:bool = true) -> void:
 	var _filepath:String
 	if relative:
@@ -237,6 +259,7 @@ func load_page(filepath, relative:bool = true) -> void:
 		current_page_json = payload
 		current_page_filepath = _filepath
 		pages[current_page_filepath] = current_page_json
+		reset_page_tab()
 		render_current_page_content()
 		return
 
@@ -359,6 +382,7 @@ func save_page(filepath) -> void:
 	if result == true:
 		l("--Saved page to " + _filepath)
 		%ApplicationName.text = APP_NAME
+		reset_page_tab()
 	else:
 		l(U.bold("--Failed to save page to " + _filepath))
 
@@ -556,7 +580,7 @@ func _on_project_option_button_popup_id_pressed(id:int) -> void:
 		var project_name:String = await special_popup_window.popup_text_entry(
 			"Name your project:",
 			"New Project",
-			true
+			true,
 		)
 		if project_name.is_empty():
 			l("User cancelled new project.")
@@ -578,7 +602,20 @@ func _on_open_user_folder_button_pressed() -> void:
 #func _on_save_project_pressed() -> void: pass
 #func _on_new_project_pressed() -> void: new_project()
 
-func _on_page_select_item_selected(index: int) -> void: pass ## TODO
+func _on_page_select_item_selected(index: int) -> void:
+	var id = page_select.get_item_id(index)
+	if id == 0:
+		var text_input:String = await special_popup_window.popup_text_entry(
+			"Enter a file name for your New Page:",
+			"Create a New Page",
+			true,
+			SpecialPopupWindow.TEXT_FORMAT.FILE
+		)
+		new_page(text_input, false, current_page_filepath.get_base_dir())
+	else:
+		var _filepath:String = page_select.get_item_text(index)
+		if _filepath.is_absolute_path():
+			load_page(_filepath, false)
 
 func _on_new_page_pressed() -> void:
 	new_page(page_filename_edit.text)

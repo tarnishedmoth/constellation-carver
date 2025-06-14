@@ -14,18 +14,55 @@ var call_on_complete:Callable
 
 func _ready() -> void: hide()
 
-func popup_text_entry(details_text:String, heading:String = "Warning", user_choice:bool = false, callable:Callable = func(_choice:bool): pass) -> String:
+enum TEXT_FORMAT {
+	NONE = 0, # Text can be anything as long as it isn't empty.
+	FILE = 1, # Text must not contain invalidating characters for a file name.
+	PATH = 2, # Text can be a relative or absolute path format.
+	REL_PATH = 3, # Text must be a relative path.
+	ABS_PATH = 4 # Text must be an absolute path.
+}
+
+func popup_text_entry(details_text:String, heading:String = "Warning", user_choice:bool = true, check_flag:TEXT_FORMAT = TEXT_FORMAT.NONE, callable:Callable = func(_choice:bool): pass) -> String:
+	var text_entry_invalid:bool = true
+	var attempted:bool = false
+
 	line_edit.clear()
 	line_edit.show()
-	await get_tree().process_frame
 
-	var result = await popup(details_text, heading, user_choice, callable)
-	if result:
-		line_edit.hide()
-		return line_edit.text
-	else:
-		line_edit.hide()
-		return ""
+	while text_entry_invalid:
+		var _details_text:String = details_text
+		if attempted:
+			_details_text += "\n\nText doesn't meet requirements, try again."
+
+		var result = await popup(_details_text, heading, user_choice, callable)
+		if result:
+
+			var let:String = line_edit.text # Abbreviation
+			if not let.is_empty():
+
+				## Check Flags
+				match check_flag:
+					TEXT_FORMAT.FILE:
+						if let.is_valid_filename(): break
+					TEXT_FORMAT.PATH:
+						if let.is_absolute_path() or let.is_relative_path(): break
+					TEXT_FORMAT.REL_PATH:
+						if let.is_relative_path(): break
+					TEXT_FORMAT.ABS_PATH:
+						if let.is_absolute_path(): break
+					_:
+						break
+
+					## If code continues here it is a fail to pass check flags.
+			## Unreturnable value
+			attempted = true
+			continue
+		else:
+			# Cancel
+			break
+
+	line_edit.hide()
+	return line_edit.text
 
 func popup(details_text:String, heading:String = "Warning", user_choice:bool = false, callable:Callable = func(_choice:bool): pass) -> bool:
 	header.text = heading
