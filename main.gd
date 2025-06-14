@@ -2,6 +2,7 @@ class_name MainScreen extends Control
 
 #region MEMORY
 const APP_NAME:String = "Constellation Carver v0.1"
+const TILE_0233 = preload("res://assets/tile_0233.png") # New project icon
 
 enum TOP_TABS {
 	PROJECT_T = 0,
@@ -20,7 +21,7 @@ const PAGE_TEMPLATE:Array = [
 	ConstellationParagraph.TEMPLATE
 ]
 
-var current_project_name: String = "Project1"
+var current_project_name: String = ""
 var current_project_filepath: String:
 	get:
 		return U.cat([Particles.file_saves_directory, current_project_name])
@@ -47,6 +48,8 @@ var selected_editable:Control
 @onready var top_tab_container: TabContainer = %TopTabContainer
 @onready var pd_display: Control = %PDDisplay
 @onready var bottom_tab_container: TabContainer = %BottomTabContainer
+# PROJECT
+@onready var project_option_button: OptionButton = %ProjectOptionButton
 
 # PAGE
 @onready var page_filename_edit: LineEdit = %PageFilenameEdit
@@ -81,13 +84,52 @@ func _ready() -> void:
 	context_menu.add_check_item("Word Wrap", id)
 	context_menu.id_pressed.connect(_on_json_edit_context_menu_pressed.bind(id))
 	
+	project_option_button.get_popup().id_pressed.connect(_on_project_option_button_popup_id_pressed)
+	
+	repopulate_project_list()
 	l("Application initialized.")
 	
 #endregion
+
+#region PROJECT
+
+func repopulate_project_list() -> void:
+	# Initialization
+	project_option_button.clear()
+	project_option_button.add_icon_item(
+		TILE_0233,
+		"New Project",
+		0
+	)
+	project_option_button.add_item("~~~~~ ~ ~ ~  ~  ~  ~   ~   ~    ~-.   ~      ~-`       ~    .       `  .", 1)
+	
+	# Scanning for files
+	var current_id_index:int = 2
+	var directories:PackedStringArray = DirAccess.get_directories_at(Particles.file_saves_directory)
+	for dir:String in directories:
+		project_option_button.add_item(dir, current_id_index)
+		
+		var dirpath:String = U.cat([Particles.file_saves_directory, dir])
+		project_option_button.set_item_metadata(current_id_index, dirpath)
+		current_id_index += 1
+		
+	#if current_page_name in directories:
+		#pass
+
+func load_project(project_dir_path:String) -> void:
+	# TODO load assets, etc etc etc extramarital features
+	load_page(U.cat([project_dir_path, "index"]), false)
+
+#endregion
+
 #region PAGES
 
-func load_page(filepath) -> void:
-	var _filepath:String = U.endify(current_project_filepath) + U.endify(filepath, ".json")
+func load_page(filepath, in_current_project:bool = true) -> void:
+	var _filepath:String
+	if in_current_project:
+		_filepath = U.endify(current_project_filepath) + U.endify(filepath, ".json")
+	else:
+		_filepath = U.endify(filepath, ".json")
 	current_page_filepath = _filepath
 	var payload = Particles.load_json_from_file(_filepath)
 	
@@ -352,8 +394,25 @@ func l(item) -> void: U.l(item)
 #region SIGNAL HANDLERS
 
 ## TOP TAB
+func _on_top_tab_container_tab_selected(tab: int) -> void:
+	if project_option_button:
+		repopulate_project_list()
+	
+func _on_project_option_button_popup_id_pressed(id:int) -> void:
+	if id == 0:
+		# New project
+		pass
+	elif id != 1:
+		# Load project
+		var selected_project_path:String = project_option_button.get_item_metadata(project_option_button.get_item_index(id))
+		load_project(selected_project_path)
 
-func _on_load_project_pressed() -> void: pass
+func _on_open_user_folder_button_pressed() -> void:
+	#OS.shell_show_in_file_manager(OS.get_user_data_dir())
+	var d:String = U.cat([OS.get_user_data_dir(), current_project_filepath.lstrip("user://")])
+	OS.shell_show_in_file_manager(d)
+
+#func _on_load_project_pressed() -> void: load_project(current_project_filepath)
 func _on_save_project_pressed() -> void: pass
 func _on_new_project_pressed() -> void: pass ## TODO
 
@@ -372,12 +431,6 @@ func _on_save_page_pressed() -> void:
 func _on_force_refresh_pressed() -> void: render_current_page_content()
 
 ## Deletes selected editable object
-func _on_open_user_folder_button_pressed() -> void:
-	#OS.shell_show_in_file_manager(OS.get_user_data_dir())
-	var d:String = U.cat([OS.get_user_data_dir(), current_project_filepath.lstrip("user://")])
-	OS.shell_show_in_file_manager(d)
-
-
 func _on_delete_selected_pressed() -> void:
 	var result = await special_popup_window.popup(
 		"Are you sure you want to delete this content?",
