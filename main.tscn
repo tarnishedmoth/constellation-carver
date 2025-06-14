@@ -1,9 +1,10 @@
-[gd_scene load_steps=8 format=3 uid="uid://c2mlaly46p3v5"]
+[gd_scene load_steps=9 format=3 uid="uid://c2mlaly46p3v5"]
 
 [ext_resource type="Script" uid="uid://dle4w1sl7v6dy" path="res://main.gd" id="1_ig7tw"]
 [ext_resource type="Theme" uid="uid://ct03hqqci348h" path="res://objects/objects.tres" id="2_0xm2m"]
 [ext_resource type="Theme" uid="uid://c1753t6oa0y8j" path="res://ui_theme.tres" id="3_h2yge"]
 [ext_resource type="Script" uid="uid://s8wdifckchem" path="res://new_object_menu.gd" id="4_1bvp3"]
+[ext_resource type="Texture2D" uid="uid://ddaobfj73bmas" path="res://assets/tile_0618.png" id="4_272bh"]
 [ext_resource type="Script" uid="uid://up2sqqiniay4" path="res://menu_style.gd" id="5_lquwl"]
 [ext_resource type="Script" uid="uid://b1f0mugcvkje7" path="res://special_popup_window.gd" id="6_7mycd"]
 
@@ -70,11 +71,10 @@ horizontal_alignment = 1
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
-current_tab = 1
+current_tab = 0
 tabs_position = 1
 
 [node name="Project" type="VBoxContainer" parent="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer"]
-visible = false
 layout_mode = 2
 metadata/_tab_index = 0
 
@@ -96,12 +96,21 @@ text = "Save Project"
 [node name="Label" type="Label" parent="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Project"]
 layout_mode = 2
 size_flags_vertical = 6
-text = "This menu non-functional.
+text = "This menu not yet functional.
 Please use the Page tab to edit pages."
 horizontal_alignment = 1
 vertical_alignment = 1
 
+[node name="OpenUserFolderButton" type="Button" parent="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Project"]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+size_flags_vertical = 6
+text = "Open Project Folder on Disk"
+icon = ExtResource("4_272bh")
+icon_alignment = 2
+
 [node name="Page" type="VBoxContainer" parent="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer"]
+visible = false
 layout_mode = 2
 alignment = 2
 metadata/_tab_index = 1
@@ -591,6 +600,7 @@ text = "Confirm"
 [connection signal="pressed" from="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Project/NewProject" to="." method="_on_new_project_pressed"]
 [connection signal="pressed" from="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Project/LoadProject" to="." method="_on_load_project_pressed"]
 [connection signal="pressed" from="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Project/SaveProject" to="." method="_on_save_project_pressed"]
+[connection signal="pressed" from="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Project/OpenUserFolderButton" to="." method="_on_open_user_folder_button_pressed"]
 [connection signal="pressed" from="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Page/NewPage" to="." method="_on_new_page_pressed"]
 [connection signal="item_selected" from="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Page/PageSelect" to="." method="_on_page_select_item_selected"]
 [connection signal="text_changed" from="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Page/TitleContainer/PageTitleEdit" to="." method="_on_page_title_edit_text_changed"]

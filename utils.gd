@@ -32,3 +32,18 @@ static func underl(text:String) -> String: return "[u]" + text + "[/u]"
 static func endify(path:String, end_with:String = "/") -> String:
 	if path.ends_with(end_with): return path
 	else: return (path + end_with)
+
+static func cat(strings:Array[String], knot:String = "/", tail:String = "", check_knots:bool = true) -> String:
+	var yarn:String = ""
+	var i:int = 0
+	var max_index:int = strings.size()
+	for strand in strings:
+		if i == max_index and not tail.is_empty():
+			strand = U.endify(strand, tail)
+		elif check_knots and i < max_index:
+			strand = U.endify(strand, knot)
+		elif i > 0:
+			yarn += knot
+		yarn += strand
+		i+=1
+	return yarn

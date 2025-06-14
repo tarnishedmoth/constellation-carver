@@ -23,10 +23,7 @@ const PAGE_TEMPLATE:Array = [
 var current_project_name: String = "Project1"
 var current_project_filepath: String:
 	get:
-		return String(
-			Particles.file_saves_directory +
-			"/" + current_project_name
-			)
+		return U.cat([Particles.file_saves_directory, current_project_name])
 var current_page_name: String:
 	get:
 		if "title" in current_page_json:
@@ -45,7 +42,7 @@ var selected_editable:Control
 @onready var log_console: RichTextLabel = %LogConsole:
 	set(value):
 		log_console = value
-		Utils.log_console = log_console
+		U.log_console = log_console
 		
 @onready var top_tab_container: TabContainer = %TopTabContainer
 @onready var pd_display: Control = %PDDisplay
@@ -77,7 +74,7 @@ func _ready() -> void:
 	%TopTabContainer.current_tab = TOP_TABS.PAGE_T # Page tab
 	%BottomTabContainer.current_tab = BOTTOM_TABS.JSON_T # JSON tab
 	
-	Utils.log_console = log_console
+	U.log_console = log_console
 	
 	var context_menu:PopupMenu = json_edit.get_menu()
 	var id:int = context_menu.item_count + 1
@@ -90,7 +87,7 @@ func _ready() -> void:
 #region PAGES
 
 func load_page(filepath) -> void:
-	var _filepath:String = Utils.endify(current_project_filepath) + Utils.endify(filepath, ".json")
+	var _filepath:String = U.endify(current_project_filepath) + U.endify(filepath, ".json")
 	current_page_filepath = _filepath
 	var payload = Particles.load_json_from_file(_filepath)
 	
@@ -193,7 +190,7 @@ func _render_content(obj:Dictionary) -> Control:
 
 func save_page(filepath) -> void:
 	cache_changes()
-	var _filepath = Utils.endify(current_project_filepath) + Utils.endify(filepath, ".json")
+	var _filepath = U.endify(current_project_filepath) + U.endify(filepath, ".json")
 	
 	if _filepath != current_page_filepath:
 		# Overwriting a different filename
@@ -225,7 +222,7 @@ func save_page(filepath) -> void:
 		l("--Saved page to " + _filepath)
 		%ApplicationName.text = APP_NAME
 	else:
-		l(Utils.bold("--Failed to save page to " + _filepath))
+		l(U.bold("--Failed to save page to " + _filepath))
 	
 func cache_changes(refresh:bool = false):
 	var index:int = 0
@@ -243,7 +240,7 @@ func cache_changes(refresh:bool = false):
 	
 func new_page(title:String, overwrite:bool = false, dirpath:String = current_project_filepath) -> void:
 	var new_page_json:String = ParticleParser.pagify(PAGE_TEMPLATE)
-	var filepath = Utils.endify(dirpath) + Utils.endify(title, ".json")
+	var filepath = U.endify(dirpath) + U.endify(title, ".json")
 	var file_exists:bool = FileAccess.file_exists(filepath)
 	if not overwrite:
 		if file_exists:
@@ -257,13 +254,13 @@ func new_page(title:String, overwrite:bool = false, dirpath:String = current_pro
 				return
 	
 	ParticleParser.save_json_to_file(new_page_json, filepath)
-	l(Utils.bold("New page created and saved!"))
+	l(U.bold("New page created and saved!"))
 	await get_tree().process_frame
 	load_page(filepath)
 	
 func add_content(content:Dictionary, index:int = -1) -> void:
 	if not current_page_json:
-		Utils.l(Utils.ital("--Can't make a new object without a page selected!"))
+		U.l(U.ital("--Can't make a new object without a page selected!"))
 		return
 		
 	cache_changes()
@@ -274,7 +271,7 @@ func add_content(content:Dictionary, index:int = -1) -> void:
 	else:
 		index = arr.size()
 		arr.append(content)
-	Utils.l(Utils.ital("Object inserted at index " + str(index) + ", refreshing..."))
+	U.l(U.ital("Object inserted at index " + str(index) + ", refreshing..."))
 	
 	render_current_page_content()
 
@@ -351,7 +348,7 @@ func get_content_at(index:int) -> Object:
 		
 #endregion
 
-func l(item) -> void: Utils.l(item)
+func l(item) -> void: U.l(item)
 #region SIGNAL HANDLERS
 
 ## TOP TAB
@@ -366,7 +363,7 @@ func _on_new_page_pressed() -> void:
 	new_page(page_filename_edit.text)
 
 func _on_load_page_pressed() -> void:
-	page_filename_edit.text = Utils.endify(page_filename_edit.text, ".json")
+	page_filename_edit.text = U.endify(page_filename_edit.text, ".json")
 	load_page(page_filename_edit.text)
 	
 func _on_save_page_pressed() -> void:
@@ -375,6 +372,12 @@ func _on_save_page_pressed() -> void:
 func _on_force_refresh_pressed() -> void: render_current_page_content()
 
 ## Deletes selected editable object
+func _on_open_user_folder_button_pressed() -> void:
+	#OS.shell_show_in_file_manager(OS.get_user_data_dir())
+	var d:String = U.cat([OS.get_user_data_dir(), current_project_filepath.lstrip("user://")])
+	OS.shell_show_in_file_manager(d)
+
+
 func _on_delete_selected_pressed() -> void:
 	var result = await special_popup_window.popup(
 		"Are you sure you want to delete this content?",

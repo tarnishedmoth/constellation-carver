@@ -11,24 +11,24 @@ func _on_popup_id_pressed(id:int) -> void:
 	var content:Dictionary
 	match id:
 		0: # Paragraph
-			Utils.l(Utils.bold("--New Paragraph"))
+			U.l(U.bold("--New Paragraph"))
 			content = ConstellationParagraph.TEMPLATE
 		1: # List
-			Utils.l(Utils.bold("--New List"))
+			U.l(U.bold("--New List"))
 			content = ConstellationList.TEMPLATE
 		2: # Blockquote
-			Utils.l(Utils.bold("--New Blockquote"))
+			U.l(U.bold("--New Blockquote"))
 			content = ConstellationBlockquote.TEMPLATE
 		3: # Button
-			Utils.l(Utils.bold("--New Button"))
+			U.l(U.bold("--New Button"))
 		4: # Separator
-			Utils.l(Utils.bold("--New Separator"))
+			U.l(U.bold("--New Separator"))
 			content = ConstellationSeparator.TEMPLATE
 		5: # Image
-			Utils.l(Utils.bold("--New Image"))
+			U.l(U.bold("--New Image"))
 			content = ConstellationImage.TEMPLATE
 		6: # Reel
-			Utils.l(Utils.bold("--New Reel"))
+			U.l(U.bold("--New Reel"))
 	
 	if is_instance_valid(Main.selected_editable):
 		Main.add_content(
