@@ -36,14 +36,15 @@ static func endify(path:String, end_with:String = "/") -> String:
 static func cat(strings:Array[String], knot:String = "/", tail:String = "", check_knots:bool = true) -> String:
 	var yarn:String = ""
 	var i:int = 0
-	var max_index:int = strings.size()
+	var max_index:int = strings.size() - 1
 	for strand in strings:
 		if i == max_index and not tail.is_empty():
 			strand = U.endify(strand, tail)
-		elif check_knots and i < max_index:
-			strand = U.endify(strand, knot)
-		elif i > 0:
-			yarn += knot
+		elif i < max_index:
+			if check_knots:
+				strand = U.endify(strand, knot)
+			elif i > 0:
+				yarn += knot
 		yarn += strand
 		i+=1
 	return yarn
