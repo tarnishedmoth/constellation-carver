@@ -125,10 +125,33 @@ size_flags_vertical = 3
 tooltip_text = "List of Pages loaded as part of this Project."
 alignment = 1
 text_overrun_behavior = 3
-autowrap_mode = 2
-clip_text = true
+autowrap_mode = 3
 icon_alignment = 2
 selected = 0
+fit_to_longest_item = false
+
+[node name="ButtonsContainer" type="HBoxContainer" parent="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Page"]
+layout_mode = 2
+alignment = 2
+
+[node name="DeletePage" type="Button" parent="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Page/ButtonsContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.4
+tooltip_text = "Delete the currently open page."
+text = "DELETE"
+
+[node name="NewPage" type="Button" parent="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Page/ButtonsContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 0
+size_flags_stretch_ratio = 0.4
+text = "NEW ..."
+
+[node name="SavePage" type="Button" parent="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Page/ButtonsContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "SAVE"
 
 [node name="LoadPage" type="Button" parent="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Page"]
 visible = false
@@ -177,19 +200,9 @@ placeholder_text = "Header"
 select_all_on_focus = true
 caret_blink = true
 
-[node name="ButtonsContainer" type="HBoxContainer" parent="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Page"]
+[node name="Spacer" type="Control" parent="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Page"]
+custom_minimum_size = Vector2(0, 5)
 layout_mode = 2
-
-[node name="NewPage" type="Button" parent="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Page/ButtonsContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 0
-text = "New Page..."
-
-[node name="SavePage" type="Button" parent="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Page/ButtonsContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "Save Page"
 
 [node name="Objects" type="VBoxContainer" parent="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer"]
 visible = false
@@ -612,18 +625,10 @@ layout_mode = 2
 text = "Warning"
 horizontal_alignment = 1
 
-[node name="LineEdit" type="LineEdit" parent="SpecialPopupWindow/VBoxContainer"]
-visible = false
-layout_mode = 2
-size_flags_vertical = 4
-placeholder_text = "Project Name"
-alignment = 1
-emoji_menu_enabled = false
-caret_blink = true
-
 [node name="Details" type="Label" parent="SpecialPopupWindow/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 6
+size_flags_stretch_ratio = 2.0
 text = "File already exists.
 
 Erase and overwrite?
@@ -631,6 +636,18 @@ Erase and overwrite?
 horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 3
+
+[node name="LineEdit" type="LineEdit" parent="SpecialPopupWindow/VBoxContainer"]
+visible = false
+layout_mode = 2
+size_flags_vertical = 6
+placeholder_text = "Enter text here"
+alignment = 1
+emoji_menu_enabled = false
+clear_button_enabled = true
+select_all_on_focus = true
+caret_blink = true
+caret_force_displayed = true
 
 [node name="ButtonsHBoxContainer" type="HBoxContainer" parent="SpecialPopupWindow/VBoxContainer"]
 layout_mode = 2
@@ -661,10 +678,10 @@ text = "Confirm"
 [connection signal="pressed" from="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Project/LoadProject" to="." method="_on_load_project_pressed"]
 [connection signal="pressed" from="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Project/SaveProject" to="." method="_on_save_project_pressed"]
 [connection signal="item_selected" from="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Page/PageSelect" to="." method="_on_page_select_item_selected"]
-[connection signal="pressed" from="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Page/LoadPage" to="." method="_on_load_page_pressed"]
-[connection signal="text_changed" from="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Page/TitleContainer/PageTitleEdit" to="." method="_on_page_title_edit_text_changed"]
 [connection signal="pressed" from="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Page/ButtonsContainer/NewPage" to="." method="_on_new_page_pressed"]
 [connection signal="pressed" from="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Page/ButtonsContainer/SavePage" to="." method="_on_save_page_pressed"]
+[connection signal="pressed" from="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Page/LoadPage" to="." method="_on_load_page_pressed"]
+[connection signal="text_changed" from="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Page/TitleContainer/PageTitleEdit" to="." method="_on_page_title_edit_text_changed"]
 [connection signal="cell_selected" from="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Objects/ObjectTree" to="." method="_on_object_tree_cell_selected"]
 [connection signal="pressed" from="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Objects/HBoxContainer/DeleteSelected" to="." method="_on_delete_selected_pressed"]
 [connection signal="pressed" from="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Debug/ForceRefresh" to="." method="_on_force_refresh_pressed"]

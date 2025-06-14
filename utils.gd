@@ -7,11 +7,11 @@ func l(item) -> void:
 	if log_console:
 		log_console.newline()
 		if item is String:
-			log_console.append_text(item)
+			log_console.append_text(str(item))
 		elif item is Dictionary:
 			var s:String = ""
 			for key in item:
-				s += key as String
+				s += str(key)
 				s += ": "
 				s += item[key]
 				s += "\n"
@@ -20,20 +20,20 @@ func l(item) -> void:
 		elif item is Array:
 			for subitem in item:
 				var s:String = ""
-				s += subitem as String
+				s += str(subitem)
 				log_console.append_text(s)
 				log_console.newline()
 
-static func bold(text:String) -> String: return "[b]" + text + "[/b]"
-static func ital(text:String) -> String: return "[i]" + text + "[/i]"
-static func center(text:String) -> String: return "[center]" + text + "[/center]"
-static func underl(text:String) -> String: return "[u]" + text + "[/u]"
+func bold(text:String) -> String: return "[b]" + text + "[/b]"
+func ital(text:String) -> String: return "[i]" + text + "[/i]"
+func center(text:String) -> String: return "[center]" + text + "[/center]"
+func underl(text:String) -> String: return "[u]" + text + "[/u]"
 
-static func endify(path:String, end_with:String = "/") -> String:
+func endify(path:String, end_with:String = "/") -> String:
 	if path.ends_with(end_with): return path
 	else: return (path + end_with)
 
-static func cat(strings:Array[String], knot:String = "/", tail:String = "", check_knots:bool = true) -> String:
+func cat(strings:Array[String], knot:String = "/", tail:String = "", check_knots:bool = true) -> String:
 	var yarn:String = ""
 	var i:int = 0
 	var max_index:int = strings.size() - 1

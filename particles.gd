@@ -15,23 +15,43 @@ func _ready() -> void:
 static func load_json_from_file(filepath:String) -> Dictionary:
 	if FileAccess.file_exists(filepath):
 		var file:FileAccess = FileAccess.open(filepath, FileAccess.READ)
-		var parsed = JSON.parse_string(file.get_as_text())
+		var jason = JSON.new()
+		var err:int = jason.parse(file.get_as_text(), true)
+
+		if err != OK:
+			push_warning("Issue parsing JSON file.")
+			U.l("JSON file is corrupt at line %s!\n--%s" % [jason.get_error_line(), filepath])
+			return {}
+
+		var parsed = JSON.parse_string(jason.get_parsed_text())
 		file.close()
+
 		if parsed is Dictionary:
 			return parsed
 		else:
 			push_error("JSON file is corrupt!")
+			U.l("JSON file is corrupt at line %s!\n--%s" % [jason.get_error_line(), filepath])
 	# No file or corrupt
 	return {}
 
 ## Returns true for successful save, false otherwise.
 static func save_json_to_file(formatted_data:String, filepath:String) -> bool:
-	var dirpath = filepath.get_base_dir()
+	var dirpath:String = filepath.get_base_dir()
 	if not dirpath.is_empty():
-		if DirAccess.open(dirpath) == null:
-			DirAccess.make_dir_recursive_absolute(dirpath)
-			print_debug("Made a new directory!")
+		var result = DirAccess.dir_exists_absolute(dirpath)
+		if result == null:
+			print_debug(DirAccess.get_open_error())
+			var da:DirAccess = DirAccess.open(dirpath)
+			result = da.make_dir_recursive(dirpath)
+			if result != OK:
+				return false
+			U.l("Made a new directory!\n%s" % [dirpath])
+
 		var file = FileAccess.open(filepath, FileAccess.WRITE)
+		if file == null:
+			var err = FileAccess.get_open_error()
+			U.l("Error accessing file to save JSON data:\n--%s" % [error_string(err)])
+			return false
 		file.store_string(formatted_data)
 		file.close()
 		return true
@@ -71,7 +91,7 @@ static func find_json_files_in(directory:String) -> Array[String]:
 
 			for subfolder in diraccess.get_directories():
 				total_directories += 1
-				var subfolder_files = find_json_files_in(directory.path_join(subfolder))
+				var subfolder_files:Array = find_json_files_in(directory.path_join(subfolder))
 				_filepaths.append_array(subfolder_files)
 
 			U.l("Found %s JSON files recursively in %s directories from %s." % [_filepaths.size(), total_directories, directory])

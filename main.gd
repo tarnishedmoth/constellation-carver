@@ -224,7 +224,7 @@ func load_page(filepath, relative:bool = true) -> void:
 	if payload.is_empty():
 		l("Loaded page is empty!")
 		var result:bool = await special_popup_window.popup(
-			"File is empty!\nWould you like to format the file into a page?\n%s" % [_filepath],
+			"File is empty!\nWould you like to format the file into a New Page?\n%s" % [_filepath],
 			"Load Page  -  Empty File",
 			true
 		)
@@ -292,8 +292,8 @@ func _render_content(obj:Dictionary) -> Control:
 	match obj["type"]:
 		"paragraph":
 			l("[b]New paragraph![/b]")
-			var len:int = obj["text"].length()
-			l(str(len) + " characters inside.")
+			var _len:int = obj["text"].length()
+			l(str(_len) + " characters inside.")
 			instance = ConstellationParagraph.new(obj["text"])
 
 		"list":
@@ -304,8 +304,8 @@ func _render_content(obj:Dictionary) -> Control:
 
 		"blockquote":
 			l("[b]New blockquote![/b]")
-			var len:int = obj["text"].length()
-			l(str(len) + " characters inside.")
+			var _len:int = obj["text"].length()
+			l(str(_len) + " characters inside.")
 			instance = ConstellationBlockquote.new(obj["text"])
 
 		"button":
@@ -376,8 +376,8 @@ func save_page(filepath) -> void:
 
 
 	l("Saving page...")
-	var formatted = Particles.stringify(current_page_json)
-	var result = Particles.save_json_to_file(formatted, _filepath)
+	var formatted = ParticleParser.stringify(current_page_json)
+	var result = ParticleParser.save_json_to_file(formatted, _filepath)
 
 	if result == true:
 		l("--Saved page to " + _filepath)
@@ -433,7 +433,7 @@ func new_page(filename:String, overwrite:bool = false, dirpath:String = current_
 				return
 
 	var new_page_json:String = ParticleParser.pagify(PAGE_TEMPLATE)
-	var did_save:bool = await ParticleParser.save_json_to_file(new_page_json, _filepath)
+	var did_save:bool = ParticleParser.save_json_to_file(new_page_json, _filepath)
 	if did_save:
 		l(U.bold("New page created and saved!"))
 
@@ -482,18 +482,21 @@ func reset_editables() -> void: ## Called typically by changing focus with mouse
 	content_tree.hide()
 	content_tree.clear()
 
-func open_edit_content(instance:Control) -> void:
+func open_edit_content(instance:Object) -> void:
 	reset_editables()
 	# Top: Show Objects tab
 	top_tab_container.current_tab = TOP_TABS.OBJECTS_T
 
 	selected_editable = instance
 	json_edit.text = str(selected_editable) # Uses _to_string() of instance
+
+
 	if "_type" in selected_editable:
 		var index = current_page_content.find(selected_editable)
 		l("Selected %s to edit at index %s" % [selected_editable._type, index])
 		selected_object_type.text = "Now editing: " + selected_editable._type + "  -  "
 		selected_object_type.text += "Indexed at %s / %s." % [index, current_page_content.size()-1]
+
 
 	if selected_editable is ConstellationButton:
 		content_empty_label.hide()
@@ -502,23 +505,27 @@ func open_edit_content(instance:Control) -> void:
 		button_prelabel_line_edit.text = selected_editable["_prelabel"]
 		button_label_line_edit.text = selected_editable["_label"]
 
+
 	if selected_editable is ConstellationList:
 		content_empty_label.hide()
 		content_text_edit.show()
 		content_tree.show()
 		content_tree.clear()
-		var root = content_tree.create_item()
+
+		var root:TreeItem = content_tree.create_item()
 		root.set_text(0, "List")
 		var index:int = 0
 		for item in selected_editable._items:
-			var tree_item = content_tree.create_item(root, index)
+			var tree_item:TreeItem = content_tree.create_item(root, index)
 			tree_item.set_text(0, item)
 			index += 1
+
 
 	if "_text" in selected_editable:
 		content_empty_label.hide()
 		content_text_edit.text = selected_editable["_text"]
 		content_text_edit.show()
+
 
 	if "style" in selected_editable:
 		if is_instance_valid(selected_editable.style):
@@ -605,20 +612,20 @@ func _on_open_user_folder_button_pressed() -> void:
 func _on_page_select_item_selected(index: int) -> void:
 	var id = page_select.get_item_id(index)
 	if id == 0:
-		var text_input:String = await special_popup_window.popup_text_entry(
-			"Enter a file name for your New Page:",
-			"Create a New Page",
-			true,
-			SpecialPopupWindow.TEXT_FORMAT.FILE
-		)
-		new_page(text_input, false, current_page_filepath.get_base_dir())
+		_on_new_page_pressed()
 	else:
 		var _filepath:String = page_select.get_item_text(index)
 		if _filepath.is_absolute_path():
 			load_page(_filepath, false)
 
 func _on_new_page_pressed() -> void:
-	new_page(page_filename_edit.text)
+	var text_input:String = await special_popup_window.popup_text_entry(
+		"Enter a file name for your New Page:",
+		"Create a New Page",
+		true,
+		SpecialPopupWindow.TEXT_FORMAT.FILE
+	)
+	new_page(text_input, false, current_page_filepath.get_base_dir())
 
 func _on_load_page_pressed() -> void:
 	load_page(page_filename_edit.text, true)
@@ -667,6 +674,7 @@ func _on_page_title_edit_text_changed(new_text: String) -> void:
 	current_page_json["title"] = new_text
 	l("Page title modified.")
 	cache_changes()
+	render_current_page_content()
 
 func _on_save_edits_button_pressed() -> void:
 	if not check_editable():
