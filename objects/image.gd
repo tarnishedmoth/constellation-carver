@@ -34,6 +34,9 @@ func _init(width, height, pixels:String, rescale:int = 1) -> void:
 	self._height = maxi(int(height), 0)
 	self._pixels = pixels
 
+	self.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	self.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+
 	if rescale > 1: self.style.scale = rescale
 
 	self.focus_mode = Control.FOCUS_CLICK

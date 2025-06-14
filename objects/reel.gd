@@ -40,6 +40,9 @@ func _init(width:int, height:int, frames:Array, rescale:int = 2) -> void:
 	self._height = maxi(height, 0)
 	self._frames = frames
 
+	self.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	self.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+
 	self.focus_mode = Control.FOCUS_CLICK
 
 	self.tooltip_text = "Reel"
