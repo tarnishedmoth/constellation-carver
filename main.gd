@@ -34,12 +34,14 @@ var current_page_name: String: ## Abstract
 			return current_page_json["title"]
 		else:
 			return "Empty"
-var current_page_filepath: String ## Manually set
+var current_page_filepath: String ## Relative path from project folder ; manually set
 var pages: Dictionary[String,Dictionary] = {} # Key is filepath, value is json dictionary
 var current_page_json: Dictionary = {}
 var current_page_content: Array = []
 
 var selected_editable:Control
+
+var is_initialized:bool = false
 
 # SPACES
 @onready var special_popup_window: SpecialPopupWindow = $SpecialPopupWindow
@@ -82,15 +84,21 @@ var json_edit_is_word_wrap:bool = false
 func _ready() -> void:
 	U.log_console = log_console
 
+	# CONTENT edit tab
+	button_action_menu.get_popup().id_pressed.connect(_on_button_action_menu_pressed)
+
+	# JSON edit tab
 	var context_menu:PopupMenu = json_edit.get_menu()
 	var id:int = context_menu.item_count + 1
 	context_menu.add_check_item("Word Wrap", id)
 	context_menu.id_pressed.connect(_on_json_edit_context_menu_pressed.bind(id))
 
+	# PROJECT tab
 	project_option_button.get_popup().id_pressed.connect(_on_project_option_button_popup_id_pressed)
 
 	set_starting_ui_state()
 	l("Application initialized.")
+	is_initialized = true
 
 func set_starting_ui_state() -> void:
 	%ApplicationName.text = APP_NAME
@@ -138,11 +146,12 @@ func load_project(project_dir_path:String) -> void:
 	if DirAccess.dir_exists_absolute(project_dir_path):
 		set_starting_ui_state()
 		pages.clear()
-		var result:bool = load_page(U.cat([project_dir_path, "index"]), false)
-		if result == true:
-			# this "rsplit" method is cool because it automatically discards a trailing delimiter when "allow_empty"=false
-			var load_project_name:String = project_dir_path.rsplit("/", false, 1)[1]
-			current_project_name = load_project_name
+		load_page(U.cat([project_dir_path, "index"]), false)
+		#var result:bool = await load_page(U.cat([project_dir_path, "index"]), false)
+		#if result == true:
+		# this "rsplit" method is cool because it automatically discards a trailing delimiter when "allow_empty"=false
+		var load_project_name:String = project_dir_path.rsplit("/", false, 1)[1]
+		current_project_name = load_project_name
 	else:
 		special_popup_window.popup(
 			"Project directory is missing!",
@@ -159,31 +168,77 @@ func new_project(project_name:String) -> void:
 
 #endregion
 #region PAGES
+func reset_page_tab() -> void:
+	if not is_initialized: await get_tree().process_frame
 
-func load_page(filepath, relative:bool = true) -> bool:
+	if current_page_filepath:
+		page_filename_edit.text = current_page_filepath.get_file()
+	else:
+		page_filename_edit.text = ""
+	page_title_edit.text = current_page_name if current_page_name != "Empty" else ""
+
+func load_page(filepath, relative:bool = true) -> void:
 	var _filepath:String
 	if relative:
 		_filepath = U.endify(current_project_filepath) + U.endify(filepath, ".json")
 	else:
 		_filepath = U.endify(filepath, ".json")
-	current_page_filepath = _filepath
+
+	if not FileAccess.file_exists(_filepath):
+		l("Tried to load page--file not found!")
+		var result:bool = await special_popup_window.popup(
+			"File does not exist!\nWould you like to create a new Page?\n%s" % [_filepath],
+			"Load Page  -  File Not Found",
+			true
+		)
+		if result:
+			new_page(_filepath, true, "")
+			load_page(_filepath, false)
+		else:
+			return
+
 	var payload = Particles.load_json_from_file(_filepath)
 
 	if payload.is_empty():
 		l("Loaded page is empty!")
-		return false
+		var result:bool = await special_popup_window.popup(
+			"File is empty!\nWould you like to format the file into a page?\n%s" % [_filepath],
+			"Load Page  -  Empty File",
+			true
+		)
+		if result:
+			new_page(_filepath, true, "")
+			load_page(_filepath, false)
+		return
 	elif not "format" in payload:
 		l("Loaded page has bad format!")
-		return false
+		var result:bool = await special_popup_window.popup(
+			"File has formatting errors!\nWould you like to format the file into a Page?\n%s" % [_filepath],
+			"Load Page  -  Corrupt File",
+			true
+		)
+		if result:
+			new_page(_filepath, false, "")
+			load_page(_filepath, false)
+		return
 	elif payload["format"] != "particle":
 		l("Loaded page has bad format!")
-		return false
+		var result:bool = await special_popup_window.popup(
+			"File has formatting errors!\nWould you like to format the file into a Page?\n%s" % [_filepath],
+			"Load Page  -  Corrupt File",
+			true
+		)
+		if result:
+			new_page(_filepath, false, "")
+			load_page(_filepath, false)
+		return
 	else:
 		l("Loading page...")
 		current_page_json = payload
+		current_page_filepath = _filepath
 		pages[current_page_filepath] = current_page_json
 		render_current_page_content()
-		return true
+		return
 
 func render_current_page_content() -> void:
 	object_tree.clear()
@@ -196,6 +251,7 @@ func render_current_page_content() -> void:
 
 	l("Rendering page: [b]"+current_page_json["title"]+"[/b]")
 	page_title_edit.text = current_page_json["title"]
+	page_filename_edit.text = current_page_filepath.get_file()
 
 	var tree_root:TreeItem = object_tree.create_item()
 	tree_root.set_text(0, current_page_json["title"])
@@ -277,7 +333,7 @@ func save_page(filepath) -> void:
 	if _filepath != current_page_filepath:
 		# Overwriting a different filename
 		var duplicate = await special_popup_window.popup(
-			"Saving location has been changed.\n\nAre you sure you want to save to a different file?",
+			"Saving location has changed.\n\nAre you sure you want to save to a new location?\n%s" % [_filepath],
 			"Save Page  -  Changed filepath",
 			true
 		)
@@ -287,7 +343,7 @@ func save_page(filepath) -> void:
 
 		if FileAccess.file_exists(_filepath):
 			var overwrite = await special_popup_window.popup(
-				"The file you're trying to save to already exists, and isn't the file you loaded for editing.\n\nOverwrite? The other file's data will be lost.",
+				"The file you're trying to save to already exists, and isn't the file you loaded for editing.\n\nOverwrite? This file's data will be lost:\n%s" % [_filepath],
 				"Save Page  -  Name conflict",
 				true
 			)
@@ -328,25 +384,39 @@ func new_page(filename:String, overwrite:bool = false, dirpath:String = current_
 		)
 		return
 
-	var new_page_json:String = ParticleParser.pagify(PAGE_TEMPLATE)
-	var filepath = U.endify(dirpath) + U.endify(filename, ".json")
-	var file_exists:bool = FileAccess.file_exists(filepath)
+	var _filepath:String
+	if not filename.is_absolute_path():
+		if dirpath.is_absolute_path():
+			# Dir path is a good path
+			_filepath = U.endify(dirpath) + U.endify(filename, ".json")
+		else:
+			push_error("Bad dirpath given to new_page()")
+			return
+	else:
+		push_warning("Gave absolute file path to new_page(). Confirm this is intended behavior.")
+		_filepath = U.endify(filename, ".json")
+
+	var file_exists:bool = FileAccess.file_exists(_filepath)
 	if not overwrite:
 		if file_exists:
 			# Warn the user
 			var result = await special_popup_window.popup(
-				"File already exists.\nErase and overwrite?\n\n(You will permanently lose this data!)",
+				"File already exists.\nErase and overwrite?\n\n(You will permanently lose this data!)\n%s" % [_filepath],
 				"New Page - Warning",
 				true
 			)
 			if not result: # Cancel
 				return
 
-	ParticleParser.save_json_to_file(new_page_json, filepath)
-	l(U.bold("New page created and saved!"))
+	var new_page_json:String = ParticleParser.pagify(PAGE_TEMPLATE)
+	var did_save:bool = await ParticleParser.save_json_to_file(new_page_json, _filepath)
+	if did_save:
+		l(U.bold("New page created and saved!"))
 
-	await get_tree().process_frame
-	var result:bool = load_page(filepath, false)
+		await get_tree().process_frame
+		load_page(_filepath, false)
+	else:
+		l(U.bold("Failed to save new page JSON!"))
 
 func add_content(content:Dictionary, index:int = -1) -> void:
 	if not current_page_json:
@@ -372,7 +442,7 @@ func remove_content_at(index:int) -> void:
 #region EDITING
 
 func reset_editables() -> void: ## Called typically by changing focus with mouse click, or saving and loading.
-	if selected_editable: l("Deselected.")
+	if check_editable(): l("Deselected.")
 	selected_editable = null
 
 	selected_object_type.text = "No object selected."
@@ -432,13 +502,6 @@ func open_edit_content(instance:Control) -> void:
 			%StyleTextAlignContainer.show()
 			%StyleTextAlign.select(selected_editable.style.get_align_int())
 
-func get_index_of(content:Object) -> int: ## Returns -1 for bad value
-	return current_page_content.find(content)
-
-## Returns instance from [member current_page_content]
-func get_content_at(index:int) -> Object:
-	return current_page_content[index]
-
 #endregion
 #region HELPERS
 
@@ -456,15 +519,36 @@ func is_current_page_valid() -> bool:
 	if not "title" in current_page_json: return false
 	if not "format" in current_page_json: return false
 	elif current_page_json["format"] != "particle": return false
-
 	return true
+
+func get_index_of(content:Object) -> int: ## Returns -1 for bad value
+	return current_page_content.find(content)
+
+## Returns instance from [member current_page_content]
+func get_content_at(index:int) -> Object:
+	return current_page_content[index]
+
+func check_editable(type = null) -> bool:
+	if selected_editable != null:
+		if is_instance_valid(selected_editable):
+			if type != null:
+				# Classes must match argument object's class
+				if selected_editable.is_instance_of(type):
+					return true
+			else:
+				# Any class
+				return true
+	return false
+
 #endregion
 #region SIGNAL HANDLERS
 
 ## TOP TAB
 func _on_top_tab_container_tab_selected(tab: int) -> void:
-	if project_option_button:
+	if tab == TOP_TABS.PROJECT_T:
 		repopulate_project_list()
+	elif tab == TOP_TABS.PAGE_T:
+		reset_page_tab()
 
 func _on_project_option_button_popup_id_pressed(id:int) -> void:
 	if id == 0:
@@ -500,8 +584,7 @@ func _on_new_page_pressed() -> void:
 	new_page(page_filename_edit.text)
 
 func _on_load_page_pressed() -> void:
-	page_filename_edit.text = U.endify(page_filename_edit.text, ".json")
-	var result:bool = load_page(page_filename_edit.text, true)
+	load_page(page_filename_edit.text, true)
 
 func _on_save_page_pressed() -> void:
 	save_page(page_filename_edit.text)
@@ -513,19 +596,19 @@ func _on_delete_selected_pressed() -> void:
 	if not is_current_project_valid():
 		special_popup_window.popup(
 			"No Project loaded!\n\nPlease load or create a Project to edit content.",
-			"Delete Selected Content  -  No Project"
+			"Delete Selected Content  -  Invalid Project"
 		)
 		return
 	elif not is_current_page_valid():
 		special_popup_window.popup(
-			"No Project loaded!\n\nPlease load or create a Project to edit content.",
-			"Delete Selected Content  -  No Project"
+			"No Page loaded!\n\nPlease load or create a Page to edit content.",
+			"Delete Selected Content  -  Invalid Page"
 		)
 		return
-	elif not selected_editable:
+	elif not check_editable():
 		special_popup_window.popup(
 			"No content selected!\n\nSelect a piece of Content by clicking on it in the display, or from the tree in the Objects tab.",
-			"Delete Selected Content  -  No Selection"
+			"Delete Selected Content  -  Invalid Selection"
 		)
 		return
 	else:
@@ -539,6 +622,7 @@ func _on_delete_selected_pressed() -> void:
 
 		current_page_content.erase(selected_editable)
 		selected_editable.queue_free()
+		reset_editables()
 		await get_tree().process_frame
 		cache_changes()
 
@@ -548,6 +632,9 @@ func _on_page_title_edit_text_changed(new_text: String) -> void:
 	cache_changes()
 
 func _on_save_edits_button_pressed() -> void:
+	if not check_editable():
+		l("Failed to save content edits: no selection.")
+		return
 	if selected_editable is ConstellationParagraph:
 		selected_editable._text = content_text_edit.text
 	elif selected_editable is ConstellationBlockquote:
@@ -576,7 +663,7 @@ func _on_object_tree_cell_selected() -> void:
 			open_edit_content(get_content_at(i))
 
 ## BOTTOM TAB
-func _on_action_menu_button_about_to_popup() -> void:
+func _on_button_action_menu_about_to_popup() -> void:
 	# Populate the list
 	var popup = button_action_menu.get_popup()
 	popup.clear(true)
@@ -588,6 +675,14 @@ func _on_action_menu_button_about_to_popup() -> void:
 		var relative_path:String = page.trim_prefix(current_project_filepath)
 		popup.add_item(relative_path, index_id)
 		index_id += 1
+
+func _on_button_action_menu_pressed(id:int) -> void:
+	# Selected an action for this button
+	if not check_editable(ConstellationButton):
+		push_error("Pressed edit button action menu without Button selected.")
+		return
+
+
 
 func _on_json_edit_context_menu_pressed(id:int, trigger_id:int) -> void:
 	if id == trigger_id:

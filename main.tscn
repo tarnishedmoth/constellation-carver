@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://c2mlaly46p3v5"]
+[gd_scene load_steps=10 format=3 uid="uid://c2mlaly46p3v5"]
 
 [ext_resource type="Script" uid="uid://dle4w1sl7v6dy" path="res://main.gd" id="1_ig7tw"]
 [ext_resource type="Theme" uid="uid://ct03hqqci348h" path="res://objects/objects.tres" id="2_0xm2m"]
@@ -6,6 +6,7 @@
 [ext_resource type="Script" uid="uid://s8wdifckchem" path="res://new_object_menu.gd" id="4_1bvp3"]
 [ext_resource type="Texture2D" uid="uid://ddaobfj73bmas" path="res://assets/tile_0618.png" id="4_272bh"]
 [ext_resource type="Script" uid="uid://up2sqqiniay4" path="res://menu_style.gd" id="5_lquwl"]
+[ext_resource type="FontFile" uid="uid://du2lro1ph87qd" path="res://assets/fonts/Roboto-Medium.ttf" id="6_5vw27"]
 [ext_resource type="Script" uid="uid://b1f0mugcvkje7" path="res://special_popup_window.gd" id="6_7mycd"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lquwl"]
@@ -334,7 +335,9 @@ layout_mode = 2
 [node name="ButtonPrelabelLineEdit" type="LineEdit" parent="VBoxContainer/BottomContainer/BottomTabContainer/Content/ButtonEditContainer"]
 unique_name_in_owner = true
 layout_mode = 2
-placeholder_text = "Prelabel  (optional)"
+theme_override_fonts/font = ExtResource("6_5vw27")
+theme_override_font_sizes/font_size = 10
+placeholder_text = "Prelabel (optional)"
 alignment = 1
 clear_button_enabled = true
 select_all_on_focus = true
@@ -658,7 +661,7 @@ text = "Confirm"
 [connection signal="pressed" from="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Objects/HBoxContainer/DeleteSelected" to="." method="_on_delete_selected_pressed"]
 [connection signal="pressed" from="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Debug/ForceRefresh" to="." method="_on_force_refresh_pressed"]
 [connection signal="item_selected" from="VBoxContainer/BottomContainer/BottomTabContainer/Content/ContentTree" to="." method="_on_content_tree_item_selected"]
-[connection signal="about_to_popup" from="VBoxContainer/BottomContainer/BottomTabContainer/Content/ButtonEditContainer/ActionMenuButton" to="." method="_on_action_menu_button_about_to_popup"]
+[connection signal="about_to_popup" from="VBoxContainer/BottomContainer/BottomTabContainer/Content/ButtonEditContainer/ActionMenuButton" to="." method="_on_button_action_menu_about_to_popup"]
 [connection signal="pressed" from="VBoxContainer/BottomContainer/BottomTabContainer/Content/HBoxContainer/CancelEdits" to="." method="_on_cancel_edits_button_pressed"]
 [connection signal="pressed" from="VBoxContainer/BottomContainer/BottomTabContainer/Content/HBoxContainer/SaveEdits" to="." method="_on_save_edits_button_pressed"]
 [connection signal="pressed" from="SpecialPopupWindow/VBoxContainer/ButtonsHBoxContainer/Cancel" to="SpecialPopupWindow" method="_on_cancel_pressed"]
