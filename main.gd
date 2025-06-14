@@ -107,17 +107,24 @@ func repopulate_project_list() -> void:
 	project_option_button.add_item("~~~~~ ~ ~ ~  ~  ~  ~   ~   ~    ~-.   ~      ~-`       ~    .       `  .", 1)
 	
 	# Scanning for files
-	var current_id_index:int = 2
+	var id_index:int = 2
 	var directories:PackedStringArray = DirAccess.get_directories_at(Particles.file_saves_directory)
+	var current_project_index:int = -1
 	for dir:String in directories:
-		project_option_button.add_item(dir, current_id_index)
+		project_option_button.add_item(dir, id_index)
+		
+		if current_project_name == dir:
+			current_project_index = id_index
 		
 		var dirpath:String = U.cat([Particles.file_saves_directory, dir])
-		project_option_button.set_item_metadata(current_id_index, dirpath)
-		current_id_index += 1
-		
-	#if current_page_name in directories:
-		#pass
+		project_option_button.set_item_metadata(id_index, dirpath)
+		id_index += 1
+	
+	if current_project_index > -1:
+		project_option_button.select(current_project_index)
+	else:
+		project_option_button.select(1)
+	
 
 func load_project(project_dir_path:String) -> void:
 	# TODO load assets, etc etc etc extramarital features
@@ -126,6 +133,7 @@ func load_project(project_dir_path:String) -> void:
 func new_project(project_name:String) -> void:
 	current_project_name = project_name
 	new_page("index")
+	top_tab_container.current_tab = TOP_TABS.PROJECT_T
 
 #endregion
 
