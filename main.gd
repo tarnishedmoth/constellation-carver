@@ -300,6 +300,7 @@ func load_page(filepath, relative:bool = true) -> void:
 		return
 	else:
 		l("Loading page...")
+		page_content_modified = false
 		current_page_json = payload
 		current_page_filepath = _filepath
 		pages[_filepath] = current_page_json ## Lazy loading. Set the keys on project load
