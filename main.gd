@@ -37,7 +37,7 @@ var current_page_name: String: ## Abstract
 			return current_page_json["title"]
 		else:
 			return "Empty"
-var current_page_filepath: String ## Relative path from project folder ; manually set
+var current_page_filepath: String ## Absolute path.
 var current_page_json: Dictionary = {}
 var current_page_content: Array = []
 
@@ -164,16 +164,15 @@ func load_project(project_dir_path:String) -> void:
 		return
 
 func new_project(project_name:String) -> void:
-	set_starting_ui_state()
-	#pages.clear()
-	_refresh_project_pages(true)
 	current_project_name = project_name
 	new_page("index")
+	_refresh_project_pages(true)
+	set_starting_ui_state()
 	top_tab_container.current_tab = TOP_TABS.PROJECT_T
 
 #endregion
 #region PAGES
-func _refresh_project_pages(force_refresh:bool = false) -> void:
+func _refresh_project_pages(force_refresh:bool = false, reload_current:bool = true) -> void:
 	if !is_pages_cached or force_refresh:
 		is_pages_cached = false
 		pages.clear()
@@ -181,9 +180,11 @@ func _refresh_project_pages(force_refresh:bool = false) -> void:
 		for json_filepath:String in ParticleParser.find_json_files_in(current_project_filepath):
 			var json_file:Dictionary = ParticleParser.load_json_from_file(json_filepath)
 			if ParticleParser.is_valid_page(json_file):
-
-				pages.get_or_add(json_filepath)
+				pages[json_filepath] = {}
 		is_pages_cached = true
+	if reload_current:
+		if current_page_filepath in pages:
+			pages[current_page_filepath] = ParticleParser.load_json_from_file(current_page_filepath)
 
 func reset_page_tab() -> void:
 	if not is_initialized: await get_tree().process_frame
@@ -205,16 +206,23 @@ func reset_page_tab() -> void:
 		page_select.add_item("Create New Page", 0) # Always id 0
 		page_select.add_separator(current_project_name)
 
-		# TODO Replace with pages[] access
-		var id_index:int = 1
-		for json_filepath in ParticleParser.find_json_files_in(current_project_filepath):
-			var json_file = ParticleParser.load_json_from_file(json_filepath)
-			if ParticleParser.is_valid_page(json_file):
-				id_index += 1
-				page_select.add_item(json_filepath, id_index)
-				if current_page_filepath.is_absolute_path():
-					if json_filepath == current_page_filepath:
-						page_select.select(id_index)
+		var id_index:int = 2
+		for page:String in pages:
+			page_select.add_item(page.trim_prefix(U.endify(current_project_filepath)), id_index)
+			page_select.set_item_metadata(id_index, page)
+			if page == current_page_filepath:
+				page_select.select(id_index)
+			id_index += 1
+
+
+		#for json_filepath in ParticleParser.find_json_files_in(current_project_filepath):
+			#var json_file = ParticleParser.load_json_from_file(json_filepath)
+			#if ParticleParser.is_valid_page(json_file):
+				#id_index += 1
+				#page_select.add_item(json_filepath, id_index)
+				#if current_page_filepath.is_absolute_path():
+					#if json_filepath == current_page_filepath:
+						#page_select.select(id_index)
 
 
 func load_page(filepath, relative:bool = true) -> void:
@@ -454,7 +462,7 @@ func new_page(filename:String, overwrite:bool = false, dirpath:String = current_
 	var did_save:bool = ParticleParser.save_json_to_file(new_page_json, _filepath)
 	if did_save:
 		l(U.bold("New page created and saved!"))
-
+		_refresh_project_pages(true)
 		await get_tree().process_frame
 		load_page(_filepath, false)
 	else:
@@ -582,7 +590,7 @@ func check_editable(type = null) -> bool:
 		if is_instance_valid(selected_editable):
 			if type != null:
 				# Classes must match argument object's class
-				if selected_editable.is_instance_of(type):
+				if is_instance_of(selected_editable, type):
 					return true
 			else:
 				# Any class
@@ -632,7 +640,7 @@ func _on_page_select_item_selected(index: int) -> void:
 	if id == 0:
 		_on_new_page_pressed()
 	else:
-		var _filepath:String = page_select.get_item_text(index)
+		var _filepath:String = page_select.get_item_metadata(index)
 		if _filepath.is_absolute_path():
 			load_page(_filepath, false)
 
@@ -735,8 +743,9 @@ func _on_button_action_menu_about_to_popup() -> void:
 	popup.add_separator("Project Pages:", 1)
 	var index_id = 2
 	for page:String in pages:
-		var relative_path:String = page.trim_prefix(current_project_filepath) # TODO replace
-		popup.add_item(relative_path, index_id)
+		var relative_path:String = page.trim_prefix(U.endify(current_project_filepath))
+		popup.add_item(relative_path, index_id) # Button shows relative filepath
+		popup.set_item_metadata(index_id, page) # Metadata contains absolute filepath
 		index_id += 1
 
 func _on_button_action_menu_pressed(id:int) -> void:
