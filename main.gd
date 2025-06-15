@@ -546,14 +546,19 @@ func reset_editables() -> void: ## Called typically by changing focus with mouse
 	content_tree.hide()
 	content_tree.clear()
 
+	image_edit_container.hide()
+
 func open_edit_content(instance:Object) -> void:
 	reset_editables()
 	# Top: Show Objects tab
 	top_tab_container.current_tab = TOP_TABS.OBJECTS_T
 
+	# Bottom:
+	if instance is ConstellationSeparator:
+		bottom_tab_container.current_tab = BOTTOM_TABS.STYLE_T
+
 	selected_editable = instance
 	json_edit.text = str(selected_editable) # Uses _to_string() of instance
-
 
 	if "_type" in selected_editable:
 		var index = current_page_content.find(selected_editable)
@@ -561,6 +566,7 @@ func open_edit_content(instance:Object) -> void:
 		selected_object_type.text = "Now editing: " + selected_editable._type + "  -  "
 		selected_object_type.text += "Indexed at %s / %s." % [index, current_page_content.size()-1]
 
+	## Supports both Blockquote and Paragraph
 	if "_text" in selected_editable:
 		content_empty_label.hide()
 		content_text_edit.text = selected_editable["_text"]
