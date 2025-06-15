@@ -604,8 +604,10 @@ func open_edit_content(instance:Object) -> void:
 	elif selected_editable is ConstellationImage:
 		content_empty_label.hide()
 		image_edit_container.show()
+		content_text_edit.show()
 		image_width_spin_box.value = int(selected_editable["_width"])
 		image_height_spin_box.value = int(selected_editable["_height"])
+		content_text_edit.text = selected_editable["_pixels"]
 
 #endregion
 #region HELPERS
@@ -778,6 +780,11 @@ func _on_save_edits_button_pressed() -> void:
 		selected_editable["_prelabel"] = button_prelabel_line_edit.text
 		selected_editable["_label"] = button_label_line_edit.text
 
+	elif selected_editable is ConstellationImage:
+		selected_editable["_width"] = image_width_spin_box.value
+		selected_editable["_height"] = image_height_spin_box.value
+		selected_editable["_pixels"] = content_text_edit.text
+
 	#selected_editable._text = content_text_edit.text
 	cache_changes(true)
 
@@ -863,6 +870,32 @@ func _on_button_action_menu_pressed(id:int) -> void:
 
 
 ## IMAGES
+
+func _on_import_image_from_json_button_pressed() -> void:
+	if selected_editable is ConstellationImage:
+		var clipboard_data:String = DisplayServer.clipboard_get()
+		if not clipboard_data.is_empty():
+			var parse_result = JSON.parse_string(clipboard_data)
+			if parse_result == null: return
+			var jason:Dictionary = parse_result
+
+			if "type" in jason:
+				if jason["type"] == ConstellationImage._type:
+					if "width" in jason:
+						image_width_spin_box.value = jason["width"]
+					if "height" in jason:
+						image_height_spin_box.value = jason["height"]
+					if "pixels" in jason:
+						content_text_edit.text = jason["pixels"]
+						#selected_editable["_pixels"] = jason["pixels"]
+
+					if "style" in jason:
+						var import_style:Style = Style.new()
+						for param in jason["style"]:
+							if param in jason["style"].keys():
+								import_style[param] = param
+
+						jason["style"] = import_style.to_dict()
 
 
 ## JSON
