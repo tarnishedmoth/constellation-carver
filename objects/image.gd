@@ -62,6 +62,7 @@ func _ready() -> void:
 func toggle_placeholder(on=true) -> void:
 	if on:
 		placeholder = PLACEHOLDER_SCENE.instantiate()
+		#placeholder.custom_minimum_size = Vector2(_width*style.scale, _height*style.scale)
 		placeholder.text = "Image\n%s x %s" % [_width, _height] # Label
 		add_child(placeholder)
 	else:

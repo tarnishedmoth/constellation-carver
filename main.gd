@@ -1,5 +1,7 @@
 class_name MainScreen extends Control
 
+signal initialized
+
 #region MEMORY
 const APP_NAME:String = "[i]Constellation Carver v0.1[/i]"
 const TILE_0233 = preload("res://assets/tile_0233.png") # New project icon
@@ -21,6 +23,12 @@ enum BOTTOM_TABS {
 	JSON_T = 2
 }
 
+enum STYLE_PARAMS {
+	TEXT_ALIGN = 0,
+	MARGIN_TOP = 1,
+	MARGIN_BOTTOM = 2,
+	SCALE = 3
+}
 
 const PAGE_TEMPLATE:Array = [
 	ConstellationImage.TEMPLATE,
@@ -48,7 +56,11 @@ var current_page_content: Array = []
 
 var selected_editable:Control
 
-var is_initialized:bool = false
+var is_initialized:bool = false:
+	set(value):
+		is_initialized = value
+		if value:
+			initialized.emit()
 var page_content_modified:bool = false:
 	set(value):
 		page_content_modified = value
@@ -94,6 +106,26 @@ var page_content_modified:bool = false:
 @onready var image_height_spin_box: SpinBox = %ImageHeightSpinBox
 
 @onready var content_empty_label: Label = %ContentEmptyLabel
+
+# STYLE
+@onready var style_empty_label: Label = %StyleEmptyLabel
+@onready var style_add_menu: MenuButton = %StyleAddMenu
+
+@onready var style_text_align_container: HBoxContainer = %StyleTextAlignContainer
+@onready var style_text_align_edit: OptionButton = %StyleTextAlignEdit
+
+@onready var style_margins_top_container: HBoxContainer = %StyleMarginsTopContainer
+@onready var style_margin_top_edit: SpinBox = %StyleMarginTopEdit
+
+@onready var style_margins_bottom_container: HBoxContainer = %StyleMarginsBottomContainer
+@onready var style_margin_bottom_edit: SpinBox = %StyleMarginBottomEdit
+
+@onready var style_scale_container: HBoxContainer = %StyleScaleContainer
+@onready var style_scale_edit: SpinBox = %StyleScaleEdit
+
+@onready var style_save_buttons: HBoxContainer = %StyleSaveButtons
+
+
 # JSON
 @onready var json_edit: CodeEdit = %JSONEdit
 var json_edit_is_word_wrap:bool = false
@@ -107,6 +139,9 @@ func _ready() -> void:
 
 	# CONTENT edit tab
 	button_action_menu.get_popup().id_pressed.connect(_on_button_action_menu_pressed)
+
+	# STYLE edit tab
+	style_add_menu.get_popup().id_pressed.connect(_on_style_add_menu_popup_id_pressed)
 
 	# JSON edit tab
 	var context_menu:PopupMenu = json_edit.get_menu()
@@ -205,7 +240,8 @@ func _refresh_project_pages(force_refresh:bool = false, reload_current:bool = tr
 			pages[current_page_filepath] = ParticleParser.load_json_from_file(current_page_filepath)
 
 func reset_page_tab() -> void:
-	if not is_initialized: await get_tree().process_frame
+	if not is_initialized:
+		await initialized
 
 	if current_page_filepath:
 		page_filename_edit.text = current_page_filepath.get_file()
@@ -548,6 +584,49 @@ func reset_editables() -> void: ## Called typically by changing focus with mouse
 
 	image_edit_container.hide()
 
+func reset_style_tab() -> void:
+	if not is_initialized:
+		await initialized
+
+	# Close all containers
+	style_text_align_container.hide()
+	style_margins_top_container.hide()
+	style_margins_bottom_container.hide()
+	style_scale_container.hide()
+	style_empty_label.show()
+
+	if not check_editable(Control):
+		return
+	else:
+		if "style" in selected_editable:
+			var style:Style = selected_editable["style"]
+			if not is_instance_valid(style): return
+
+			var modified_style_properties:Dictionary = style.get_modified_properties()
+			if not modified_style_properties.is_empty():
+				style_empty_label.hide()
+				var _add_menu_popup:PopupMenu = style_add_menu.get_popup()
+
+				if "text-align" in modified_style_properties:
+					_add_menu_popup.set_item_checked(_add_menu_popup.get_item_index(STYLE_PARAMS.TEXT_ALIGN), true)
+					style_text_align_container.show()
+					style_text_align_edit.select(selected_editable.style.get_align_int())
+
+				if "margin-top" in modified_style_properties:
+					_add_menu_popup.set_item_checked(_add_menu_popup.get_item_index(STYLE_PARAMS.MARGIN_TOP), true)
+					style_margins_top_container.show()
+					style_margin_top_edit.value = modified_style_properties["margin-top"]
+
+				if "margin-bottom" in modified_style_properties:
+					_add_menu_popup.set_item_checked(_add_menu_popup.get_item_index(STYLE_PARAMS.MARGIN_BOTTOM), true)
+					style_margins_bottom_container.show()
+					style_margin_bottom_edit.value = modified_style_properties["margin-bottom"]
+
+				if "scale" in modified_style_properties:
+					_add_menu_popup.set_item_checked(_add_menu_popup.get_item_index(STYLE_PARAMS.SCALE), true)
+					style_scale_container.show()
+					style_scale_edit.value = modified_style_properties["scale"]
+
 func open_edit_content(instance:Object) -> void:
 	reset_editables()
 	# Top: Show Objects tab
@@ -573,11 +652,8 @@ func open_edit_content(instance:Object) -> void:
 		content_text_edit.show()
 
 
-	if "style" in selected_editable:
-		if is_instance_valid(selected_editable.style):
-			%StyleEmptyLabel.hide()
-			%StyleTextAlignContainer.show()
-			%StyleTextAlign.select(selected_editable.style.get_align_int())
+	#if "style" in selected_editable:
+	reset_style_tab()
 
 
 	if selected_editable is ConstellationButton:
@@ -642,9 +718,14 @@ func get_index_of(content:Object) -> int: ## Returns -1 for bad value
 func get_content_at(index:int) -> Object:
 	return current_page_content[index]
 
-func check_editable(type = null) -> bool:
+func check_editable(type = null, check_has_style:bool = false) -> bool:
 	if selected_editable != null:
 		if is_instance_valid(selected_editable):
+
+			if check_has_style:
+				if "style" in selected_editable: return true
+				else: return false
+
 			if type != null:
 				# Classes must match argument object's class
 				var matches = is_instance_of(selected_editable, type)
@@ -810,6 +891,11 @@ func _on_object_tree_cell_selected() -> void:
 
 
 ## BOTTOM TAB
+
+func _on_bottom_tab_container_tab_selected(tab: int) -> void:
+	if tab == BOTTOM_TABS.STYLE_T:
+		reset_style_tab()
+
 ## LISTS
 
 func _on_content_tree_item_selected() -> void:
@@ -903,6 +989,47 @@ func _on_import_image_from_json_button_pressed() -> void:
 
 						jason["style"] = import_style.to_dict()
 
+## STYLE
+
+func _on_style_add_menu_popup_id_pressed(id:int) -> void:
+	if not check_editable(Control, true):
+		push_error("Style: No editable selected / No 'style' in editable.")
+		return
+	#else:
+		#if not is_instance_valid(editable.style):
+			#editable.style = Style.new()
+
+	var _add_menu_popup:PopupMenu = style_add_menu.get_popup()
+	var _index:int = _add_menu_popup.get_item_index(id)
+
+	# Toggle the check
+	_add_menu_popup.toggle_item_checked(_index)
+
+	match id:
+		## If the arrangements of the menu items ever change, this will break. To fix, instantiate popup items in code. HACK
+		## The buttons for each id have checkboxes & are check'ed when opening the editable based on its Style.
+		STYLE_PARAMS.TEXT_ALIGN: # Text Align
+			style_text_align_container.visible = _add_menu_popup.is_item_checked(_index)
+			style_text_align_edit.select(Style.get_align(Style.DEFAULTS.TEXT_ALIGN))
+
+		STYLE_PARAMS.MARGIN_TOP: # Margin Top
+			style_margins_top_container.visible = _add_menu_popup.is_item_checked(_index)
+			style_margin_top_edit.value = Style.DEFAULTS.MARGIN_TOP
+
+		STYLE_PARAMS.MARGIN_BOTTOM: # Margin Bottom
+			style_margins_bottom_container.visible = _add_menu_popup.is_item_checked(_index)
+			style_margin_bottom_edit.value = Style.DEFAULTS.MARGIN_BOTTOM
+
+		STYLE_PARAMS.SCALE: # Scale
+			style_scale_container.visible = _add_menu_popup.is_item_checked(_index)
+			if selected_editable is ConstellationImage:
+				style_scale_edit.value = Style.DEFAULTS.SCALE_IMAGE
+			elif selected_editable is ConstellationReel:
+				style_scale_edit.value = Style.DEFAULTS.SCALE_REEL
+
+func _on_style_save_button_pressed() -> void:
+	# TODO
+	pass # Replace with function body.
 
 ## JSON
 
