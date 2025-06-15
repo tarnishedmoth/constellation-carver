@@ -106,3 +106,6 @@ static func is_valid_page(page:Dictionary) -> bool:
 	if not "title" in page: return false
 	if not "content" in page: return false
 	return true
+
+static func is_valid_webpath(path:String) -> bool:
+	return true

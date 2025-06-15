@@ -48,3 +48,7 @@ func cat(strings:Array[String], knot:String = "/", tail:String = "", check_knots
 		yarn += strand
 		i+=1
 	return yarn
+
+func is_relative_path(path:String) -> bool:
+	if path.trim_prefix("/").is_relative_path(): return true
+	else: return false

@@ -1,7 +1,7 @@
 class_name MainScreen extends Control
 
 #region MEMORY
-const APP_NAME:String = "Constellation Carver v0.1"
+const APP_NAME:String = "[i]Constellation Carver v0.1[/i]"
 const TILE_0233 = preload("res://assets/tile_0233.png") # New project icon
 
 enum TOP_TABS {
@@ -44,7 +44,15 @@ var current_page_content: Array = []
 var selected_editable:Control
 
 var is_initialized:bool = false
+var page_content_modified:bool = false:
+	set(value):
+		page_content_modified = value
+		if value:
+			application_name["text"] = APP_NAME + "  -  [b]unsaved page changes[/b] 💔"
+		else:
+			application_name["text"] = APP_NAME
 
+@onready var application_name: RichTextLabel = %ApplicationName
 # SPACES
 @onready var special_popup_window: SpecialPopupWindow = $SpecialPopupWindow
 @onready var log_console: RichTextLabel = %LogConsole:
@@ -85,6 +93,7 @@ var json_edit_is_word_wrap:bool = false
 
 func _ready() -> void:
 	U.log_console = log_console
+	application_name.text = APP_NAME
 
 	# CONTENT edit tab
 	button_action_menu.get_popup().id_pressed.connect(_on_button_action_menu_pressed)
@@ -103,7 +112,6 @@ func _ready() -> void:
 	is_initialized = true
 
 func set_starting_ui_state() -> void:
-	%ApplicationName.text = APP_NAME
 	# Menu initial states
 	top_tab_container.current_tab = TOP_TABS.PROJECT_T # Project tab
 	bottom_tab_container.current_tab = BOTTOM_TABS.CONTENT_T # Content tab
@@ -226,6 +234,16 @@ func reset_page_tab() -> void:
 
 
 func load_page(filepath, relative:bool = true) -> void:
+	if page_content_modified:
+		var discard:bool = await special_popup_window.popup(
+			"Page content modified!\n\nDiscard changes?",
+			"Load Page  -  Page Modified",
+			true
+		)
+		if not discard:
+			## User Cancel
+			return
+
 	var _filepath:String
 	if relative:
 		_filepath = U.endify(current_project_filepath) + U.endify(filepath, ".json")
@@ -234,12 +252,12 @@ func load_page(filepath, relative:bool = true) -> void:
 
 	if not FileAccess.file_exists(_filepath):
 		l("Tried to load page--file not found!")
-		var result:bool = await special_popup_window.popup(
+		var overwrite:bool = await special_popup_window.popup(
 			"File does not exist!\nWould you like to create a new Page?\n%s" % [_filepath],
 			"Load Page  -  File Not Found",
 			true
 		)
-		if result:
+		if overwrite:
 			new_page(_filepath, true, "")
 			load_page(_filepath, false)
 		else:
@@ -249,23 +267,23 @@ func load_page(filepath, relative:bool = true) -> void:
 
 	if payload.is_empty():
 		l("Loaded page is empty!")
-		var result:bool = await special_popup_window.popup(
+		var overwrite:bool = await special_popup_window.popup(
 			"File is empty!\nWould you like to format the file into a New Page?\n%s" % [_filepath],
 			"Load Page  -  Empty File",
 			true
 		)
-		if result:
+		if overwrite:
 			new_page(_filepath, true, "")
 			load_page(_filepath, false)
 		return
 	elif not "format" in payload:
 		l("Loaded page has bad format!")
-		var result:bool = await special_popup_window.popup(
+		var overwrite:bool = await special_popup_window.popup(
 			"File has formatting errors!\nWould you like to format the file into a Page?\n%s" % [_filepath],
 			"Load Page  -  Corrupt File",
 			true
 		)
-		if result:
+		if overwrite:
 			new_page(_filepath, false, "")
 			load_page(_filepath, false)
 		return
@@ -285,6 +303,7 @@ func load_page(filepath, relative:bool = true) -> void:
 		current_page_json = payload
 		current_page_filepath = _filepath
 		pages[_filepath] = current_page_json ## Lazy loading. Set the keys on project load
+		set_starting_ui_state()
 		reset_page_tab()
 		render_current_page_content()
 		return
@@ -407,7 +426,7 @@ func save_page(filepath) -> void:
 
 	if result == true:
 		l("--Saved page to " + _filepath)
-		%ApplicationName.text = APP_NAME
+		page_content_modified = false
 		reset_page_tab()
 	else:
 		l(U.bold("--Failed to save page to " + _filepath))
@@ -422,7 +441,7 @@ func cache_changes(refresh:bool = false):
 
 	l("Cached %s items." % [index])
 
-	%ApplicationName.text = APP_NAME + " - unsaved changes"
+	page_content_modified = true
 
 	if refresh: render_current_page_content()
 
@@ -528,6 +547,11 @@ func open_edit_content(instance:Object) -> void:
 		content_empty_label.hide()
 		button_edit_container.show()
 
+		var action_display_text:String = selected_editable["_action"]
+		if action_display_text.is_empty() or action_display_text == ".":
+			action_display_text = "(No Action)"
+		button_action_menu.text = action_display_text
+
 		button_prelabel_line_edit.text = selected_editable["_prelabel"]
 		button_label_line_edit.text = selected_editable["_label"]
 
@@ -590,7 +614,8 @@ func check_editable(type = null) -> bool:
 		if is_instance_valid(selected_editable):
 			if type != null:
 				# Classes must match argument object's class
-				if is_instance_of(selected_editable, type):
+				var matches = is_instance_of(selected_editable, type)
+				if matches:
 					return true
 			else:
 				# Any class
@@ -643,6 +668,7 @@ func _on_page_select_item_selected(index: int) -> void:
 		var _filepath:String = page_select.get_item_metadata(index)
 		if _filepath.is_absolute_path():
 			load_page(_filepath, false)
+			reset_page_tab()
 
 func _on_new_page_pressed() -> void:
 	var text_input:String = await special_popup_window.popup_text_entry(
@@ -700,14 +726,16 @@ func _on_page_title_edit_text_changed(new_text: String) -> void:
 	current_page_json["title"] = new_text
 	l("Page title modified.")
 	cache_changes()
-	render_current_page_content()
+	render_current_page_content() # Might not be necessary
 
 func _on_save_edits_button_pressed() -> void:
 	if not check_editable():
 		l("Failed to save content edits: no selection.")
 		return
+
 	if selected_editable is ConstellationParagraph:
 		selected_editable._text = content_text_edit.text
+
 	elif selected_editable is ConstellationBlockquote:
 		selected_editable._text = content_text_edit.text
 
@@ -715,6 +743,14 @@ func _on_save_edits_button_pressed() -> void:
 		var tree_item = content_tree.get_selected()
 		tree_item.set_text(0, content_text_edit.text)
 		selected_editable._items[tree_item.get_index()] = tree_item.get_text(0)
+
+	elif selected_editable is ConstellationButton:
+		var _action:String = button_action_menu.text
+		if _action == "(No Action)": _action == ""
+
+		selected_editable["_action"] = _action
+		selected_editable["_prelabel"] = button_prelabel_line_edit.text
+		selected_editable["_label"] = button_label_line_edit.text
 
 	#selected_editable._text = content_text_edit.text
 	cache_changes(true)
@@ -739,13 +775,21 @@ func _on_button_action_menu_about_to_popup() -> void:
 	var popup = button_action_menu.get_popup()
 	popup.clear(true)
 
-	popup.add_icon_item(TILE_0233, "URL / Enter Manually", 0)
+	popup.add_icon_radio_check_item(TILE_0233, "URL / Enter Manually", 0)
+	var _current_action_value:String = selected_editable["_action"]
+	if not _current_action_value.is_empty():
+		popup.set_item_checked(0, true)
+		popup.set_item_text(0, _current_action_value)
+
 	popup.add_separator("Project Pages:", 1)
 	var index_id = 2
 	for page:String in pages:
-		var relative_path:String = page.trim_prefix(U.endify(current_project_filepath))
-		popup.add_item(relative_path, index_id) # Button shows relative filepath
-		popup.set_item_metadata(index_id, page) # Metadata contains absolute filepath
+		var formatted_path:String = page.trim_prefix(current_project_filepath).rstrip(".json")
+		if formatted_path == _current_action_value:
+			popup.set_item_checked(0, false) # Action links to existing page in project
+			popup.set_item_checked(index_id, true)
+		popup.add_radio_check_item(formatted_path, index_id) # Button shows whatever looks nice // vv These are one in the same for now. vv
+		popup.set_item_metadata(index_id, formatted_path) # Metadata contains formatted filepath
 		index_id += 1
 
 func _on_button_action_menu_pressed(id:int) -> void:
@@ -753,8 +797,34 @@ func _on_button_action_menu_pressed(id:int) -> void:
 	if not check_editable(ConstellationButton):
 		push_error("Pressed edit button action menu without Button selected.")
 		return
+	## Selected editable is a ConstellationButton
 
+	# HERE WE GO FINALLY
+	var _result_action:String = selected_editable["_action"]
 
+	var popup:PopupMenu = button_action_menu.get_popup()
+	if id == 0:
+		## Manual entry / existing action
+		var custom_action:String = await special_popup_window.popup_text_entry(
+			"Type a value to assign to this button's action field. You don't need to include the file extension.\
+			This should begin with a forward slash '/' for local paths.\
+			If the path ends in a slash, it's treated as a directory, within Constellation will try to load 'index.json'.",
+			"Manual Button 'Action'",
+			true, 0,
+			selected_editable["_action"]
+		)
+		if custom_action.is_empty():
+			## User canceled
+			return
+		else:
+			_result_action = custom_action
+	else:
+		_result_action = str(popup.get_item_metadata(id))
+	# Set the UI
+	if not ParticleParser.is_valid_webpath(_result_action):
+		special_popup_window.popup("Invalid webpath, canceling.")
+	else:
+		button_action_menu.text = _result_action
 
 func _on_json_edit_context_menu_pressed(id:int, trigger_id:int) -> void:
 	if id == trigger_id:

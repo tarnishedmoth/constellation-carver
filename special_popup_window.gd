@@ -19,14 +19,17 @@ enum TEXT_FORMAT {
 	FILE = 1, # Text must not contain invalidating characters for a file name.
 	PATH = 2, # Text can be a relative or absolute path format.
 	REL_PATH = 3, # Text must be a relative path.
-	ABS_PATH = 4 # Text must be an absolute path.
+	ABS_PATH = 4, # Text must be an absolute path.
+	WEB_PATH = 5, # Uses method in ParticleParser.
 }
 
-func popup_text_entry(details_text:String, heading:String = "Warning", user_choice:bool = true, check_flag:TEXT_FORMAT = TEXT_FORMAT.NONE, callable:Callable = func(_choice:bool): pass) -> String:
+func popup_text_entry(details_text:String, heading:String = "Input Text", user_choice:bool = true, check_flag:TEXT_FORMAT = TEXT_FORMAT.NONE, populate_line_edit:String = "", callable:Callable = func(_choice:bool): pass) -> String:
 	var text_entry_invalid:bool = true
 	var attempted:bool = false
 
 	line_edit.clear()
+	if not populate_line_edit.is_empty():
+		line_edit.text = populate_line_edit
 	line_edit.show()
 
 	while text_entry_invalid:
@@ -45,11 +48,13 @@ func popup_text_entry(details_text:String, heading:String = "Warning", user_choi
 					TEXT_FORMAT.FILE:
 						if let.is_valid_filename(): break
 					TEXT_FORMAT.PATH:
-						if let.is_absolute_path() or let.is_relative_path(): break
+						if let.is_absolute_path() or let.is_relative_path(): break # TODO fix, relative path doesn't like leading slash
 					TEXT_FORMAT.REL_PATH:
-						if let.is_relative_path(): break
+						if let.is_relative_path(): break # TODO fix, relative path doesn't like leading slash
 					TEXT_FORMAT.ABS_PATH:
 						if let.is_absolute_path(): break
+					TEXT_FORMAT.WEB_PATH:
+						if ParticleParser.is_valid_webpath(let): break
 					_:
 						break
 
@@ -59,7 +64,7 @@ func popup_text_entry(details_text:String, heading:String = "Warning", user_choi
 			continue
 		else:
 			# Cancel
-			break
+			return ""
 
 	line_edit.hide()
 	return line_edit.text
