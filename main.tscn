@@ -328,6 +328,7 @@ auto_tooltip = false
 
 [node name="ButtonEditContainer" type="VBoxContainer" parent="VBoxContainer/BottomContainer/BottomTabContainer/Content"]
 unique_name_in_owner = true
+visible = false
 layout_mode = 2
 size_flags_vertical = 3
 
@@ -372,6 +373,59 @@ alignment = 1
 clear_button_enabled = true
 select_all_on_focus = true
 caret_blink = true
+
+[node name="ImageEditContainer" type="VBoxContainer" parent="VBoxContainer/BottomContainer/BottomTabContainer/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="WidthHBoxContainer" type="HBoxContainer" parent="VBoxContainer/BottomContainer/BottomTabContainer/Content/ImageEditContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBoxContainer/BottomContainer/BottomTabContainer/Content/ImageEditContainer/WidthHBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Width:"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ImageWidthSpinBox" type="SpinBox" parent="VBoxContainer/BottomContainer/BottomTabContainer/Content/ImageEditContainer/WidthHBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 1.0
+max_value = 400.0
+value = 1.0
+rounded = true
+allow_greater = true
+suffix = "p"
+custom_arrow_step = 2.0
+select_all_on_focus = true
+
+[node name="HeightHBoxContainer" type="HBoxContainer" parent="VBoxContainer/BottomContainer/BottomTabContainer/Content/ImageEditContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBoxContainer/BottomContainer/BottomTabContainer/Content/ImageEditContainer/HeightHBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Height"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ImageHeightSpinBox" type="SpinBox" parent="VBoxContainer/BottomContainer/BottomTabContainer/Content/ImageEditContainer/HeightHBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 1.0
+max_value = 240.0
+value = 1.0
+rounded = true
+allow_greater = true
+suffix = "p"
+custom_arrow_step = 2.0
+select_all_on_focus = true
 
 [node name="ContentTextEdit" type="TextEdit" parent="VBoxContainer/BottomContainer/BottomTabContainer/Content"]
 unique_name_in_owner = true

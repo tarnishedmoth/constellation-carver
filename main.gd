@@ -82,12 +82,17 @@ var page_content_modified:bool = false:
 # CONTENT
 @onready var content_text_edit: TextEdit = %ContentTextEdit
 
+@onready var content_tree: Tree = %ContentTree
+
 @onready var button_edit_container: VBoxContainer = %ButtonEditContainer
 @onready var button_prelabel_line_edit: LineEdit = %ButtonPrelabelLineEdit
 @onready var button_label_line_edit: LineEdit = %ButtonLabelLineEdit
 @onready var button_action_menu: MenuButton = %ActionMenuButton
 
-@onready var content_tree: Tree = %ContentTree
+@onready var image_edit_container: VBoxContainer = %ImageEditContainer
+@onready var image_width_spin_box: SpinBox = %ImageWidthSpinBox
+@onready var image_height_spin_box: SpinBox = %ImageHeightSpinBox
+
 @onready var content_empty_label: Label = %ContentEmptyLabel
 # JSON
 @onready var json_edit: CodeEdit = %JSONEdit
@@ -306,9 +311,9 @@ func load_page(filepath, relative:bool = true) -> void:
 	else:
 		l("Loading page...")
 		page_content_modified = false
-		current_page_json = payload
+		current_page_json = payload.duplicate(true)
 		current_page_filepath = _filepath
-		pages[_filepath] = current_page_json ## Lazy loading. Set the keys on project load
+		pages[_filepath] = payload.duplicate(true) ## Lazy loading. Set the keys on project load
 		set_starting_ui_state()
 		reset_page_tab()
 		render_current_page_content()
@@ -442,11 +447,19 @@ func cache_changes(refresh:bool = false):
 	for item:Control in current_page_content:
 		if not item == null:
 			if item.has_method("to_dict"):
-				current_page_json.content[index] = item.to_dict()
+				current_page_json["content"][index] = item.to_dict()
 		index += 1
 
 	l("Cached %s items." % [index])
 
+	## NONE of this is working for some reason so we'll keep it manual for now.
+	#if current_page_json != pages[current_page_filepath]:
+	#if current_page_json.hash() != pages[current_page_filepath].hash():
+	#if not current_page_json.recursive_equal(pages[current_page_filepath], 6): #BUG
+	#if ParticleParser.stringify(current_page_json) != ParticleParser.stringify(pages[current_page_filepath]):
+		#page_content_modified = true
+	#else:
+		#page_content_modified = false
 	page_content_modified = true
 
 	if refresh: render_current_page_content()
@@ -548,6 +561,18 @@ func open_edit_content(instance:Object) -> void:
 		selected_object_type.text = "Now editing: " + selected_editable._type + "  -  "
 		selected_object_type.text += "Indexed at %s / %s." % [index, current_page_content.size()-1]
 
+	if "_text" in selected_editable:
+		content_empty_label.hide()
+		content_text_edit.text = selected_editable["_text"]
+		content_text_edit.show()
+
+
+	if "style" in selected_editable:
+		if is_instance_valid(selected_editable.style):
+			%StyleEmptyLabel.hide()
+			%StyleTextAlignContainer.show()
+			%StyleTextAlign.select(selected_editable.style.get_align_int())
+
 
 	if selected_editable is ConstellationButton:
 		content_empty_label.hide()
@@ -562,7 +587,7 @@ func open_edit_content(instance:Object) -> void:
 		button_label_line_edit.text = selected_editable["_label"]
 
 
-	if selected_editable is ConstellationList:
+	elif selected_editable is ConstellationList:
 		content_empty_label.hide()
 		content_text_edit.show()
 		content_tree.show()
@@ -576,18 +601,11 @@ func open_edit_content(instance:Object) -> void:
 			tree_item.set_text(0, item)
 			index += 1
 
-
-	if "_text" in selected_editable:
+	elif selected_editable is ConstellationImage:
 		content_empty_label.hide()
-		content_text_edit.text = selected_editable["_text"]
-		content_text_edit.show()
-
-
-	if "style" in selected_editable:
-		if is_instance_valid(selected_editable.style):
-			%StyleEmptyLabel.hide()
-			%StyleTextAlignContainer.show()
-			%StyleTextAlign.select(selected_editable.style.get_align_int())
+		image_edit_container.show()
+		image_width_spin_box.value = int(selected_editable["_width"])
+		image_height_spin_box.value = int(selected_editable["_height"])
 
 #endregion
 #region HELPERS
@@ -606,6 +624,7 @@ func is_current_page_valid() -> bool:
 	if not "title" in current_page_json: return false
 	if not "format" in current_page_json: return false
 	elif current_page_json["format"] != "particle": return false
+	elif not "content" in current_page_json: return false
 	return true
 
 func get_index_of(content:Object) -> int: ## Returns -1 for bad value
@@ -776,7 +795,16 @@ func _on_object_tree_cell_selected() -> void:
 			var i:int = tree_item.get_index()
 			open_edit_content(get_content_at(i))
 
+
 ## BOTTOM TAB
+## LISTS
+
+func _on_content_tree_item_selected() -> void:
+	content_text_edit.text = content_tree.get_selected().get_text(0)
+
+
+## BUTTONS
+
 func _on_button_action_menu_about_to_popup() -> void:
 	# Populate the list
 	var popup = button_action_menu.get_popup()
@@ -833,6 +861,12 @@ func _on_button_action_menu_pressed(id:int) -> void:
 	else:
 		button_action_menu.text = _result_action
 
+
+## IMAGES
+
+
+## JSON
+
 func _on_json_edit_context_menu_pressed(id:int, trigger_id:int) -> void:
 	if id == trigger_id:
 		json_edit_is_word_wrap = !json_edit_is_word_wrap
@@ -843,6 +877,3 @@ func _on_json_edit_context_menu_pressed(id:int, trigger_id:int) -> void:
 			json_edit.wrap_mode = TextEdit.LINE_WRAPPING_BOUNDARY
 		else:
 			json_edit.wrap_mode = TextEdit.LINE_WRAPPING_NONE
-
-func _on_content_tree_item_selected() -> void:
-	content_text_edit.text = content_tree.get_selected().get_text(0)
