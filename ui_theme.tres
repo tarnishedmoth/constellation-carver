@@ -1,4 +1,4 @@
-[gd_resource type="Theme" load_steps=27 format=3 uid="uid://c1753t6oa0y8j"]
+[gd_resource type="Theme" load_steps=28 format=3 uid="uid://c1753t6oa0y8j"]
 
 [ext_resource type="FontFile" uid="uid://bec1e5bv27s6c" path="res://assets/fonts/Roboto-Bold.ttf" id="1_mk0s6"]
 [ext_resource type="FontFile" uid="uid://bs0a5sycrdrkv" path="res://assets/fonts/Roboto-Regular.ttf" id="1_touxu"]
@@ -148,6 +148,19 @@ corner_radius_bottom_left = 20
 corner_detail = 5
 anti_aliasing = false
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fdstn"]
+bg_color = Color(0, 0, 0, 1)
+border_width_left = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(1, 1, 1, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+corner_detail = 1
+anti_aliasing = false
+
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dmjyp"]
 bg_color = Color(0, 0, 0, 1)
 border_color = Color(1, 1, 1, 1)
@@ -261,6 +274,11 @@ LineEdit/colors/font_color = Color(0, 0, 0, 1)
 LineEdit/colors/font_placeholder_color = Color(0, 0, 0, 0.388235)
 LineEdit/styles/focus = SubResource("StyleBoxFlat_wgsb3")
 LineEdit/styles/normal = SubResource("StyleBoxFlat_g4wr8")
+MenuButtonRaised/base_type = &"MenuButton"
+MenuButtonRaised/styles/normal = SubResource("StyleBoxFlat_fdstn")
+OptionButton/colors/font_focus_color = Color(1, 1, 1, 1)
+OptionButton/colors/font_hover_color = Color(1, 1, 1, 1)
+OptionButton/constants/modulate_arrow = 1
 Panel/styles/panel = SubResource("StyleBoxFlat_dmjyp")
 PanelContainer/styles/panel = SubResource("StyleBoxFlat_uo360")
 RichTextLabel/fonts/bold_font = ExtResource("1_mk0s6")

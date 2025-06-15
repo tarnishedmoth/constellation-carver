@@ -24,7 +24,10 @@ const PAGE_TEMPLATE:Array = [
 	ConstellationButton.TEMPLATE,
 ]
 
-var current_project_name: String = "" ## Manually set
+var pages: Dictionary[String,Dictionary] = {} # Key is absolute filepath, value is json dictionary
+var is_pages_cached:bool = false
+
+var current_project_name: String = "" ## Manually set, name of subfolder in Project directory
 var current_project_filepath: String: ## Abstract
 	get:
 		return U.cat([Particles.file_saves_directory, current_project_name])
@@ -35,7 +38,6 @@ var current_page_name: String: ## Abstract
 		else:
 			return "Empty"
 var current_page_filepath: String ## Relative path from project folder ; manually set
-var pages: Dictionary[String,Dictionary] = {} # Key is filepath, value is json dictionary
 var current_page_json: Dictionary = {}
 var current_page_content: Array = []
 
@@ -126,6 +128,9 @@ func repopulate_project_list() -> void:
 	var directories:PackedStringArray = DirAccess.get_directories_at(Particles.file_saves_directory)
 	var current_project_index:int = -1
 	for dir:String in directories:
+		if not FileAccess.file_exists(U.cat([Particles.file_saves_directory, dir, "index"], "/", ".json")):
+			U.l("Directory %s has no 'index.json.'" % [dir])
+			continue
 		project_option_button.add_item(dir, id_index)
 
 		if current_project_name == dir:
@@ -142,32 +147,44 @@ func repopulate_project_list() -> void:
 
 
 func load_project(project_dir_path:String) -> void:
-	#var filepath = U.cat([project_dir_path, "index"], "/", ".json")
-	if DirAccess.dir_exists_absolute(project_dir_path):
-		set_starting_ui_state()
-		pages.clear()
-		load_page(U.cat([project_dir_path, "index"]), false)
-		#var result:bool = await load_page(U.cat([project_dir_path, "index"]), false)
-		#if result == true:
+	var _filepath = U.cat([project_dir_path, "index"], "/", ".json")
+	if FileAccess.file_exists(_filepath):
 		# this "rsplit" method is cool because it automatically discards a trailing delimiter when "allow_empty"=false
 		var load_project_name:String = project_dir_path.rsplit("/", false, 1)[1]
 		current_project_name = load_project_name
+		set_starting_ui_state()
+		#pages.clear()
+		_refresh_project_pages(true)
+		load_page(_filepath, false)
 	else:
 		special_popup_window.popup(
-			"Project directory is missing!",
-			"Load Project  -  Directory Doesn't Exist"
+			"Project is missing!\n%s" % [_filepath],
+			"Load Project  -  Index Doesn't Exist"
 		)
 		return
 
 func new_project(project_name:String) -> void:
 	set_starting_ui_state()
-	pages.clear()
+	#pages.clear()
+	_refresh_project_pages(true)
 	current_project_name = project_name
 	new_page("index")
 	top_tab_container.current_tab = TOP_TABS.PROJECT_T
 
 #endregion
 #region PAGES
+func _refresh_project_pages(force_refresh:bool = false) -> void:
+	if !is_pages_cached or force_refresh:
+		is_pages_cached = false
+		pages.clear()
+
+		for json_filepath:String in ParticleParser.find_json_files_in(current_project_filepath):
+			var json_file:Dictionary = ParticleParser.load_json_from_file(json_filepath)
+			if ParticleParser.is_valid_page(json_file):
+
+				pages.get_or_add(json_filepath)
+		is_pages_cached = true
+
 func reset_page_tab() -> void:
 	if not is_initialized: await get_tree().process_frame
 
@@ -188,6 +205,7 @@ func reset_page_tab() -> void:
 		page_select.add_item("Create New Page", 0) # Always id 0
 		page_select.add_separator(current_project_name)
 
+		# TODO Replace with pages[] access
 		var id_index:int = 1
 		for json_filepath in ParticleParser.find_json_files_in(current_project_filepath):
 			var json_file = ParticleParser.load_json_from_file(json_filepath)
@@ -258,7 +276,7 @@ func load_page(filepath, relative:bool = true) -> void:
 		l("Loading page...")
 		current_page_json = payload
 		current_page_filepath = _filepath
-		pages[current_page_filepath] = current_page_json
+		pages[_filepath] = current_page_json ## Lazy loading. Set the keys on project load
 		reset_page_tab()
 		render_current_page_content()
 		return
@@ -717,7 +735,7 @@ func _on_button_action_menu_about_to_popup() -> void:
 	popup.add_separator("Project Pages:", 1)
 	var index_id = 2
 	for page:String in pages:
-		var relative_path:String = page.trim_prefix(current_project_filepath)
+		var relative_path:String = page.trim_prefix(current_project_filepath) # TODO replace
 		popup.add_item(relative_path, index_id)
 		index_id += 1
 
