@@ -300,8 +300,8 @@ func load_page(filepath, relative:bool = true) -> void:
 		pages[_filepath] = payload.duplicate(true) ## Lazy loading. Set the keys on project load
 		ui_set_starting_state()
 
-		reset_current_tabs()
-		#reset_page_tab()
+		ui_reset_current_tabs()
+		#ui_reset_page_tab()
 		render_current_page_content()
 		return
 
@@ -339,7 +339,7 @@ func save_page(filepath) -> void:
 	if result == true:
 		l("--Saved page to " + _filepath)
 		page_content_modified = false
-		reset_page_tab()
+		ui_reset_page_tab()
 	else:
 		l(U.bold("--Failed to save page to " + _filepath))
 
@@ -505,15 +505,15 @@ func _ui_refresh_project_pages(force_refresh:bool = false, reload_current:bool =
 			pages[current_page_filepath] = ParticleParser.load_json_from_file(current_page_filepath)
 
 ## TABS
-func reset_current_tabs() -> void:
+func ui_reset_current_tabs() -> void:
 	top_tab_container.tab_selected.emit(top_tab_container.current_tab)
 	bottom_tab_container.tab_selected.emit(bottom_tab_container.current_tab)
 
 ## UPPER
-func reset_project_tab() -> void:
+func ui_reset_project_tab() -> void:
 	ui_repopulate_project_list()
 
-func reset_page_tab() -> void:
+func ui_reset_page_tab() -> void:
 	if not is_initialized:
 		await initialized
 
@@ -552,7 +552,7 @@ func reset_page_tab() -> void:
 					#if json_filepath == current_page_filepath:
 						#page_select.select(id_index)
 
-func reset_object_tab():
+func ui_reset_object_tab():
 	if not is_initialized: await initialized
 
 	if not check_editable():
@@ -564,7 +564,7 @@ func reset_object_tab():
 		selected_object_type.text += "Indexed at %s / %s." % [index, current_page_content.size()-1]
 
 ## LOWER
-func reset_content_tab() -> void:
+func ui_reset_content_tab() -> void:
 	if not is_initialized:
 		await initialized
 
@@ -623,12 +623,12 @@ func reset_content_tab() -> void:
 	elif selected_editable is ConstellationReel:
 		content_empty_label.hide()
 		image_edit_container.show()
-		content_text_edit.show()
+		#content_text_edit.show()
 		image_width_spin_box.value = int(selected_editable["_width"])
 		image_height_spin_box.value = int(selected_editable["_height"])
-		content_text_edit.text = selected_editable["_pixels"]
+		#content_text_edit.text = selected_editable["_pixels"]
 
-func reset_style_tab() -> void:
+func ui_reset_style_tab() -> void:
 	if not is_initialized:
 		await initialized
 
@@ -693,7 +693,7 @@ func reset_style_tab() -> void:
 					style_scale_container.show()
 					style_scale_edit.value = modified_style_properties["scale"]
 
-func reset_json_tab() -> void:
+func ui_reset_json_tab() -> void:
 	# TODO
 	pass
 
@@ -704,11 +704,10 @@ func open_edit_content(instance:Object) -> void:
 	reset_editables()
 	selected_editable = instance
 
-	reset_current_tabs()
+	ui_reset_current_tabs()
 
 	# Top: Show Objects tab
 	top_tab_container.current_tab = TOP_TABS.OBJECTS_T
-
 
 func reset_editables() -> void: ## Called typically by changing focus with mouse click, or saving and loading.
 	if check_editable(): l("Deselected.")
@@ -729,6 +728,23 @@ func reset_editables() -> void: ## Called typically by changing focus with mouse
 
 	image_edit_container.hide()
 
+func check_editable(type = null, check_has_style:bool = false) -> bool:
+	if selected_editable != null:
+		if is_instance_valid(selected_editable):
+
+			if check_has_style:
+				if "style" in selected_editable: return true
+				else: return false
+
+			if type != null:
+				# Classes must match argument object's class
+				var matches = is_instance_of(selected_editable, type)
+				if matches:
+					return true
+			else:
+				# Any class
+				return true
+	return false
 
 func cache_changes(refresh:bool = false):
 	var index:int = 0
@@ -779,35 +795,17 @@ func get_index_of(content:Object) -> int: ## Returns -1 for bad value
 func get_content_at(index:int) -> Object:
 	return current_page_content[index]
 
-func check_editable(type = null, check_has_style:bool = false) -> bool:
-	if selected_editable != null:
-		if is_instance_valid(selected_editable):
-
-			if check_has_style:
-				if "style" in selected_editable: return true
-				else: return false
-
-			if type != null:
-				# Classes must match argument object's class
-				var matches = is_instance_of(selected_editable, type)
-				if matches:
-					return true
-			else:
-				# Any class
-				return true
-	return false
-
 #endregion
 #region SIGNAL HANDLERS
 
 ## TOP TAB
 func _on_top_tab_container_tab_selected(tab: int) -> void:
 	if tab == TOP_TABS.PROJECT_T:
-		reset_project_tab()
+		ui_reset_project_tab()
 	elif tab == TOP_TABS.PAGE_T:
-		reset_page_tab()
+		ui_reset_page_tab()
 	elif tab == TOP_TABS.OBJECTS_T:
-		reset_object_tab()
+		ui_reset_object_tab()
 
 func _on_project_option_button_popup_id_pressed(id:int) -> void:
 	if id == 0:
@@ -846,7 +844,7 @@ func _on_page_select_item_selected(index: int) -> void:
 		var _filepath:String = page_select.get_item_metadata(index)
 		if _filepath.is_absolute_path():
 			load_page(_filepath, false)
-			reset_page_tab()
+			ui_reset_page_tab()
 
 func _on_new_page_pressed() -> void:
 	var text_input:String = await special_popup_window.popup_text_entry(
@@ -958,10 +956,10 @@ func _on_object_tree_cell_selected() -> void:
 func _on_bottom_tab_container_tab_selected(tab: int) -> void:
 	match tab:
 		BOTTOM_TABS.CONTENT_T:
-			reset_content_tab()
+			ui_reset_content_tab()
 			pass
 		BOTTOM_TABS.STYLE_T:
-			reset_style_tab()
+			ui_reset_style_tab()
 		BOTTOM_TABS.JSON_T:
 			json_edit.text = str(selected_editable) # Uses _to_string() of instance
 ## LISTS
