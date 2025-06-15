@@ -30,7 +30,7 @@ class_name MainScreen extends Control
 signal initialized
 
 #region MEMORY
-const APP_NAME:String = "[i]Constellation Carver v0.7[/i]"
+const APP_NAME:String = "[i]Constellation Carver v0.6.9[/i]"
 const TILE_0233 = preload("res://assets/tile_0233.png") # New project icon
 
 const BUTTON_ACTION_EMPTY = {
