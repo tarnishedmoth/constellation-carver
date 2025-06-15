@@ -308,10 +308,9 @@ theme = ExtResource("3_h2yge")
 [node name="BottomTabContainer" type="TabContainer" parent="VBoxContainer/BottomContainer"]
 unique_name_in_owner = true
 layout_mode = 2
-current_tab = 1
+current_tab = 0
 
 [node name="Content" type="VBoxContainer" parent="VBoxContainer/BottomContainer/BottomTabContainer"]
-visible = false
 layout_mode = 2
 metadata/_tab_index = 0
 
@@ -386,7 +385,6 @@ caret_blink = true
 
 [node name="ImageEditContainer" type="VBoxContainer" parent="VBoxContainer/BottomContainer/BottomTabContainer/Content"]
 unique_name_in_owner = true
-visible = false
 layout_mode = 2
 size_flags_vertical = 3
 alignment = 1
@@ -491,6 +489,7 @@ size_flags_horizontal = 3
 text = "Apply"
 
 [node name="Style" type="MarginContainer" parent="VBoxContainer/BottomContainer/BottomTabContainer"]
+visible = false
 layout_mode = 2
 metadata/_tab_index = 1
 
