@@ -472,8 +472,8 @@ func new_page(filename:String, overwrite:bool = false, dirpath:String = current_
 		_filepath = U.endify(filename, ".json")
 
 	var file_exists:bool = FileAccess.file_exists(_filepath)
-	if not overwrite:
-		if file_exists:
+	if file_exists:
+		if not overwrite:
 			# Warn the user
 			var result = await special_popup_window.popup(
 				"File already exists.\nErase and overwrite?\n\n(You will permanently lose this data!)\n%s" % [_filepath],
@@ -645,6 +645,7 @@ func _on_project_option_button_popup_id_pressed(id:int) -> void:
 			"Name your project:",
 			"New Project",
 			true,
+			SpecialPopupWindow.TEXT_FORMAT.NONE # TODO check is valid as folder name
 		)
 		if project_name.is_empty():
 			l("User cancelled new project.")

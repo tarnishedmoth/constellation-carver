@@ -38,12 +38,11 @@ static func load_json_from_file(filepath:String) -> Dictionary:
 static func save_json_to_file(formatted_data:String, filepath:String) -> bool:
 	var dirpath:String = filepath.get_base_dir()
 	if not dirpath.is_empty():
-		var result = DirAccess.dir_exists_absolute(dirpath)
-		if result == null:
-			print_debug(DirAccess.get_open_error())
-			var da:DirAccess = DirAccess.open(dirpath)
-			result = da.make_dir_recursive(dirpath)
-			if result != OK:
+		if not DirAccess.dir_exists_absolute(dirpath):
+			var err:int = DirAccess.make_dir_recursive_absolute(dirpath)
+
+			if err != OK:
+				print_debug(DirAccess.get_open_error())
 				return false
 			U.l("Made a new directory!\n%s" % [dirpath])
 
