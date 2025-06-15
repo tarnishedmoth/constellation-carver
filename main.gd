@@ -23,7 +23,7 @@ enum BOTTOM_TABS {
 	JSON_T = 2
 }
 
-enum STYLE_PARAMS {
+enum STYLE_MENU_ID_INDEX {
 	TEXT_ALIGN = 0,
 	MARGIN_TOP = 1,
 	MARGIN_BOTTOM = 2,
@@ -144,10 +144,10 @@ func _ready() -> void:
 	style_add_menu.get_popup().id_pressed.connect(_on_style_add_menu_popup_id_pressed)
 
 	# JSON edit tab
-	var context_menu:PopupMenu = json_edit.get_menu()
-	var id:int = context_menu.item_count + 1
-	context_menu.add_check_item("Word Wrap", id)
-	context_menu.id_pressed.connect(_on_json_edit_context_menu_pressed.bind(id))
+	var _json_context_menu:PopupMenu = json_edit.get_menu()
+	var id:int = _json_context_menu.item_count + 1
+	_json_context_menu.add_check_item("Word Wrap", id)
+	_json_context_menu.id_pressed.connect(_on_json_edit_context_menu_pressed.bind(id))
 
 	# PROJECT tab
 	project_option_button.get_popup().id_pressed.connect(_on_project_option_button_popup_id_pressed)
@@ -588,6 +588,29 @@ func reset_style_tab() -> void:
 	if not is_initialized:
 		await initialized
 
+	# Set up add/remove menu
+	var _add_menu_popup:PopupMenu = style_add_menu.get_popup()
+	_add_menu_popup.clear(true)
+	_add_menu_popup.add_check_item("Text Align", STYLE_MENU_ID_INDEX.TEXT_ALIGN)
+	_add_menu_popup.add_check_item("Margin Top", STYLE_MENU_ID_INDEX.MARGIN_TOP)
+	_add_menu_popup.add_check_item("Margin Bottom", STYLE_MENU_ID_INDEX.MARGIN_BOTTOM)
+	_add_menu_popup.add_check_item("Scale", STYLE_MENU_ID_INDEX.SCALE)
+	# Metadata not used for anything yet
+	_add_menu_popup.set_item_metadata(STYLE_MENU_ID_INDEX.TEXT_ALIGN, "text-align")
+	_add_menu_popup.set_item_metadata(STYLE_MENU_ID_INDEX.MARGIN_TOP, "margin-top")
+	_add_menu_popup.set_item_metadata(STYLE_MENU_ID_INDEX.MARGIN_BOTTOM, "margin-bottom")
+	_add_menu_popup.set_item_metadata(STYLE_MENU_ID_INDEX.SCALE, "scale")
+
+	# Set up text align options
+	style_text_align_edit.clear()
+	style_text_align_edit.add_item("Left", Style.get_align("left"))
+	style_text_align_edit.add_item("Center", Style.get_align("center"))
+	style_text_align_edit.add_item("Right", Style.get_align("right"))
+
+	style_text_align_edit.set_item_metadata(Style.get_align("left"), "left")
+	style_text_align_edit.set_item_metadata(Style.get_align("center"), "center")
+	style_text_align_edit.set_item_metadata(Style.get_align("right"), "right")
+
 	# Close all containers
 	style_text_align_container.hide()
 	style_margins_top_container.hide()
@@ -605,25 +628,24 @@ func reset_style_tab() -> void:
 			var modified_style_properties:Dictionary = style.get_modified_properties()
 			if not modified_style_properties.is_empty():
 				style_empty_label.hide()
-				var _add_menu_popup:PopupMenu = style_add_menu.get_popup()
 
 				if "text-align" in modified_style_properties:
-					_add_menu_popup.set_item_checked(_add_menu_popup.get_item_index(STYLE_PARAMS.TEXT_ALIGN), true)
+					_add_menu_popup.set_item_checked(STYLE_MENU_ID_INDEX.TEXT_ALIGN, true)
 					style_text_align_container.show()
 					style_text_align_edit.select(selected_editable.style.get_align_int())
 
 				if "margin-top" in modified_style_properties:
-					_add_menu_popup.set_item_checked(_add_menu_popup.get_item_index(STYLE_PARAMS.MARGIN_TOP), true)
+					_add_menu_popup.set_item_checked(STYLE_MENU_ID_INDEX.MARGIN_TOP, true)
 					style_margins_top_container.show()
 					style_margin_top_edit.value = modified_style_properties["margin-top"]
 
 				if "margin-bottom" in modified_style_properties:
-					_add_menu_popup.set_item_checked(_add_menu_popup.get_item_index(STYLE_PARAMS.MARGIN_BOTTOM), true)
+					_add_menu_popup.set_item_checked(STYLE_MENU_ID_INDEX.MARGIN_BOTTOM, true)
 					style_margins_bottom_container.show()
 					style_margin_bottom_edit.value = modified_style_properties["margin-bottom"]
 
 				if "scale" in modified_style_properties:
-					_add_menu_popup.set_item_checked(_add_menu_popup.get_item_index(STYLE_PARAMS.SCALE), true)
+					_add_menu_popup.set_item_checked(STYLE_MENU_ID_INDEX.SCALE, true)
 					style_scale_container.show()
 					style_scale_edit.value = modified_style_properties["scale"]
 
@@ -637,7 +659,6 @@ func open_edit_content(instance:Object) -> void:
 		bottom_tab_container.current_tab = BOTTOM_TABS.STYLE_T
 
 	selected_editable = instance
-	json_edit.text = str(selected_editable) # Uses _to_string() of instance
 
 	if "_type" in selected_editable:
 		var index = current_page_content.find(selected_editable)
@@ -893,9 +914,13 @@ func _on_object_tree_cell_selected() -> void:
 ## BOTTOM TAB
 
 func _on_bottom_tab_container_tab_selected(tab: int) -> void:
-	if tab == BOTTOM_TABS.STYLE_T:
-		reset_style_tab()
-
+	match tab:
+		BOTTOM_TABS.CONTENT_T:
+			pass
+		BOTTOM_TABS.STYLE_T:
+			reset_style_tab()
+		BOTTOM_TABS.JSON_T:
+			json_edit.text = str(selected_editable) # Uses _to_string() of instance
 ## LISTS
 
 func _on_content_tree_item_selected() -> void:
@@ -1008,19 +1033,19 @@ func _on_style_add_menu_popup_id_pressed(id:int) -> void:
 	match id:
 		## If the arrangements of the menu items ever change, this will break. To fix, instantiate popup items in code. HACK
 		## The buttons for each id have checkboxes & are check'ed when opening the editable based on its Style.
-		STYLE_PARAMS.TEXT_ALIGN: # Text Align
+		STYLE_MENU_ID_INDEX.TEXT_ALIGN: # Text Align
 			style_text_align_container.visible = _add_menu_popup.is_item_checked(_index)
 			style_text_align_edit.select(Style.get_align(Style.DEFAULTS.TEXT_ALIGN))
 
-		STYLE_PARAMS.MARGIN_TOP: # Margin Top
+		STYLE_MENU_ID_INDEX.MARGIN_TOP: # Margin Top
 			style_margins_top_container.visible = _add_menu_popup.is_item_checked(_index)
 			style_margin_top_edit.value = Style.DEFAULTS.MARGIN_TOP
 
-		STYLE_PARAMS.MARGIN_BOTTOM: # Margin Bottom
+		STYLE_MENU_ID_INDEX.MARGIN_BOTTOM: # Margin Bottom
 			style_margins_bottom_container.visible = _add_menu_popup.is_item_checked(_index)
 			style_margin_bottom_edit.value = Style.DEFAULTS.MARGIN_BOTTOM
 
-		STYLE_PARAMS.SCALE: # Scale
+		STYLE_MENU_ID_INDEX.SCALE: # Scale
 			style_scale_container.visible = _add_menu_popup.is_item_checked(_index)
 			if selected_editable is ConstellationImage:
 				style_scale_edit.value = Style.DEFAULTS.SCALE_IMAGE
@@ -1028,8 +1053,20 @@ func _on_style_add_menu_popup_id_pressed(id:int) -> void:
 				style_scale_edit.value = Style.DEFAULTS.SCALE_REEL
 
 func _on_style_save_button_pressed() -> void:
-	# TODO
-	pass # Replace with function body.
+	if not check_editable(Control, true):
+		push_error("Invalid editable for Style save.")
+		return
+
+	print_debug(selected_editable.style)
+
+	selected_editable.style.text_align = style_text_align_edit.get_item_metadata(style_text_align_edit.selected)
+	selected_editable.style.margin_top = style_margin_top_edit.value
+	selected_editable.style.margin_bottom = style_margin_bottom_edit.value
+	selected_editable.style.scale = style_scale_edit.value
+
+	print_debug(selected_editable.style)
+
+	cache_changes(true)
 
 ## JSON
 
@@ -1043,3 +1080,7 @@ func _on_json_edit_context_menu_pressed(id:int, trigger_id:int) -> void:
 			json_edit.wrap_mode = TextEdit.LINE_WRAPPING_BOUNDARY
 		else:
 			json_edit.wrap_mode = TextEdit.LINE_WRAPPING_NONE
+
+
+func _on_style_text_align_edit_item_selected(index: int) -> void:
+	style_text_align_edit.alignment = style_text_align_edit.get_selected_id()

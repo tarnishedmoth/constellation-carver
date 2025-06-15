@@ -3,10 +3,17 @@ class_name ConstellationReel extends Control
 const PLACEHOLDER_SCENE = preload("res://objects/placeholder.tscn")
 var placeholder:Control # Instance
 
+const DEFAULTS:Dictionary = {
+	WIDTH = 16,
+	HEIGHT = 16,
+	FRAMES = [],
+	SCALE = 2
+}
+
 const TEMPLATE = {
 	"type": "reel",
-	"width": "1", # irange 1-200
-	"height": "1", # irange 1-120
+	"width": "16", # irange 1-200
+	"height": "16", # irange 1-120
 	"frames": []
 	#frame-duration default 2, irange 1-1800. Divide 30 by this for framerate
 }
@@ -95,7 +102,7 @@ func to_dict() -> Dictionary:
 		data["frame-duration"] = _frame_duration
 
 	if style:
-		var style_output = style.to_dict()
+		var style_output = style.to_dict(DEFAULTS)
 		if not style_output.is_empty():
 			data.merge({"style": style_output})
 	return data

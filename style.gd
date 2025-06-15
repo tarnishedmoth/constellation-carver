@@ -58,7 +58,7 @@ func get_align_int() -> int:
 ## Will return a 'String' if given an 'int', and vice versa.
 static func get_align(value:Variant) -> Variant:
 	if value is String:
-		match value:
+		match value.to_lower():
 			"center": return 1
 			"right": return 2
 			_: return 0
@@ -97,6 +97,6 @@ func get_modified_properties(defaults:Dictionary = DEFAULT) -> Dictionary:
 	return write
 
 
-func to_dict() -> Dictionary:
-	var write:Dictionary = get_modified_properties()
+func to_dict(defaults:Dictionary = DEFAULT) -> Dictionary:
+	var write:Dictionary = get_modified_properties(defaults)
 	return write

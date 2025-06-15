@@ -425,7 +425,7 @@ max_value = 400.0
 value = 1.0
 rounded = true
 allow_greater = true
-suffix = "p"
+suffix = "pixels"
 custom_arrow_step = 2.0
 select_all_on_focus = true
 
@@ -451,7 +451,7 @@ max_value = 240.0
 value = 1.0
 rounded = true
 allow_greater = true
-suffix = "p"
+suffix = "pixels"
 custom_arrow_step = 2.0
 select_all_on_focus = true
 
@@ -768,6 +768,7 @@ text = "Confirm"
 [connection signal="pressed" from="VBoxContainer/BottomContainer/BottomTabContainer/Content/ImageEditContainer/ImportImageFromJSONButton" to="." method="_on_import_image_from_json_button_pressed"]
 [connection signal="pressed" from="VBoxContainer/BottomContainer/BottomTabContainer/Content/HBoxContainer/CancelEdits" to="." method="_on_cancel_edits_button_pressed"]
 [connection signal="pressed" from="VBoxContainer/BottomContainer/BottomTabContainer/Content/HBoxContainer/SaveEdits" to="." method="_on_save_edits_button_pressed"]
+[connection signal="item_selected" from="VBoxContainer/BottomContainer/BottomTabContainer/Style/VBoxContainer/StyleTextAlignContainer/StyleTextAlignEdit" to="." method="_on_style_text_align_edit_item_selected"]
 [connection signal="pressed" from="VBoxContainer/BottomContainer/BottomTabContainer/Style/VBoxContainer/StyleSaveButtons/StyleSaveButton" to="." method="_on_style_save_button_pressed"]
 [connection signal="pressed" from="SpecialPopupWindow/VBoxContainer/ButtonsHBoxContainer/Cancel" to="SpecialPopupWindow" method="_on_cancel_pressed"]
 [connection signal="pressed" from="SpecialPopupWindow/VBoxContainer/ButtonsHBoxContainer/OK" to="SpecialPopupWindow" method="_on_confirm_pressed"]
