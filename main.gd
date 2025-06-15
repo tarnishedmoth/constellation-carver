@@ -4,6 +4,11 @@ class_name MainScreen extends Control
 const APP_NAME:String = "[i]Constellation Carver v0.1[/i]"
 const TILE_0233 = preload("res://assets/tile_0233.png") # New project icon
 
+const BUTTON_ACTION_EMPTY = {
+	DISPLAY = "(No Action)",
+	VALUE = "."
+}
+
 enum TOP_TABS {
 	PROJECT_T = 0,
 	PAGE_T = 1,
@@ -549,8 +554,8 @@ func open_edit_content(instance:Object) -> void:
 		button_edit_container.show()
 
 		var action_display_text:String = selected_editable["_action"]
-		if action_display_text.is_empty() or action_display_text == ".":
-			action_display_text = "(No Action)"
+		if action_display_text.is_empty() or action_display_text == BUTTON_ACTION_EMPTY.VALUE:
+			action_display_text = BUTTON_ACTION_EMPTY.DISPLAY
 		button_action_menu.text = action_display_text
 
 		button_prelabel_line_edit.text = selected_editable["_prelabel"]
@@ -747,7 +752,7 @@ func _on_save_edits_button_pressed() -> void:
 
 	elif selected_editable is ConstellationButton:
 		var _action:String = button_action_menu.text
-		if _action == "(No Action)": _action == ""
+		if _action == BUTTON_ACTION_EMPTY.DISPLAY: _action == BUTTON_ACTION_EMPTY.VALUE
 
 		selected_editable["_action"] = _action
 		selected_editable["_prelabel"] = button_prelabel_line_edit.text
