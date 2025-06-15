@@ -1,9 +1,36 @@
 class_name MainScreen extends Control
 
+#region ROADMAP
+##----0.7--|
+## WORKING Fully functional project/page/object/load/edit/save, all objects.
+## TASK Investigate List functionality.
+## TASK Web build.
+##----0.8--|
+## FEATURE Margins implemented for all objects;
+## FEATURE Editable content highlighting/frame while editing;
+## TASK Object tree matches/follows selected editable object.
+## TASK Import project from external folder.
+## TASK Import page data from clipboard.
+##----0.9--|
+## FEATURE Images encoding/decoding (and rendering?)
+## FEATURE Reels basic support following images.
+##----1.0--|
+##
+##----1.1--|
+## FEATURE Use alternate fonts and render to image on page.
+##----1.5--|
+## FEATURE Asset Browser: Import images/etc; link to page objects?
+##----2.0--|
+## FEATURE WYSIWYG
+## FEATURE Image transform & compositing.
+## FEATURE Inline text with images.
+##
+#endregion
+
 signal initialized
 
 #region MEMORY
-const APP_NAME:String = "[i]Constellation Carver v0.1[/i]"
+const APP_NAME:String = "[i]Constellation Carver v0.7[/i]"
 const TILE_0233 = preload("res://assets/tile_0233.png") # New project icon
 
 const BUTTON_ACTION_EMPTY = {
@@ -28,6 +55,13 @@ enum STYLE_MENU_ID_INDEX {
 	MARGIN_TOP = 1,
 	MARGIN_BOTTOM = 2,
 	SCALE = 3
+}
+enum IMAGE_IMPORT_MENU_ID_INDEX {
+	CLIPBOARD = 0,
+	FILE = 1,
+	PAGE = 2,
+	SEPARATOR = 3,
+	TEXTBOX = 4
 }
 
 const PAGE_TEMPLATE:Array = [
@@ -101,6 +135,7 @@ var page_content_modified:bool = false:
 @onready var button_label_line_edit: LineEdit = %ButtonLabelLineEdit
 @onready var button_action_menu: MenuButton = %ActionMenuButton
 
+@onready var import_image_data_button: MenuButton = %ImportImageDataButton
 @onready var image_edit_container: VBoxContainer = %ImageEditContainer
 @onready var image_width_spin_box: SpinBox = %ImageWidthSpinBox
 @onready var image_height_spin_box: SpinBox = %ImageHeightSpinBox
@@ -139,6 +174,7 @@ func _ready() -> void:
 
 	# CONTENT edit tab
 	button_action_menu.get_popup().id_pressed.connect(_on_button_action_menu_pressed)
+	import_image_data_button.get_popup().id_pressed.connect(_on_import_image_button_popup_id_pressed)
 
 	# STYLE edit tab
 	style_add_menu.get_popup().id_pressed.connect(_on_style_add_menu_popup_id_pressed)
@@ -694,8 +730,7 @@ func ui_reset_style_tab() -> void:
 					style_scale_edit.value = modified_style_properties["scale"]
 
 func ui_reset_json_tab() -> void:
-	# TODO
-	pass
+	json_edit.text = str(selected_editable) # Uses _to_string() of instance
 
 #endregion
 #region EDITING
@@ -961,7 +996,7 @@ func _on_bottom_tab_container_tab_selected(tab: int) -> void:
 		BOTTOM_TABS.STYLE_T:
 			ui_reset_style_tab()
 		BOTTOM_TABS.JSON_T:
-			json_edit.text = str(selected_editable) # Uses _to_string() of instance
+			ui_reset_json_tab()
 ## LISTS
 
 func _on_content_tree_item_selected() -> void:
@@ -1029,31 +1064,39 @@ func _on_button_action_menu_pressed(id:int) -> void:
 
 ## IMAGES
 
-func _on_import_image_from_json_button_pressed() -> void:
-	if selected_editable is ConstellationImage:
-		var clipboard_data:String = DisplayServer.clipboard_get()
-		if not clipboard_data.is_empty():
-			var parse_result = JSON.parse_string(clipboard_data)
-			if parse_result == null: return
-			var jason:Dictionary = parse_result
+func _on_import_image_button_popup_id_pressed(id:int) -> void:
+	if not check_editable(): return
+	match id:
+		IMAGE_IMPORT_MENU_ID_INDEX.CLIPBOARD:
+			var jason:Dictionary = ParticleParser.grab_json_from_clipboard()
+			if jason.is_empty(): return
 
-			if "type" in jason:
-				if jason["type"] == ConstellationImage._type:
-					if "width" in jason:
-						image_width_spin_box.value = jason["width"]
-					if "height" in jason:
-						image_height_spin_box.value = jason["height"]
-					if "pixels" in jason:
-						content_text_edit.text = jason["pixels"]
-						#selected_editable["_pixels"] = jason["pixels"]
+			if selected_editable is ConstellationImage:
+				if "type" in jason:
+					if jason["type"] == ConstellationImage._type:
+						if "width" in jason:
+							image_width_spin_box.value = jason["width"]
+						if "height" in jason:
+							image_height_spin_box.value = jason["height"]
+						if "pixels" in jason:
+							content_text_edit.text = jason["pixels"]
+							# TODO Fancy image viewing/editing
 
-					if "style" in jason:
-						var import_style:Style = Style.new()
-						for param in jason["style"]:
-							if param in jason["style"].keys():
-								import_style[param] = param
+			elif selected_editable is ConstellationReel:
+				if "type" in jason:
+					if jason["type"] == ConstellationReel._type:
+						if "width" in jason:
+							image_width_spin_box.value = jason["width"]
+						if "height" in jason:
+							image_height_spin_box.value = jason["height"]
+						if "frames" in jason:
+							content_text_edit.text = jason["frames"].duplicate(true)
+							# TODO Fancy reel viewing/editing
 
-						jason["style"] = import_style.to_dict()
+			if "style" in jason:
+				# TODO Style import from clipboard data
+				#for param in jason["style"]:
+				pass
 
 ## STYLE
 

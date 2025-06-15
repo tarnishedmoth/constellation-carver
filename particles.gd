@@ -108,3 +108,11 @@ static func is_valid_page(page:Dictionary) -> bool:
 
 static func is_valid_webpath(path:String) -> bool:
 	return true
+
+static func grab_json_from_clipboard() -> Dictionary:
+	var clipboard_data:String = DisplayServer.clipboard_get()
+	if not clipboard_data.is_empty():
+		var parse_result:Dictionary = JSON.parse_string(clipboard_data)
+		if not parse_result == null:
+			return parse_result
+	return {}

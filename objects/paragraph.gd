@@ -1,5 +1,7 @@
 class_name ConstellationParagraph extends RichTextLabel
 
+# TODO margins
+
 const TEMPLATE = {
 	"type": "paragraph",
 	"text": "Lorem ipsum dolor sit amet consectetur adipiscing elit."
@@ -39,7 +41,7 @@ func _init(titties:String, style:Style = null) -> void:
 	self.bbcode_enabled = true
 	self.scroll_active = false
 	self.autowrap_mode = TextServer.AUTOWRAP_WORD
-	self.context_menu_enabled = true ## TODO
+	self.context_menu_enabled = true ## TODO editing options in context like delete
 	self.meta_underlined = false
 	self.hint_underlined = false
 

@@ -316,6 +316,7 @@ metadata/_tab_index = 0
 
 [node name="ContentEmptyLabel" type="Label" parent="VBoxContainer/BottomContainer/BottomTabContainer/Content"]
 unique_name_in_owner = true
+visible = false
 layout_mode = 2
 size_flags_vertical = 6
 text = "There's nothing here...
@@ -389,17 +390,32 @@ layout_mode = 2
 size_flags_vertical = 3
 alignment = 1
 
-[node name="ImportImageFromJSONButton" type="Button" parent="VBoxContainer/BottomContainer/BottomTabContainer/Content/ImageEditContainer"]
+[node name="ImageEditButtons" type="HBoxContainer" parent="VBoxContainer/BottomContainer/BottomTabContainer/Content/ImageEditContainer"]
 layout_mode = 2
-size_flags_vertical = 3
-text = "Import Image Data ..."
+alignment = 1
 
-[node name="EditImagePixelsButton" type="Button" parent="VBoxContainer/BottomContainer/BottomTabContainer/Content/ImageEditContainer"]
+[node name="ImportImageDataButton" type="MenuButton" parent="VBoxContainer/BottomContainer/BottomTabContainer/Content/ImageEditContainer/ImageEditButtons"]
 unique_name_in_owner = true
-visible = false
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
-size_flags_vertical = 6
-text = "Edit Image Data ..."
+size_flags_horizontal = 3
+size_flags_vertical = 3
+text = "Load Image ..."
+flat = false
+item_count = 5
+popup/item_0/text = "... from Clipboard"
+popup/item_0/id = 0
+popup/item_1/text = "... from File"
+popup/item_1/id = 1
+popup/item_1/disabled = true
+popup/item_2/text = "... from Page"
+popup/item_2/id = 2
+popup/item_2/disabled = true
+popup/item_3/id = 3
+popup/item_3/separator = true
+popup/item_4/text = "... manual entry"
+popup/item_4/id = 4
+popup/item_4/disabled = true
 
 [node name="WidthHBoxContainer" type="HBoxContainer" parent="VBoxContainer/BottomContainer/BottomTabContainer/Content/ImageEditContainer"]
 layout_mode = 2
@@ -764,7 +780,7 @@ text = "Confirm"
 [connection signal="tab_selected" from="VBoxContainer/BottomContainer/BottomTabContainer" to="." method="_on_bottom_tab_container_tab_selected"]
 [connection signal="item_selected" from="VBoxContainer/BottomContainer/BottomTabContainer/Content/ContentTree" to="." method="_on_content_tree_item_selected"]
 [connection signal="about_to_popup" from="VBoxContainer/BottomContainer/BottomTabContainer/Content/ButtonEditContainer/ActionMenuButton" to="." method="_on_button_action_menu_about_to_popup"]
-[connection signal="pressed" from="VBoxContainer/BottomContainer/BottomTabContainer/Content/ImageEditContainer/ImportImageFromJSONButton" to="." method="_on_import_image_from_json_button_pressed"]
+[connection signal="pressed" from="VBoxContainer/BottomContainer/BottomTabContainer/Content/ImageEditContainer/ImageEditButtons/ImportImageDataButton" to="." method="_on_import_image_button_pressed"]
 [connection signal="pressed" from="VBoxContainer/BottomContainer/BottomTabContainer/Content/HBoxContainer/CancelEdits" to="." method="_on_cancel_edits_button_pressed"]
 [connection signal="pressed" from="VBoxContainer/BottomContainer/BottomTabContainer/Content/HBoxContainer/SaveEdits" to="." method="_on_save_edits_button_pressed"]
 [connection signal="item_selected" from="VBoxContainer/BottomContainer/BottomTabContainer/Style/VBoxContainer/StyleTextAlignContainer/StyleTextAlignEdit" to="." method="_on_style_text_align_edit_item_selected"]

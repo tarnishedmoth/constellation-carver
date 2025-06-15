@@ -1,5 +1,7 @@
 class_name ConstellationReel extends Control
 
+# TODO margins, helper methods for showing content & creating
+
 const PLACEHOLDER_SCENE = preload("res://objects/placeholder.tscn")
 var placeholder:Control # Instance
 
