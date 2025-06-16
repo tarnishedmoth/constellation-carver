@@ -64,6 +64,7 @@ func popup_text_entry(details_text:String, heading:String = "Input Text", user_c
 			continue
 		else:
 			# Cancel
+			line_edit.hide()
 			return ""
 
 	line_edit.hide()

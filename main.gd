@@ -7,16 +7,14 @@ class_name MainScreen extends Control
 ## WORKING Export Web build.
 ## WORKING Publish on itch.io.
 ## TODO File exports don't work on Web.
-## TASK Open project folder? Show filepath at least?
-## TASK Provide entire page JSON for easy copy.
-## TASK Delete page button. WORKING in memory, doesn't delete files yet
+## TODO Provide entire page JSON for easy copy.
+## TODO Delete page button. WORKING in memory, doesn't delete files yet
+## BUG Open project folder? Show filepath at least?
 ## BUG Editing Page Title causes caret to go to beginning (TODO rework instant update+refresh)
 ## BUG Creating a new Button breaks things
-## BUG Investigate if Clipboard access works at all or if we should provide a text box popup to capture it.
-## BUG Special Popup doesn't ensure the right things are hidden/visible necessarily.
-## BUG Make a new page in an empty project.
+## BUG Investigate if Clipboard access works at all or if TODO we should provide a text box popup to capture it.
 ##----0.8--|
-## FEATURE Margins implemented for all objects;
+## FEATURE Margins implemented for all objects
 ## FEATURE Editable content highlighting/frame while editing;
 ## WORKING Object tree matches/follows selected editable object.
 ## TASK Import project from external folder.
