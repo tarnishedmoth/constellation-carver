@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://c2mlaly46p3v5"]
+[gd_scene load_steps=10 format=3 uid="uid://c2mlaly46p3v5"]
 
 [ext_resource type="Script" uid="uid://dle4w1sl7v6dy" path="res://main.gd" id="1_ig7tw"]
 [ext_resource type="Theme" uid="uid://ct03hqqci348h" path="res://objects/objects.tres" id="2_0xm2m"]
@@ -7,6 +7,7 @@
 [ext_resource type="Texture2D" uid="uid://ddaobfj73bmas" path="res://assets/tile_0618.png" id="4_272bh"]
 [ext_resource type="FontFile" uid="uid://du2lro1ph87qd" path="res://assets/fonts/Roboto-Medium.ttf" id="6_5vw27"]
 [ext_resource type="Script" uid="uid://b1f0mugcvkje7" path="res://special_popup_window.gd" id="6_7mycd"]
+[ext_resource type="Script" uid="uid://c7pp8sxjdelhu" path="res://smooth_scroll_container.gd" id="6_kek77"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lquwl"]
 content_margin_left = 64.0
@@ -285,12 +286,14 @@ layout_mode = 2
 text = "Force Refresh"
 
 [node name="MiddleContainer" type="ScrollContainer" parent="VBoxContainer"]
+unique_name_in_owner = true
 custom_minimum_size = Vector2(400, 240)
 layout_mode = 2
 size_flags_horizontal = 4
 theme = ExtResource("2_0xm2m")
 horizontal_scroll_mode = 0
 vertical_scroll_mode = 3
+script = ExtResource("6_kek77")
 
 [node name="PDDisplay" type="VBoxContainer" parent="VBoxContainer/MiddleContainer"]
 unique_name_in_owner = true
@@ -327,7 +330,6 @@ vertical_alignment = 1
 
 [node name="ContentTree" type="Tree" parent="VBoxContainer/BottomContainer/BottomTabContainer/Content"]
 unique_name_in_owner = true
-visible = false
 layout_mode = 2
 size_flags_vertical = 3
 tooltip_text = "List item"
@@ -386,6 +388,7 @@ caret_blink = true
 
 [node name="ImageEditContainer" type="VBoxContainer" parent="VBoxContainer/BottomContainer/BottomTabContainer/Content"]
 unique_name_in_owner = true
+visible = false
 layout_mode = 2
 size_flags_vertical = 3
 alignment = 1
@@ -471,7 +474,6 @@ select_all_on_focus = true
 
 [node name="ContentTextEdit" type="TextEdit" parent="VBoxContainer/BottomContainer/BottomTabContainer/Content"]
 unique_name_in_owner = true
-visible = false
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/line_spacing = 0

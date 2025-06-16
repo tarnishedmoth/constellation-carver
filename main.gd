@@ -1,27 +1,36 @@
 class_name MainScreen extends Control
 
 #region ROADMAP
-##----0.7--|
+##----0.6.9|
 ## WORKING Fully functional project/page/object/load/edit/save, all objects.
 ## TASK Investigate List functionality.
-## TASK Web build.
+## TASK Export Windows build.
+## TASK Export Web build.
+## TASK Publish on itch.io.
 ##----0.8--|
 ## FEATURE Margins implemented for all objects;
 ## FEATURE Editable content highlighting/frame while editing;
-## TASK Object tree matches/follows selected editable object.
+## WORKING Object tree matches/follows selected editable object.
 ## TASK Import project from external folder.
 ## TASK Import page data from clipboard.
 ##----0.9--|
 ## FEATURE Images encoding/decoding (and rendering?)
 ## FEATURE Reels basic support following images.
 ##----1.0--|
-##
+## TASK Rename projects & pages.
+## TASK User configurable content templates.
+## TASK Duplicate content on page.
+## TASK Copy/paste content across pages.
 ##----1.1--|
+## FEATURE User editor options?
 ## FEATURE Use alternate fonts and render to image on page.
 ##----1.5--|
 ## FEATURE Asset Browser: Import images/etc; link to page objects?
+## FEATURE Dual page viewer--upper tab with a configurable page--copy/paste content?
 ##----2.0--|
 ## FEATURE WYSIWYG
+## FEATURE Full-screen viewer (~3x vertical space).
+## FEATURE Drag selection in viewer.
 ## FEATURE Image transform & compositing.
 ## FEATURE Inline text with images.
 ##
@@ -89,6 +98,7 @@ var current_page_json: Dictionary = {}
 var current_page_content: Array = []
 
 var selected_editable:Control
+var selected_editable_index:int ## Index within current_page_content
 
 var is_initialized:bool = false:
 	set(value):
@@ -112,6 +122,7 @@ var page_content_modified:bool = false:
 		U.log_console = log_console
 
 @onready var top_tab_container: TabContainer = %TopTabContainer
+@onready var middle_scroll_container: SmoothScrollContainer = %MiddleContainer
 @onready var pd_display: Control = %PDDisplay
 @onready var bottom_tab_container: TabContainer = %BottomTabContainer
 # PROJECT
@@ -393,6 +404,7 @@ func render_current_page_content() -> void:
 	page_title_edit.text = current_page_json["title"]
 	page_filename_edit.text = current_page_filepath.get_file()
 
+	## Object tree population happens alongside this.
 	var tree_root:TreeItem = object_tree.create_item()
 	tree_root.set_text(0, current_page_json["title"])
 	tree_root.set_metadata(0, "title")
@@ -594,10 +606,15 @@ func ui_reset_object_tab():
 	if not check_editable():
 		return
 	if "_type" in selected_editable:
-		var index = current_page_content.find(selected_editable)
-		l("Selected %s to edit at index %s" % [selected_editable._type, index])
+		selected_editable_index = current_page_content.find(selected_editable)
+		l("Selected %s to edit at index %s" % [selected_editable._type, selected_editable_index])
 		selected_object_type.text = "Now editing: " + selected_editable._type + "  -  "
-		selected_object_type.text += "Indexed at %s / %s." % [index, current_page_content.size()-1]
+		selected_object_type.text += "Indexed at %s / %s." % [selected_editable_index, current_page_content.size()-1]
+
+		var selected_tree_object:TreeItem = object_tree.get_root().get_child(selected_editable_index)
+		object_tree.scroll_to_item(selected_tree_object)
+		object_tree.deselect_all()
+		object_tree.set_selected(selected_tree_object, 0)
 
 ## LOWER
 func ui_reset_content_tab() -> void:
@@ -638,9 +655,13 @@ func ui_reset_content_tab() -> void:
 		content_tree.show()
 		content_tree.clear()
 
+		# TODO allow for adding/removing items
+		#content_tree
+
 		var root:TreeItem = content_tree.create_item()
 		root.set_text(0, "List")
-		var index:int = 0
+
+		var index:int = 1
 		for item in selected_editable._items:
 			var tree_item:TreeItem = content_tree.create_item(root, index)
 			tree_item.set_text(0, item)
@@ -741,12 +762,22 @@ func open_edit_content(instance:Object) -> void:
 
 	ui_reset_current_tabs()
 
-	# Top: Show Objects tab
-	top_tab_container.current_tab = TOP_TABS.OBJECTS_T
+	# Top: Show Objects tab (but don't double refresh)
+	if top_tab_container.current_tab != TOP_TABS.OBJECTS_T:
+		top_tab_container.current_tab = TOP_TABS.OBJECTS_T
+
+	# Scroll to content in viewer
+	#middle_scroll_container.ensure_control_visible(selected_editable)
+	middle_scroll_container.smooth_scroll(selected_editable.position.y)
+
+	#var selected_tree_item:TreeItem = object_tree.get_root().get_child(get_index_of(selected_editable))
+	#object_tree.scroll_to_item(selected_tree_item)
+
 
 func reset_editables() -> void: ## Called typically by changing focus with mouse click, or saving and loading.
 	if check_editable(): l("Deselected.")
 	selected_editable = null
+	selected_editable_index = -1
 
 	selected_object_type.text = "No object selected."
 	content_empty_label.show()
@@ -983,6 +1014,8 @@ func _on_object_tree_cell_selected() -> void:
 			return
 		_:
 			var i:int = tree_item.get_index()
+			if selected_editable_index == i:
+				return
 			open_edit_content(get_content_at(i))
 
 
