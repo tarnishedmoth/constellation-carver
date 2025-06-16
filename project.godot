@@ -18,8 +18,11 @@ config/use_custom_user_dir=true
 config/custom_user_dir_name="constellationcarver"
 config/quit_on_go_back=false
 config/features=PackedStringArray("4.4", "GL Compatibility")
+run/max_fps=60
 run/low_processor_mode=true
+boot_splash/bg_color=Color(0.127386, 0.138565, 0.17761, 1)
 boot_splash/show_image=false
+boot_splash/use_filter=false
 config/icon="uid://56y8w74j618v"
 
 [autoload]
@@ -39,7 +42,10 @@ gdscript/warnings/return_value_discarded=1
 
 window/size/viewport_width=400
 window/size/viewport_height=720
+window/stretch/mode="viewport"
 window/handheld/orientation=1
+mouse_cursor/custom_image="uid://2w3mb6gt85o4"
+mouse_cursor/custom_image_hotspot=Vector2(5, 2)
 
 [input]
 

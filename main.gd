@@ -13,6 +13,7 @@ class_name MainScreen extends Control
 ## WORKING Object tree matches/follows selected editable object.
 ## TASK Import project from external folder.
 ## TASK Import page data from clipboard.
+## TODO Boot splash icon, background image, branding images, etc.
 ##----0.9--|
 ## FEATURE Images encoding/decoding (and rendering?)
 ## FEATURE Reels basic support following images.
