@@ -3,7 +3,7 @@ class_name MainScreen extends Control
 #region ROADMAP
 ##----0.6.9|
 ## WORKING Fully functional project/page/object/load/edit/save, all objects.
-## TASK Investigate List functionality.
+## WORKING Finish list editing functionality.
 ## TASK Export Windows build.
 ## TASK Export Web build.
 ## TASK Publish on itch.io.
@@ -139,6 +139,7 @@ var page_content_modified:bool = false:
 # CONTENT
 @onready var content_text_edit: TextEdit = %ContentTextEdit
 
+@onready var list_edit_container: HBoxContainer = %ListEditContainer
 @onready var content_tree: Tree = %ContentTree
 
 @onready var button_edit_container: VBoxContainer = %ButtonEditContainer
@@ -152,6 +153,7 @@ var page_content_modified:bool = false:
 @onready var image_height_spin_box: SpinBox = %ImageHeightSpinBox
 
 @onready var content_empty_label: Label = %ContentEmptyLabel
+
 
 # STYLE
 @onready var style_empty_label: Label = %StyleEmptyLabel
@@ -622,7 +624,7 @@ func ui_reset_content_tab() -> void:
 		await initialized
 
 	content_empty_label.show()
-	content_tree.hide()
+	list_edit_container.hide()
 	button_edit_container.hide()
 	image_edit_container.hide()
 	content_text_edit.hide()
@@ -652,7 +654,7 @@ func ui_reset_content_tab() -> void:
 	elif selected_editable is ConstellationList:
 		content_empty_label.hide()
 		content_text_edit.show()
-		content_tree.show()
+		list_edit_container.show()
 		content_tree.clear()
 
 		# TODO allow for adding/removing items
@@ -789,7 +791,7 @@ func reset_editables() -> void: ## Called typically by changing focus with mouse
 	content_text_edit.hide()
 	content_text_edit.clear()
 
-	content_tree.hide()
+	list_edit_container.hide()
 	content_tree.clear()
 
 	image_edit_container.hide()
@@ -833,6 +835,53 @@ func cache_changes(refresh:bool = false):
 	page_content_modified = true
 
 	if refresh: render_current_page_content()
+
+func save_content_edits() -> void:
+	if not check_editable():
+		l("Failed to save content edits: no selection.")
+		return
+
+	## WORKING
+	if selected_editable is ConstellationParagraph:
+		selected_editable._text = content_text_edit.text
+
+	## WORKING
+	elif selected_editable is ConstellationBlockquote:
+		selected_editable._text = content_text_edit.text
+
+	## WORKING
+	elif selected_editable is ConstellationList:
+		#var tree_item = content_tree.get_selected()
+		#tree_item.set_text(0, content_text_edit.text)
+		#selected_editable._items[tree_item.get_index()] = tree_item.get_text(0)
+		var list_items:Array[String] = []
+		for item in content_tree.get_root().get_children():
+			list_items.append(item.get_text(0))
+
+		selected_editable._items = list_items
+
+	## WORKING
+	elif selected_editable is ConstellationButton:
+		var _action:String = button_action_menu.text
+		if _action == BUTTON_ACTION_EMPTY.DISPLAY: _action == BUTTON_ACTION_EMPTY.VALUE
+
+		selected_editable["_action"] = _action
+		selected_editable["_prelabel"] = button_prelabel_line_edit.text
+		selected_editable["_label"] = button_label_line_edit.text
+
+	## WORKING
+	elif selected_editable is ConstellationImage:
+		selected_editable["_width"] = image_width_spin_box.value
+		selected_editable["_height"] = image_height_spin_box.value
+		selected_editable["_pixels"] = content_text_edit.text
+
+	## TODO TEST
+	elif selected_editable is ConstellationReel:
+		selected_editable["_width"] = image_width_spin_box.value
+		selected_editable["_height"] = image_height_spin_box.value
+		selected_editable["_frames"] = content_text_edit.text # TODO
+
+	cache_changes(true)
 
 #endregion
 #region HELPERS
@@ -971,36 +1020,7 @@ func _on_page_title_edit_text_changed(new_text: String) -> void:
 	render_current_page_content() # Might not be necessary
 
 func _on_save_edits_button_pressed() -> void:
-	if not check_editable():
-		l("Failed to save content edits: no selection.")
-		return
-
-	if selected_editable is ConstellationParagraph:
-		selected_editable._text = content_text_edit.text
-
-	elif selected_editable is ConstellationBlockquote:
-		selected_editable._text = content_text_edit.text
-
-	elif selected_editable is ConstellationList:
-		var tree_item = content_tree.get_selected()
-		tree_item.set_text(0, content_text_edit.text)
-		selected_editable._items[tree_item.get_index()] = tree_item.get_text(0)
-
-	elif selected_editable is ConstellationButton:
-		var _action:String = button_action_menu.text
-		if _action == BUTTON_ACTION_EMPTY.DISPLAY: _action == BUTTON_ACTION_EMPTY.VALUE
-
-		selected_editable["_action"] = _action
-		selected_editable["_prelabel"] = button_prelabel_line_edit.text
-		selected_editable["_label"] = button_label_line_edit.text
-
-	elif selected_editable is ConstellationImage:
-		selected_editable["_width"] = image_width_spin_box.value
-		selected_editable["_height"] = image_height_spin_box.value
-		selected_editable["_pixels"] = content_text_edit.text
-
-	#selected_editable._text = content_text_edit.text
-	cache_changes(true)
+	save_content_edits()
 
 func _on_cancel_edits_button_pressed() -> void:
 	reset_editables()
@@ -1030,10 +1050,36 @@ func _on_bottom_tab_container_tab_selected(tab: int) -> void:
 			ui_reset_style_tab()
 		BOTTOM_TABS.JSON_T:
 			ui_reset_json_tab()
+
 ## LISTS
+
+func _on_content_text_edit_text_changed() -> void:
+	if check_editable(ConstellationList):
+		content_tree.get_selected().set_text(0, content_text_edit.text)
 
 func _on_content_tree_item_selected() -> void:
 	content_text_edit.text = content_tree.get_selected().get_text(0)
+
+func _on_list_insert_above_pressed() -> void:
+	_insert_content_tree_list_item(true)
+
+func _on_list_selected_delete_pressed() -> void:
+	content_tree.get_root().remove_child(content_tree.get_selected())
+
+func _on_list_insert_below_pressed() -> void:
+	_insert_content_tree_list_item(false)
+
+
+func _insert_content_tree_list_item(above:bool = true) -> void:
+	var new_item:TreeItem = content_tree.create_item()
+	new_item.set_text(0, "Lorem ipsum")
+
+	if above:
+		# Insert Above
+		new_item.move_before(content_tree.get_selected())
+	else:
+		# Insert Below
+		new_item.move_after(content_tree.get_selected())
 
 
 ## BUTTONS
@@ -1174,14 +1220,10 @@ func _on_style_save_button_pressed() -> void:
 		push_error("Invalid editable for Style save.")
 		return
 
-	print_debug(selected_editable.style)
-
 	selected_editable.style.text_align = style_text_align_edit.get_item_metadata(style_text_align_edit.selected)
 	selected_editable.style.margin_top = style_margin_top_edit.value
 	selected_editable.style.margin_bottom = style_margin_bottom_edit.value
 	selected_editable.style.scale = style_scale_edit.value
-
-	print_debug(selected_editable.style)
 
 	cache_changes(true)
 
