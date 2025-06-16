@@ -127,6 +127,7 @@ popup/item_0/id = 0
 popup/item_0/separator = true
 popup/item_1/text = "Page as JSON"
 popup/item_1/id = 1
+popup/item_1/disabled = true
 
 [node name="NewProject" type="Button" parent="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Project"]
 visible = false
