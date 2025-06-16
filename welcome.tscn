@@ -1,9 +1,27 @@
-[gd_scene load_steps=3 format=3 uid="uid://bba6fstf66qx5"]
+[gd_scene load_steps=4 format=3 uid="uid://bba6fstf66qx5"]
 
 [ext_resource type="Theme" uid="uid://c1753t6oa0y8j" path="res://ui_theme.tres" id="1_hp420"]
 [ext_resource type="Script" uid="uid://dq4wpoyp5f5v3" path="res://welcome.gd" id="2_odedu"]
 
-[node name="Welcome" type="Control"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_6xvht"]
+bg_color = Color(0, 0, 0, 1)
+draw_center = false
+border_width_left = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(1, 1, 1, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+corner_detail = 12
+expand_margin_left = 20.0
+expand_margin_top = 4.0
+expand_margin_right = 20.0
+expand_margin_bottom = 4.0
+anti_aliasing = false
+
+[node name="Welcome" type="Control" node_paths=PackedStringArray("elements", "typewriter")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -12,6 +30,9 @@ grow_horizontal = 2
 grow_vertical = 2
 theme = ExtResource("1_hp420")
 script = ExtResource("2_odedu")
+elements = [NodePath("PanelContainer/MarginContainer/PanelContainer"), NodePath("PanelContainer/MarginContainer/PanelContainer/VBoxContainer/RichTextLabel2"), NodePath("PanelContainer/MarginContainer/PanelContainer/VBoxContainer/WelcomeOKButton")]
+element_fade_times = Array[float]([1.5, 2.0, 1.5])
+typewriter = [NodePath("PanelContainer/MarginContainer/PanelContainer/VBoxContainer/RichTextLabel")]
 
 [node name="PanelContainer" type="PanelContainer" parent="."]
 layout_mode = 1
@@ -28,10 +49,14 @@ theme_override_constants/margin_top = 80
 theme_override_constants/margin_right = 60
 theme_override_constants/margin_bottom = 80
 
-[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer/MarginContainer"]
+[node name="PanelContainer" type="PanelContainer" parent="PanelContainer/MarginContainer"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_6xvht")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer/MarginContainer/PanelContainer"]
 layout_mode = 2
 
-[node name="RichTextLabel" type="RichTextLabel" parent="PanelContainer/MarginContainer/VBoxContainer"]
+[node name="RichTextLabel" type="RichTextLabel" parent="PanelContainer/MarginContainer/PanelContainer/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 2
 theme_override_font_sizes/bold_italics_font_size = 20
@@ -43,7 +68,7 @@ fit_content = true
 scroll_active = false
 horizontal_alignment = 1
 
-[node name="RichTextLabel2" type="RichTextLabel" parent="PanelContainer/MarginContainer/VBoxContainer"]
+[node name="RichTextLabel2" type="RichTextLabel" parent="PanelContainer/MarginContainer/PanelContainer/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 6
 focus_mode = 2
@@ -61,10 +86,10 @@ fit_content = true
 scroll_active = false
 selection_enabled = true
 
-[node name="WelcomeOKButton" type="Button" parent="PanelContainer/MarginContainer/VBoxContainer"]
+[node name="WelcomeOKButton" type="Button" parent="PanelContainer/MarginContainer/PanelContainer/VBoxContainer"]
 custom_minimum_size = Vector2(0, 80)
 layout_mode = 2
 size_flags_vertical = 6
 text = "New Project ..."
 
-[connection signal="pressed" from="PanelContainer/MarginContainer/VBoxContainer/WelcomeOKButton" to="." method="_on_welcome_ok_button_pressed"]
+[connection signal="pressed" from="PanelContainer/MarginContainer/PanelContainer/VBoxContainer/WelcomeOKButton" to="." method="_on_welcome_ok_button_pressed"]

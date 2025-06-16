@@ -88,7 +88,8 @@ const PAGE_TEMPLATE:Array = [
 	ConstellationButton.TEMPLATE,
 ]
 
-var flag_projects_empty:bool = true
+var flag_fs_not_persistent:bool = false
+var flag_user_no_projects:bool = true
 
 var pages: Dictionary[String,Dictionary] = {} # Key is absolute filepath, value is json dictionary
 var is_pages_cached:bool = false
@@ -196,11 +197,18 @@ func _ready() -> void:
 	U.log_console = log_console
 	application_name.text = APP_NAME
 
+	## Typically web platform
 	if not OS.is_userfs_persistent():
-		l("Warning: File storage is not persistent!")
+		l("Warning: File storage is not persistent.")
+		flag_fs_not_persistent = true
 
+	## Signals
 	welcome.ok_pressed.connect(_on_welcome_screen_ok_button_pressed)
+	#---TOP TABS
+	# PROJECT tab
+	project_option_button.get_popup().id_pressed.connect(_on_project_option_button_popup_id_pressed)
 
+	#---BOTTOM TABS
 	# CONTENT edit tab
 	button_action_menu.get_popup().id_pressed.connect(_on_button_action_menu_pressed)
 	import_image_data_button.get_popup().id_pressed.connect(_on_import_image_button_popup_id_pressed)
@@ -209,19 +217,18 @@ func _ready() -> void:
 	style_add_menu.get_popup().id_pressed.connect(_on_style_add_menu_popup_id_pressed)
 
 	# JSON edit tab
+	## Set up a button in the right click context menu for WORD WRAP
 	var _json_context_menu:PopupMenu = json_edit.get_menu()
 	var id:int = _json_context_menu.item_count + 1
 	_json_context_menu.add_check_item("Word Wrap", id)
 	_json_context_menu.id_pressed.connect(_on_json_edit_context_menu_pressed.bind(id))
 
-	# PROJECT tab
-	project_option_button.get_popup().id_pressed.connect(_on_project_option_button_popup_id_pressed)
-
-	ui_set_starting_state()
+	#
+	ui_set_starting_state() # HACK The project list is populated when the tab switches to Project. We could check ourselves.
 	l("Application initialized.")
 	is_initialized = true
 
-	if flag_projects_empty:
+	if flag_user_no_projects:
 		welcome.show()
 
 #endregion
@@ -242,7 +249,7 @@ func prompt_user_new_project() -> void:
 func new_project(project_name:String) -> void:
 	current_project_name = project_name
 	new_page("index")
-	#ui_set_starting_state()
+	ui_set_starting_state()
 	top_tab_container.current_tab = TOP_TABS.PROJECT_T
 
 func load_project(project_dir_path:String) -> void:
@@ -251,8 +258,8 @@ func load_project(project_dir_path:String) -> void:
 		# this "rsplit" method is cool because it automatically discards a trailing delimiter when "allow_empty"=false
 		var load_project_name:String = project_dir_path.rsplit("/", false, 1)[1]
 		current_project_name = load_project_name
-		ui_set_starting_state()
 
+		ui_set_starting_state()
 		_ui_refresh_project_pages(true)
 		load_page(_filepath, false)
 	else:
@@ -379,9 +386,9 @@ func load_page(filepath, relative:bool = true) -> void:
 		current_page_json = payload.duplicate(true)
 		current_page_filepath = _filepath
 		pages[_filepath] = payload.duplicate(true) ## Lazy loading. Set the keys on project load
-		ui_set_starting_state()
 
-		ui_reset_current_tabs()
+		#ui_set_starting_state() # I think these are just causing problems, handle this in the calling function
+		#ui_reset_current_tabs()
 		#ui_reset_page_tab()
 		render_current_page_content()
 		return
@@ -552,32 +559,41 @@ func ui_repopulate_project_list() -> void:
 	)
 	project_option_button.add_item("~~~~~ ~ ~ ~  ~  ~  ~   ~   ~    ~-.   ~      ~-`       ~    .       `  .", 1)
 
-	# Scanning for files
+	## Check if user projects folder exists
+	flag_user_no_projects = true
 	if not DirAccess.dir_exists_absolute(Particles.file_saves_directory):
 		DirAccess.make_dir_recursive_absolute(Particles.file_saves_directory)
-
-	var id_index:int = 2
-	var directories:PackedStringArray = DirAccess.get_directories_at(Particles.file_saves_directory)
-	var current_project_index:int = -1
-	for dir:String in directories:
-		if not FileAccess.file_exists(U.cat([Particles.file_saves_directory, dir, "index"], "/", ".json")):
-			U.l("Directory %s has no 'index.json.'" % [dir])
-			continue
-		project_option_button.add_item(dir, id_index)
-
-		if current_project_name == dir:
-			current_project_index = id_index
-
-		var dirpath:String = U.cat([Particles.file_saves_directory, dir])
-		project_option_button.set_item_metadata(id_index, dirpath)
-		id_index += 1
-
-	if current_project_index > -1:
-		flag_projects_empty = false
-		project_option_button.select(current_project_index)
 	else:
-		flag_projects_empty = true
+		## Look for Projects
+
+		# UI variables
+		var id_index:int = 2 # To assign to the Project menu buttons
+		var current_project_index:int = -1 # To select the current project in our popup menu
+
+		## Scan for index.json within all immediate subfolders
+		var directories:PackedStringArray = DirAccess.get_directories_at(Particles.file_saves_directory)
+		for dir:String in directories:
+			if not FileAccess.file_exists(U.cat([Particles.file_saves_directory, dir, "index"], "/", ".json")):
+				U.l("Directory %s has no 'index.json.'" % [dir])
+				continue
+			else:
+				flag_user_no_projects = false
+				project_option_button.add_item(dir, id_index)
+
+				if current_project_name == dir:
+					current_project_index = id_index
+
+				var dirpath:String = U.cat([Particles.file_saves_directory, dir])
+				project_option_button.set_item_metadata(id_index, dirpath)
+				id_index += 1
+
+		if current_project_index > -1:
+			project_option_button.select(current_project_index)
+		return
+
+		# No currently selected project
 		project_option_button.select(1)
+
 
 func _ui_refresh_project_pages(force_refresh:bool = false, reload_current:bool = true) -> void:
 	if !is_pages_cached or force_refresh:
@@ -588,7 +604,9 @@ func _ui_refresh_project_pages(force_refresh:bool = false, reload_current:bool =
 			var json_file:Dictionary = ParticleParser.load_json_from_file(json_filepath)
 			if ParticleParser.is_valid_page(json_file):
 				pages[json_filepath] = {}
+
 		is_pages_cached = true
+
 	if reload_current:
 		if current_page_filepath in pages:
 			pages[current_page_filepath] = ParticleParser.load_json_from_file(current_page_filepath)
