@@ -1,4 +1,4 @@
-[gd_resource type="Theme" load_steps=31 format=3 uid="uid://c1753t6oa0y8j"]
+[gd_resource type="Theme" load_steps=33 format=3 uid="uid://c1753t6oa0y8j"]
 
 [ext_resource type="FontFile" uid="uid://bec1e5bv27s6c" path="res://assets/fonts/Roboto-Bold.ttf" id="1_mk0s6"]
 [ext_resource type="FontFile" uid="uid://bs0a5sycrdrkv" path="res://assets/fonts/Roboto-Regular.ttf" id="1_touxu"]
@@ -226,13 +226,37 @@ border_color = Color(1, 1, 1, 1)
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_dmjyp"]
 
+[sub_resource type="StyleBoxLine" id="StyleBoxLine_mk0s6"]
+color = Color(1, 1, 1, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_684jh"]
+content_margin_left = 15.0
+content_margin_right = 15.0
+bg_color = Color(1, 1, 1, 1)
+draw_center = false
+border_width_top = 2
+border_width_right = 2
+border_color = Color(1, 1, 1, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 1
+corner_detail = 1
+expand_margin_right = 3.0
+anti_aliasing = false
+
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_j8y15"]
 content_margin_left = 10.0
+content_margin_right = 10.0
 bg_color = Color(0, 0, 0, 1)
-border_width_left = 1
-border_width_top = 2
-border_width_bottom = 2
+draw_center = false
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
 border_color = Color(1, 1, 1, 1)
+corner_radius_top_right = 3
+corner_radius_bottom_right = 10
+corner_detail = 6
+anti_aliasing = false
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_wtrrt"]
 bg_color = Color(0.154876, 0.154876, 0.154876, 1)
@@ -345,8 +369,10 @@ RichTextLabel/fonts/italics_font = ExtResource("3_g7fvb")
 RichTextLabel/fonts/normal_font = ExtResource("1_touxu")
 TabContainer/colors/font_hovered_color = Color(1, 1, 1, 1)
 TabContainer/colors/font_selected_color = Color(1, 1, 1, 1)
-TabContainer/constants/side_margin = 20
+TabContainer/font_sizes/font_size = 16
 TabContainer/styles/panel = SubResource("StyleBoxEmpty_dmjyp")
+TabContainer/styles/tab_focus = SubResource("StyleBoxLine_mk0s6")
+TabContainer/styles/tab_selected = SubResource("StyleBoxFlat_684jh")
 TabContainer/styles/tab_unselected = SubResource("StyleBoxFlat_j8y15")
 TabContainer/styles/tabbar_background = SubResource("StyleBoxFlat_wtrrt")
 TextEdit/constants/line_spacing = 10

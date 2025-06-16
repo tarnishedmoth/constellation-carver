@@ -31,7 +31,7 @@ grow_vertical = 2
 theme = ExtResource("1_hp420")
 script = ExtResource("2_odedu")
 elements = [NodePath("PanelContainer/MarginContainer/PanelContainer"), NodePath("PanelContainer/MarginContainer/PanelContainer/VBoxContainer/RichTextLabel2"), NodePath("PanelContainer/MarginContainer/PanelContainer/VBoxContainer/WelcomeOKButton")]
-element_fade_times = Array[float]([1.5, 2.0, 1.5])
+element_fade_times = Array[float]([2.25, 2.5, 1.5])
 typewriter = [NodePath("PanelContainer/MarginContainer/PanelContainer/VBoxContainer/RichTextLabel")]
 
 [node name="PanelContainer" type="PanelContainer" parent="."]

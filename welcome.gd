@@ -2,7 +2,7 @@ class_name WelcomeScreen extends Control
 
 signal ok_pressed
 
-const FADE_IN_TIME:float = 1.6
+const FADE_IN_TIME:float = 2.3
 const FADE_OUT_TIME:float = 0.7
 const TRANSPARENT:Color = Color(Color.WHITE, 0.0)
 
@@ -24,9 +24,8 @@ func _on_visibility_changed() -> void:
 
 	if visible:
 		tween = create_tween()
-		tween.set_trans(Tween.TRANS_CIRC)
+		tween.set_trans(Tween.TRANS_CIRC).set_ease(Tween.EASE_OUT)
 		tween.tween_property(self, ^"modulate", Color.WHITE, FADE_IN_TIME)
-
 		var i:int = 0
 		#var subtweens:Tween = create_tween()
 		for element in elements:
@@ -35,6 +34,7 @@ func _on_visibility_changed() -> void:
 			#subtweens.tween_subtween(twee)
 			element.modulate = TRANSPARENT
 			tween.tween_property(element, ^"modulate", Color.WHITE, element_fade_times[i])
+			tween.set_trans(Tween.TRANS_SINE)
 			i+=1
 
 		for element in typewriter:
