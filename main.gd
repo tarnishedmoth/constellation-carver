@@ -6,6 +6,7 @@ class_name MainScreen extends Control
 ## WORKING Finish list editing functionality.
 ## WORKING Export Web build.
 ## WORKING Publish on itch.io.
+## IN PROGRESS File menu (export page as JSON in popup code edit box)
 ## TODO File exports don't work on Web.
 ## TODO Provide entire page JSON for easy copy.
 ## TODO Delete page button. WORKING in memory, doesn't delete files yet
@@ -124,9 +125,11 @@ var page_content_modified:bool = false:
 			application_name["text"] = APP_NAME
 
 @onready var application_name: RichTextLabel = %ApplicationName
-@onready var welcome: WelcomeScreen = %Welcome
 # SPACES
+@onready var welcome: WelcomeScreen = %Welcome
 @onready var special_popup_window: SpecialPopupWindow = $SpecialPopupWindow
+@onready var file_popup_window: PanelContainer = $FilePopupWindow
+
 @onready var log_console: RichTextLabel = %LogConsole:
 	set(value):
 		log_console = value
@@ -138,7 +141,9 @@ var page_content_modified:bool = false:
 @onready var bottom_tab_container: TabContainer = %BottomTabContainer
 # PROJECT
 @onready var project_option_button: OptionButton = %ProjectOptionButton
-
+@onready var open_user_folder_button: Button = %OpenUserFolderButton
+@onready var file_menu_button: MenuButton = %FileMenuButton
+@onready var project_rich_text_label: RichTextLabel = %ProjectRichTextLabel
 # PAGE
 @onready var page_filename_edit: LineEdit = %PageFilenameEdit
 @onready var page_title_edit: LineEdit = %PageTitleEdit
@@ -197,6 +202,10 @@ func _ready() -> void:
 	U.log_console = log_console
 	application_name.text = APP_NAME
 
+	## Hide overlays
+	#special_popup_window.hide() # Handled by script
+	file_popup_window.hide() # TODO should do the same
+
 	## Typically web platform
 	if not OS.is_userfs_persistent():
 		l("Warning: File storage is not persistent.")
@@ -207,6 +216,7 @@ func _ready() -> void:
 	#---TOP TABS
 	# PROJECT tab
 	project_option_button.get_popup().id_pressed.connect(_on_project_option_button_popup_id_pressed)
+	file_menu_button.get_popup().id_pressed.connect(_on_project_file_menu_button_popup_id_pressed)
 
 	#---BOTTOM TABS
 	# CONTENT edit tab
@@ -642,6 +652,18 @@ func ui_reset_current_tabs() -> void:
 func ui_reset_project_tab() -> void:
 	ui_repopulate_project_list()
 
+	if not is_initialized:
+		await initialized
+
+	var total_pages:int
+	#var total_contents:int
+	total_pages = pages.size()
+	#for page in pages:
+		#total_contents += pages[page]["content"].size()
+	## We aren't going to get this total contents value because we are lazy loading pages.
+	## Uncached pages don't have a dictionary in their value slot.
+	project_rich_text_label.text = "%s pages" % [total_pages]
+
 func ui_reset_page_tab() -> void:
 	## NOTE We don't reload the page files inside the project here, only reference the pages[] dictionary.
 	##      See ui_refresh_project_pages()
@@ -1014,11 +1036,20 @@ func _on_project_option_button_popup_id_pressed(id:int) -> void:
 		# Load project
 		var selected_project_path:String = project_option_button.get_item_metadata(project_option_button.get_item_index(id))
 		load_project(selected_project_path)
+		ui_reset_current_tabs()
+
 
 func _on_open_user_folder_button_pressed() -> void:
 	#OS.shell_show_in_file_manager(OS.get_user_data_dir())
 	var d:String = U.cat([OS.get_user_data_dir(), current_project_filepath.lstrip("user://")])
 	OS.shell_show_in_file_manager(ProjectSettings.globalize_path(d))
+
+func _on_project_file_menu_button_popup_id_pressed(id:int) -> void:
+	match id:
+		1:
+			## Export page as JSON
+			# TODO
+			pass
 
 #func _on_load_project_pressed() -> void: load_project(current_project_filepath)
 #func _on_save_project_pressed() -> void: pass
@@ -1032,7 +1063,8 @@ func _on_page_select_item_selected(index: int) -> void:
 		var _filepath:String = page_select.get_item_metadata(index)
 		if _filepath.is_absolute_path():
 			load_page(_filepath, false)
-			ui_reset_page_tab()
+			#ui_reset_page_tab()
+			ui_reset_current_tabs()
 
 func _on_welcome_screen_ok_button_pressed() -> void:
 	prompt_user_new_project()
@@ -1059,10 +1091,10 @@ func _on_new_page_pressed() -> void:
 	)
 	new_page(text_input, false, current_page_filepath.get_base_dir())
 
-func _on_load_page_pressed() -> void:
+func _on_load_page_pressed() -> void: # DEPRECATED
 	load_page(page_filename_edit.text, true)
 
-func _on_save_page_pressed() -> void:
+func _on_save_page_pressed() -> void: # DEPRECATED
 	save_page(page_filename_edit.text)
 
 func _on_force_refresh_pressed() -> void: render_current_page_content()
