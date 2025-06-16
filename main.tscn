@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3 uid="uid://c2mlaly46p3v5"]
+[gd_scene load_steps=14 format=3 uid="uid://c2mlaly46p3v5"]
 
 [ext_resource type="Script" uid="uid://dle4w1sl7v6dy" path="res://main.gd" id="1_ig7tw"]
 [ext_resource type="Theme" uid="uid://ct03hqqci348h" path="res://objects/objects.tres" id="2_0xm2m"]
@@ -11,6 +11,7 @@
 [ext_resource type="Texture2D" uid="uid://cicb7tkutbvuu" path="res://assets/plusup.png" id="8_efxa6"]
 [ext_resource type="Texture2D" uid="uid://ckq6uacedwlvw" path="res://assets/tile_0693.png" id="9_dg77c"]
 [ext_resource type="Texture2D" uid="uid://dw1os5pxq4nwu" path="res://assets/plusdown.png" id="10_ycdy4"]
+[ext_resource type="PackedScene" uid="uid://bba6fstf66qx5" path="res://welcome.tscn" id="12_dg77c"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lquwl"]
 content_margin_left = 64.0
@@ -802,6 +803,11 @@ size_flags_horizontal = 10
 size_flags_vertical = 4
 theme_override_font_sizes/font_size = 18
 text = "Confirm"
+
+[node name="Welcome" parent="." instance=ExtResource("12_dg77c")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
 
 [connection signal="tab_selected" from="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer" to="." method="_on_top_tab_container_tab_selected"]
 [connection signal="pressed" from="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Project/OpenUserFolderButton" to="." method="_on_open_user_folder_button_pressed"]

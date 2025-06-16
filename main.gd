@@ -4,9 +4,10 @@ class_name MainScreen extends Control
 ##----0.6.9|
 ## WORKING Fully functional project/page/object/load/edit/save, all objects.
 ## WORKING Finish list editing functionality.
-## TASK Export Windows build.
-## TASK Export Web build.
-## TASK Publish on itch.io.
+## WORKING Export Web build.
+## WORKING Publish on itch.io.
+## TASK Open project folder? Show filepath at least?
+## TEST New project prompt
 ##----0.8--|
 ## FEATURE Margins implemented for all objects;
 ## FEATURE Editable content highlighting/frame while editing;
@@ -81,6 +82,8 @@ const PAGE_TEMPLATE:Array = [
 	ConstellationButton.TEMPLATE,
 ]
 
+var flag_projects_empty:bool = true
+
 var pages: Dictionary[String,Dictionary] = {} # Key is absolute filepath, value is json dictionary
 var is_pages_cached:bool = false
 
@@ -115,6 +118,7 @@ var page_content_modified:bool = false:
 			application_name["text"] = APP_NAME
 
 @onready var application_name: RichTextLabel = %ApplicationName
+@onready var welcome: WelcomeScreen = %Welcome
 # SPACES
 @onready var special_popup_window: SpecialPopupWindow = $SpecialPopupWindow
 @onready var log_console: RichTextLabel = %LogConsole:
@@ -186,6 +190,8 @@ func _ready() -> void:
 	U.log_console = log_console
 	application_name.text = APP_NAME
 
+	welcome.ok_pressed.connect(_on_welcome_screen_ok_button_pressed)
+
 	# CONTENT edit tab
 	button_action_menu.get_popup().id_pressed.connect(_on_button_action_menu_pressed)
 	import_image_data_button.get_popup().id_pressed.connect(_on_import_image_button_popup_id_pressed)
@@ -206,8 +212,24 @@ func _ready() -> void:
 	l("Application initialized.")
 	is_initialized = true
 
+	if flag_projects_empty:
+		welcome.show()
+
 #endregion
 #region PROJECT
+func prompt_user_new_project() -> void:
+	var project_name:String = await special_popup_window.popup_text_entry(
+			"Name your project:",
+			"New Project",
+			true,
+			SpecialPopupWindow.TEXT_FORMAT.NONE # TODO check is valid as folder name
+		)
+	if project_name.is_empty():
+		l("User cancelled new project.")
+		return
+	else:
+		new_project(project_name)
+
 func new_project(project_name:String) -> void:
 	current_project_name = project_name
 	new_page("index")
@@ -520,6 +542,9 @@ func ui_repopulate_project_list() -> void:
 	project_option_button.add_item("~~~~~ ~ ~ ~  ~  ~  ~   ~   ~    ~-.   ~      ~-`       ~    .       `  .", 1)
 
 	# Scanning for files
+	if not DirAccess.dir_exists_absolute(Particles.file_saves_directory):
+		DirAccess.make_dir_recursive_absolute(Particles.file_saves_directory)
+
 	var id_index:int = 2
 	var directories:PackedStringArray = DirAccess.get_directories_at(Particles.file_saves_directory)
 	var current_project_index:int = -1
@@ -537,8 +562,10 @@ func ui_repopulate_project_list() -> void:
 		id_index += 1
 
 	if current_project_index > -1:
+		flag_projects_empty = false
 		project_option_button.select(current_project_index)
 	else:
+		flag_projects_empty = true
 		project_option_button.select(1)
 
 func _ui_refresh_project_pages(force_refresh:bool = false, reload_current:bool = true) -> void:
@@ -926,17 +953,7 @@ func _on_top_tab_container_tab_selected(tab: int) -> void:
 func _on_project_option_button_popup_id_pressed(id:int) -> void:
 	if id == 0:
 		# New project
-		var project_name:String = await special_popup_window.popup_text_entry(
-			"Name your project:",
-			"New Project",
-			true,
-			SpecialPopupWindow.TEXT_FORMAT.NONE # TODO check is valid as folder name
-		)
-		if project_name.is_empty():
-			l("User cancelled new project.")
-			return
-		else:
-			new_project(project_name)
+		prompt_user_new_project()
 
 	elif id != 1:
 		# Load project
@@ -946,7 +963,7 @@ func _on_project_option_button_popup_id_pressed(id:int) -> void:
 func _on_open_user_folder_button_pressed() -> void:
 	#OS.shell_show_in_file_manager(OS.get_user_data_dir())
 	var d:String = U.cat([OS.get_user_data_dir(), current_project_filepath.lstrip("user://")])
-	OS.shell_show_in_file_manager(d)
+	OS.shell_show_in_file_manager(ProjectSettings.globalize_path(d))
 
 #func _on_load_project_pressed() -> void: load_project(current_project_filepath)
 #func _on_save_project_pressed() -> void: pass
@@ -961,6 +978,9 @@ func _on_page_select_item_selected(index: int) -> void:
 		if _filepath.is_absolute_path():
 			load_page(_filepath, false)
 			ui_reset_page_tab()
+
+func _on_welcome_screen_ok_button_pressed() -> void:
+	prompt_user_new_project()
 
 func _on_new_page_pressed() -> void:
 	var text_input:String = await special_popup_window.popup_text_entry(

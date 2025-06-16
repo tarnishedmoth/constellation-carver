@@ -15,7 +15,7 @@ config/description="A GUI editor for designing mini websites, viewable on the Pl
 config/version="0.6.9"
 run/main_scene="uid://c2mlaly46p3v5"
 config/use_custom_user_dir=true
-config/custom_user_dir_name="constellationcarver"
+config/custom_user_dir_name="Constellation Carver"
 config/quit_on_go_back=false
 config/features=PackedStringArray("4.4", "GL Compatibility")
 run/max_fps=60
@@ -42,7 +42,6 @@ gdscript/warnings/return_value_discarded=1
 
 window/size/viewport_width=400
 window/size/viewport_height=720
-window/stretch/mode="viewport"
 window/handheld/orientation=1
 mouse_cursor/custom_image="uid://2w3mb6gt85o4"
 mouse_cursor/custom_image_hotspot=Vector2(5, 2)
