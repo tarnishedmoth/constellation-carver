@@ -9,7 +9,8 @@ class_name MainScreen extends Control
 ## TODO File exports don't work on Web.
 ## TASK Open project folder? Show filepath at least?
 ## TASK Provide entire page JSON for easy copy.
-## TASK Delete page button.
+## TASK Delete page button. WORKING in memory, doesn't delete files yet
+## BUG Editing Page Title causes caret to go to beginning (TODO rework instant update+refresh)
 ## BUG Creating a new Button breaks things
 ## BUG Investigate if Clipboard access works at all or if we should provide a text box popup to capture it.
 ## BUG Special Popup doesn't ensure the right things are hidden/visible necessarily.
