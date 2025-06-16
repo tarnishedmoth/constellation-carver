@@ -23,7 +23,6 @@ run/low_processor_mode=true
 boot_splash/bg_color=Color(0.127386, 0.138565, 0.17761, 1)
 boot_splash/show_image=false
 boot_splash/use_filter=false
-config/icon="uid://56y8w74j618v"
 
 [autoload]
 

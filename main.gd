@@ -7,7 +7,9 @@ class_name MainScreen extends Control
 ## WORKING Export Web build.
 ## WORKING Publish on itch.io.
 ## TASK Open project folder? Show filepath at least?
-## TEST New project prompt
+## BUG Creating a new Button breaks things
+## BUG Investigate if Clipboard access works at all or if we should provide a text box popup to capture it.
+## TODO Provide entire page JSON for easy copy.
 ##----0.8--|
 ## FEATURE Margins implemented for all objects;
 ## FEATURE Editable content highlighting/frame while editing;
@@ -189,6 +191,9 @@ var json_edit_is_word_wrap:bool = false
 func _ready() -> void:
 	U.log_console = log_console
 	application_name.text = APP_NAME
+
+	if not OS.is_userfs_persistent():
+		l("Warning: File storage is not persistent!")
 
 	welcome.ok_pressed.connect(_on_welcome_screen_ok_button_pressed)
 
@@ -532,6 +537,8 @@ func ui_set_starting_state() -> void:
 	bottom_tab_container.current_tab = BOTTOM_TABS.CONTENT_T # Content tab
 
 func ui_repopulate_project_list() -> void:
+	if not is_initialized:
+		await initialized
 	# Initialization
 	project_option_button.clear()
 	project_option_button.add_icon_item(
