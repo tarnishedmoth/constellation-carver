@@ -144,6 +144,8 @@ layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 0.4
 tooltip_text = "Delete the currently open page."
+theme_type_variation = &"3DButton"
+disabled = true
 text = "DELETE"
 
 [node name="NewPage" type="Button" parent="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Page/ButtonsContainer"]
@@ -151,6 +153,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 0
 size_flags_stretch_ratio = 0.4
+theme_type_variation = &"3DButton"
 text = "NEW ..."
 
 [node name="SavePage" type="Button" parent="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Page/ButtonsContainer"]

@@ -12,7 +12,7 @@ config_version=5
 
 config/name="Constellation Carver"
 config/description="A GUI editor for designing mini websites, viewable on the Playdate console by Panic, within Particle Studios' \"Constellations\" web browser."
-config/version="0.6.9"
+config/version="0.6.9.0"
 run/main_scene="uid://c2mlaly46p3v5"
 config/use_custom_user_dir=true
 config/custom_user_dir_name="Constellation Carver"

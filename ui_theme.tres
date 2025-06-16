@@ -1,9 +1,60 @@
-[gd_resource type="Theme" load_steps=28 format=3 uid="uid://c1753t6oa0y8j"]
+[gd_resource type="Theme" load_steps=31 format=3 uid="uid://c1753t6oa0y8j"]
 
 [ext_resource type="FontFile" uid="uid://bec1e5bv27s6c" path="res://assets/fonts/Roboto-Bold.ttf" id="1_mk0s6"]
 [ext_resource type="FontFile" uid="uid://bs0a5sycrdrkv" path="res://assets/fonts/Roboto-Regular.ttf" id="1_touxu"]
 [ext_resource type="FontFile" uid="uid://7yjs7lvchc7i" path="res://assets/fonts/Roboto-BoldItalic.ttf" id="2_5kxjo"]
 [ext_resource type="FontFile" uid="uid://q2oe418emaa6" path="res://assets/fonts/Roboto-Italic.ttf" id="3_g7fvb"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_yuc8m"]
+content_margin_left = 4.0
+content_margin_top = 4.0
+content_margin_right = 4.0
+content_margin_bottom = 4.0
+bg_color = Color(0, 0, 0, 1)
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.8, 0.8, 0.8, 0.545098)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+corner_detail = 1
+anti_aliasing = false
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_nhcad"]
+content_margin_left = 4.0
+content_margin_top = 4.0
+content_margin_right = 4.0
+content_margin_bottom = 4.0
+bg_color = Color(0, 0, 0, 1)
+draw_center = false
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(1, 1, 1, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 3
+corner_detail = 1
+expand_margin_right = 2.0
+expand_margin_bottom = 1.0
+anti_aliasing = false
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_x2bbx"]
+content_margin_left = 4.0
+content_margin_top = 4.0
+content_margin_right = 4.0
+content_margin_bottom = 4.0
+bg_color = Color(0, 0, 0, 1)
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(1, 1, 1, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+corner_detail = 1
+anti_aliasing = false
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_touxu"]
 content_margin_left = 4.0
@@ -11,11 +62,14 @@ content_margin_top = 4.0
 content_margin_right = 4.0
 content_margin_bottom = 4.0
 bg_color = Color(0.1, 0.1, 0.1, 0.3)
+border_width_bottom = 1
+border_color = Color(0.87451, 0.87451, 0.87451, 0.501961)
 corner_radius_top_left = 3
 corner_radius_top_right = 3
-corner_radius_bottom_right = 3
-corner_radius_bottom_left = 3
-corner_detail = 5
+corner_radius_bottom_right = 1
+corner_radius_bottom_left = 1
+corner_detail = 1
+anti_aliasing = false
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2pn01"]
 content_margin_left = 4.0
@@ -242,6 +296,10 @@ content_margin_bottom = 8.0
 [resource]
 default_font = ExtResource("1_touxu")
 default_font_size = 14
+3DButton/base_type = &"Button"
+3DButton/styles/disabled = SubResource("StyleBoxFlat_yuc8m")
+3DButton/styles/hover = SubResource("StyleBoxFlat_nhcad")
+3DButton/styles/normal = SubResource("StyleBoxFlat_x2bbx")
 BoxContainer/constants/separation = 2
 Button/colors/font_color = Color(0.875, 0.875, 0.875, 1)
 Button/colors/font_disabled_color = Color(0.875, 0.875, 0.875, 0.5)
