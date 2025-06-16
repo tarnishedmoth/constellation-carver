@@ -1,4 +1,4 @@
-[gd_scene load_steps=4 format=3 uid="uid://bba6fstf66qx5"]
+[gd_scene load_steps=5 format=3 uid="uid://bba6fstf66qx5"]
 
 [ext_resource type="Theme" uid="uid://c1753t6oa0y8j" path="res://ui_theme.tres" id="1_hp420"]
 [ext_resource type="Script" uid="uid://dq4wpoyp5f5v3" path="res://welcome.gd" id="2_odedu"]
@@ -21,6 +21,8 @@ expand_margin_right = 20.0
 expand_margin_bottom = 4.0
 anti_aliasing = false
 
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_odedu"]
+
 [node name="Welcome" type="Control" node_paths=PackedStringArray("elements", "typewriter")]
 layout_mode = 3
 anchors_preset = 15
@@ -31,7 +33,7 @@ grow_vertical = 2
 theme = ExtResource("1_hp420")
 script = ExtResource("2_odedu")
 elements = [NodePath("PanelContainer/MarginContainer/PanelContainer"), NodePath("PanelContainer/MarginContainer/PanelContainer/VBoxContainer/RichTextLabel2"), NodePath("PanelContainer/MarginContainer/PanelContainer/VBoxContainer/WelcomeOKButton")]
-element_fade_times = Array[float]([2.25, 2.5, 1.5])
+element_fade_times = Array[float]([2.25, 2.1, 0.8])
 typewriter = [NodePath("PanelContainer/MarginContainer/PanelContainer/VBoxContainer/RichTextLabel")]
 
 [node name="PanelContainer" type="PanelContainer" parent="."]
@@ -76,6 +78,7 @@ theme_override_constants/line_separation = 5
 theme_override_font_sizes/italics_font_size = 14
 theme_override_font_sizes/normal_font_size = 13
 theme_override_font_sizes/bold_font_size = 14
+theme_override_styles/focus = SubResource("StyleBoxEmpty_odedu")
 bbcode_enabled = true
 text = "This tool helps you create miniature webpages that are viewable on the [b]Playdate[/b] handheld console, in the [b]Constellation Browser[/b] made by Particle Studios.
 
@@ -84,6 +87,7 @@ text = "This tool helps you create miniature webpages that are viewable on the [
 [url=https://play.date/]https://play.date/[/url][/center]"
 fit_content = true
 scroll_active = false
+context_menu_enabled = true
 selection_enabled = true
 
 [node name="WelcomeOKButton" type="Button" parent="PanelContainer/MarginContainer/PanelContainer/VBoxContainer"]

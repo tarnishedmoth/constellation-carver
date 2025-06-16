@@ -144,6 +144,7 @@ var page_content_modified:bool = false:
 @onready var page_filename_edit: LineEdit = %PageFilenameEdit
 @onready var page_title_edit: LineEdit = %PageTitleEdit
 @onready var page_select: OptionButton = %PageSelect
+@onready var delete_page_button: Button = %DeletePage
 # OBJECT
 @onready var new_object_menu: MenuButton = %NewObjectMenu
 @onready var selected_object_type: Label = %ObjectType
@@ -260,7 +261,7 @@ func load_project(project_dir_path:String) -> void:
 		current_project_name = load_project_name
 
 		ui_set_starting_state()
-		_ui_refresh_project_pages(true)
+		ui_refresh_project_pages(true)
 		load_page(_filepath, false)
 	else:
 		special_popup_window.popup(
@@ -308,7 +309,7 @@ func new_page(filename:String, overwrite:bool = false, dirpath:String = current_
 	var did_save:bool = ParticleParser.save_json_to_file(new_page_json, _filepath)
 	if did_save:
 		l(U.bold("New page created and saved!"))
-		_ui_refresh_project_pages(true)
+		ui_refresh_project_pages(true)
 		await get_tree().process_frame
 		load_page(_filepath, false)
 	else:
@@ -457,6 +458,28 @@ func render_current_page_content() -> void:
 		tree_item.set_text(0, obj["type"])
 		tree_item.set_metadata(0, obj["type"])
 
+func delete_page(page:String, in_current_project:bool = true) -> void: # Filepath in Pages
+	if in_current_project:
+		if page in pages:
+			# Delete the file
+			# TODO
+
+			# Delete our page in memory
+			var next_page:String # Filepath
+			for _page in pages:
+				if _page == current_page_filepath:
+					continue
+				else:
+					next_page == _page
+					break
+
+			pages.erase(page)
+			if not next_page.is_empty():
+				load_page(next_page)
+			else:
+				ui_reset_current_tabs()
+
+
 func _render_content(obj:Dictionary) -> Control:
 	var instance:Control
 	match obj["type"]:
@@ -595,7 +618,7 @@ func ui_repopulate_project_list() -> void:
 		project_option_button.select(1)
 
 
-func _ui_refresh_project_pages(force_refresh:bool = false, reload_current:bool = true) -> void:
+func ui_refresh_project_pages(force_refresh:bool = false, reload_current:bool = true) -> void:
 	if !is_pages_cached or force_refresh:
 		is_pages_cached = false
 		pages.clear()
@@ -621,13 +644,17 @@ func ui_reset_project_tab() -> void:
 	ui_repopulate_project_list()
 
 func ui_reset_page_tab() -> void:
+	## NOTE We don't reload the page files inside the project here, only reference the pages[] dictionary.
+	##      See ui_refresh_project_pages()
 	if not is_initialized:
 		await initialized
 
 	if current_page_filepath:
 		page_filename_edit.text = current_page_filepath.get_file()
+		delete_page_button.disabled = false
 	else:
 		page_filename_edit.text = ""
+		delete_page_button.disabled = true
 	page_title_edit.text = current_page_name if current_page_name != "Empty" else ""
 
 	# Page select menu
@@ -1010,6 +1037,19 @@ func _on_page_select_item_selected(index: int) -> void:
 
 func _on_welcome_screen_ok_button_pressed() -> void:
 	prompt_user_new_project()
+
+
+func _on_delete_page_pressed() -> void:
+	if is_current_page_valid():
+		var confirm:bool = await special_popup_window.popup(
+			"Are you sure you want to delete this page?",
+			"Warning  -  Delete Page",
+			true
+		)
+		if confirm:
+			delete_page(current_page_filepath)
+		else:
+			return
 
 func _on_new_page_pressed() -> void:
 	var text_input:String = await special_popup_window.popup_text_entry(
