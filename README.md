@@ -2,7 +2,7 @@
 > A GUI editor for Particle Studios' "Constellations" web browser on the Playdate console by Panic.
 
 # Roadmap
-## ----0.6.9|
+## ----0.6.9| (Current)
 * WORKING Fully functional project/page/object/load/edit/save, all objects.
 * WORKING Finish list editing functionality.
 * WORKING Export Web build.
