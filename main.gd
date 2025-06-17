@@ -8,8 +8,9 @@ class_name MainScreen extends Control
 ## WORKING Publish on itch.io.
 ## IN PROGRESS File menu (export page as JSON in popup code edit box)
 ## TODO File exports don't work on Web.
-## TODO Provide entire page JSON for easy copy.
-## TODO Delete page button. WORKING in memory, doesn't delete files yet
+## WORKING Provide entire page JSON for easy copy.
+## TODO Select from any page in page json popup.
+## WORKING Delete page button in memory, TODO doesn't delete files yet
 ## BUG Open project folder? Show filepath at least?
 ## BUG Editing Page Title causes caret to go to beginning (TODO rework instant update+refresh)
 ## BUG Creating a new Button breaks things
@@ -128,7 +129,7 @@ var page_content_modified:bool = false:
 # SPACES
 @onready var welcome: WelcomeScreen = %Welcome
 @onready var special_popup_window: SpecialPopupWindow = $SpecialPopupWindow
-@onready var file_popup_window: PanelContainer = $FilePopupWindow
+@onready var file_popup_window: FilePopupMenu = $FilePopupWindow
 
 @onready var log_console: RichTextLabel = %LogConsole:
 	set(value):
@@ -924,6 +925,7 @@ func cache_changes(refresh:bool = false):
 	for item:Control in current_page_content:
 		if not item == null:
 			if item.has_method("to_dict"):
+				## CRITICAL Set the current page JSON
 				current_page_json["content"][index] = item.to_dict()
 		index += 1
 
@@ -1048,8 +1050,17 @@ func _on_project_file_menu_button_popup_id_pressed(id:int) -> void:
 	match id:
 		1:
 			## Export page as JSON
-			# TODO
-			pass
+			if page_content_modified:
+				var confirm:bool = await special_popup_window.popup(
+					"Page content has changed. Save changes?",
+					"Export  -  Page Modified",
+					true
+				)
+				if confirm:
+					cache_changes()
+
+			# cache_changes() is where the JSON is saved for the page
+			file_popup_window.popup_code(ParticleParser.stringify(current_page_json))
 
 #func _on_load_project_pressed() -> void: load_project(current_project_filepath)
 #func _on_save_project_pressed() -> void: pass

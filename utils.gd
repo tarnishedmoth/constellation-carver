@@ -1,6 +1,8 @@
-extends Node
+class_name Utils extends Node
 
 var log_console:RichTextLabel
+
+const TRANSPARENT:Color = Color(Color.WHITE, 0.0)
 
 func l(item) -> void:
 	print(item)
