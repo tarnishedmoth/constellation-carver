@@ -1050,14 +1050,14 @@ func _on_project_file_menu_button_popup_id_pressed(id:int) -> void:
 	match id:
 		1:
 			## Export page as JSON
-			if page_content_modified:
-				var confirm:bool = await special_popup_window.popup(
-					"Page content has changed. Save changes?",
-					"Export  -  Page Modified",
-					true
-				)
-				if confirm:
-					cache_changes()
+			#if page_content_modified:
+				#var confirm:bool = await special_popup_window.popup(
+					#"Page content has changed. Save changes?",
+					#"Export  -  Page Modified",
+					#true
+				#
+				#if confirm:
+			cache_changes(true)
 
 			# cache_changes() is where the JSON is saved for the page
 			file_popup_window.popup_code(ParticleParser.stringify(current_page_json))
