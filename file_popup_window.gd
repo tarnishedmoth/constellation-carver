@@ -10,6 +10,9 @@ const FADE_TIME:float = 1.0
 
 var modulate_tween:Tween
 
+func _ready() -> void:
+	hide()
+
 func popup_code(code:String = "", editable:bool = false) -> bool:
 	text_box.text = code
 	text_box.editable = editable
@@ -35,8 +38,6 @@ func _on_visibility_changed() -> void:
 			modulate_tween.kill()
 		modulate_tween = create_tween()
 		modulate_tween.tween_property(self, ^"modulate", Color.WHITE, FADE_TIME).from(Utils.TRANSPARENT)
-	else:
-		text_box.clear()
 
 func _on_cancel_button_pressed() -> void:
 	exited.emit(false)

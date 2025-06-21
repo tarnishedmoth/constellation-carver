@@ -6,14 +6,13 @@ class_name MainScreen extends Control
 ## WORKING Finish list editing functionality.
 ## WORKING Export Web build.
 ## WORKING Publish on itch.io.
-## IN PROGRESS File menu (export page as JSON in popup code edit box)
-## TODO File exports don't work on Web.
+## WORKING File menu (export/import page as JSON in popup code edit box)
 ## WORKING Provide entire page JSON for easy copy.
-## TODO Select from any page in page json popup.
 ## WORKING Delete page button in memory, TODO doesn't delete files yet
-## BUG Open project folder? Show filepath at least?
-## BUG Editing Page Title causes caret to go to beginning (TODO rework instant update+refresh)
-## BUG Creating a new Button breaks things
+## BUG FIXED Open project folder? Show filepath at least?
+## BUG FIXED Editing Page Title causes caret to go to beginning (TODO rework instant update+refresh)
+## BUG FIXED Creating a new Button breaks things
+## TODO Select from any page in page export as json popup.
 ## BUG Investigate if Clipboard access works at all or if TODO we should provide a text box popup to capture it.
 ##----0.8--|
 ## FEATURE Margins implemented for all objects
@@ -25,6 +24,7 @@ class_name MainScreen extends Control
 ##----0.9--|
 ## FEATURE Images encoding/decoding (and rendering?)
 ## FEATURE Reels basic support following images.
+## TODO File exports don't work on Web.
 ##----1.0--|
 ## TASK Rename projects & pages.
 ## TASK User configurable content templates.
@@ -205,7 +205,7 @@ func _ready() -> void:
 
 	## Hide overlays
 	#special_popup_window.hide() # Handled by script
-	file_popup_window.hide() # TODO should do the same
+	#file_popup_window.hide() # Handled by script
 
 	## Typically web platform
 	if not OS.is_userfs_persistent():
@@ -283,7 +283,7 @@ func load_project(project_dir_path:String) -> void:
 #endregion
 #region PAGES
 
-func new_page(filename:String, overwrite:bool = false, dirpath:String = current_project_filepath) -> void:
+func new_page(filename:String, overwrite:bool = false, new_page_json:String = ParticleParser.pagify(PAGE_TEMPLATE), dirpath:String = current_project_filepath) -> void:
 	if current_project_name.is_empty():
 		special_popup_window.popup(
 			"No project!\n\nLoad or create a Project to edit pages.",
@@ -315,7 +315,6 @@ func new_page(filename:String, overwrite:bool = false, dirpath:String = current_
 			if not result: # Cancel
 				return
 
-	var new_page_json:String = ParticleParser.pagify(PAGE_TEMPLATE)
 	var did_save:bool = ParticleParser.save_json_to_file(new_page_json, _filepath)
 	if did_save:
 		l(U.bold("New page created and saved!"))
@@ -351,7 +350,7 @@ func load_page(filepath, relative:bool = true) -> void:
 			true
 		)
 		if overwrite:
-			new_page(_filepath, true, "")
+			new_page(_filepath, true, ParticleParser.pagify(PAGE_TEMPLATE), "") # TEST
 			load_page(_filepath, false)
 		else:
 			return
@@ -366,7 +365,7 @@ func load_page(filepath, relative:bool = true) -> void:
 			true
 		)
 		if overwrite:
-			new_page(_filepath, true, "")
+			new_page(_filepath, true, ParticleParser.pagify(PAGE_TEMPLATE), "")
 			load_page(_filepath, false)
 		return
 	elif not "format" in payload:
@@ -377,7 +376,7 @@ func load_page(filepath, relative:bool = true) -> void:
 			true
 		)
 		if overwrite:
-			new_page(_filepath, false, "")
+			new_page(_filepath, false, ParticleParser.pagify(PAGE_TEMPLATE), "")
 			load_page(_filepath, false)
 		return
 	elif payload["format"] != "particle":
@@ -388,15 +387,39 @@ func load_page(filepath, relative:bool = true) -> void:
 			true
 		)
 		if result:
-			new_page(_filepath, false, "")
+			new_page(_filepath, false, ParticleParser.pagify(PAGE_TEMPLATE), "")
 			load_page(_filepath, false)
+		return
+	else:
+		l("Loading page...")
+		load_page_json(payload, _filepath)
+		#page_content_modified = false
+		#current_page_json = payload.duplicate(true)
+		#current_page_filepath = _filepath
+		#pages[_filepath] = payload.duplicate(true) ## Lazy loading. Set the keys on project load
+
+		#ui_set_starting_state() # I think these are just causing problems, handle this in the calling function
+		#ui_reset_current_tabs()
+		#ui_reset_page_tab()
+		render_current_page_content()
+		return
+
+func load_page_json(payload:Dictionary, filepath:String = "TEMP") -> void:
+	if payload.is_empty():
+		return
+	elif not "format" in payload:
+		l("--Loaded page JSON has bad format.")
+		return
+	elif payload["format"] != "particle":
+		l("--Loaded page JSON has bad format.")
 		return
 	else:
 		l("Loading page...")
 		page_content_modified = false
 		current_page_json = payload.duplicate(true)
-		current_page_filepath = _filepath
-		pages[_filepath] = payload.duplicate(true) ## Lazy loading. Set the keys on project load
+
+		current_page_filepath = filepath
+		pages[filepath] = payload.duplicate(true)
 
 		#ui_set_starting_state() # I think these are just causing problems, handle this in the calling function
 		#ui_reset_current_tabs()
@@ -1046,12 +1069,24 @@ func _on_project_option_button_popup_id_pressed(id:int) -> void:
 
 
 func _on_open_user_folder_button_pressed() -> void:
-	#OS.shell_show_in_file_manager(OS.get_user_data_dir())
-	var d:String = U.cat([OS.get_user_data_dir(), current_project_filepath.lstrip("user://")])
-	OS.shell_show_in_file_manager(ProjectSettings.globalize_path(d))
+	if flag_fs_not_persistent:
+		special_popup_window.popup(
+			"Some features are not yet available on Web, such as user file access.
+			If you want to export your pages, use [b]Project->File->Export[/b], and copy the JSON manually into your file.
+			You can also select individual content objects, and navigate to the JSON tab to copy only specific pieces.",
+			"Web Version  -  File Access Blocked"
+		)
+		return
+	else:
+		#OS.shell_show_in_file_manager(OS.get_user_data_dir())
+		var d:String = U.cat([OS.get_user_data_dir(), current_project_filepath.lstrip("user://")])
+		OS.shell_show_in_file_manager(ProjectSettings.globalize_path(d))
 
 func _on_project_file_menu_button_popup_id_pressed(id:int) -> void:
 	match id:
+		0:
+			# Export Separator
+			pass
 		1:
 			## Export page as JSON
 			#if page_content_modified:
@@ -1065,6 +1100,30 @@ func _on_project_file_menu_button_popup_id_pressed(id:int) -> void:
 
 			# cache_changes() is where the JSON is saved for the page
 			file_popup_window.popup_code(ParticleParser.stringify(current_page_json))
+		50: # Import separator
+			pass
+		51:
+			## Import page as JSON
+			cache_changes(true)
+			var confirm:bool = await file_popup_window.popup_code("", true)
+			if confirm:
+				# Make a new page with the JSON
+				var new_page_json:String = file_popup_window.text_box.text
+
+				var result:String = await special_popup_window.popup_text_entry(
+					"Enter a filepath for your page.",
+					"Save Page  -  New File",
+					true, SpecialPopupWindow.TEXT_FORMAT.FILE)
+				if result.is_empty():
+					return
+				else:
+					var filepath:String = result
+					new_page(filepath, false, new_page_json)
+
+
+				#if ParticleParser.is_valid_page(new_page_json):
+				#	pass
+
 
 #func _on_load_project_pressed() -> void: load_project(current_project_filepath)
 #func _on_save_project_pressed() -> void: pass
@@ -1104,12 +1163,12 @@ func _on_new_page_pressed() -> void:
 		true,
 		SpecialPopupWindow.TEXT_FORMAT.FILE
 	)
-	new_page(text_input, false, current_page_filepath.get_base_dir())
+	new_page(text_input, false, ParticleParser.pagify(PAGE_TEMPLATE), current_page_filepath.get_base_dir())
 
-func _on_load_page_pressed() -> void: # DEPRECATED
+func _on_load_page_pressed() -> void:
 	load_page(page_filename_edit.text, true)
 
-func _on_save_page_pressed() -> void: # DEPRECATED
+func _on_save_page_pressed() -> void:
 	save_page(page_filename_edit.text)
 
 func _on_force_refresh_pressed() -> void: render_current_page_content()
@@ -1149,7 +1208,8 @@ func _on_delete_selected_pressed() -> void:
 		await get_tree().process_frame
 		cache_changes()
 
-func _on_page_title_edit_text_changed(new_text: String) -> void:
+#func _on_page_title_edit_text_changed(new_text: String) -> void:
+func _on_page_title_edit_text_submitted(new_text: String) -> void:
 	current_page_json["title"] = new_text
 	l("Page title modified.")
 	cache_changes()
