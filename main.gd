@@ -553,7 +553,11 @@ func _render_content(obj:Dictionary) -> Control:
 	return instance
 
 func add_content(content:Dictionary, index:int = -1) -> void:
+	if content.is_empty():
+		push_warning("Tried to add empty content to page. Returning.")
+		return
 	if not current_page_json:
+		push_warning("Tried to make a new object without a page selected!")
 		U.l(U.ital("--Can't make a new object without a page selected!"))
 		return
 

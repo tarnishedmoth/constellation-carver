@@ -1,0 +1,22 @@
+[gd_scene load_steps=6 format=3 uid="uid://e5n5q0thyxa3"]
+
+[ext_resource type="Script" uid="uid://cybc7mxuvc8fh" path="res://assets/sounds/sfx.gd" id="1_2bbp8"]
+[ext_resource type="AudioStream" uid="uid://cugfosuqbqhea" path="res://assets/sounds/click1.ogg" id="1_ohtle"]
+[ext_resource type="AudioStream" uid="uid://ddp2tdv6h8rp6" path="res://assets/sounds/click2.ogg" id="2_2d8r3"]
+[ext_resource type="AudioStream" uid="uid://h0ok6fv4eyog" path="res://assets/sounds/switch2.ogg" id="3_2bbp8"]
+[ext_resource type="AudioStream" uid="uid://cmdiy3re6utpv" path="res://assets/sounds/rollover2.ogg" id="4_uslfs"]
+
+[node name="SFX" type="Node"]
+script = ExtResource("1_2bbp8")
+
+[node name="Click1" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("1_ohtle")
+
+[node name="Click2" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("2_2d8r3")
+
+[node name="Click3" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("4_uslfs")
+
+[node name="Switch" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("3_2bbp8")

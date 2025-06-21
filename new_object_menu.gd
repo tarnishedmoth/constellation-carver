@@ -34,6 +34,7 @@ func _on_popup_id_pressed(id:int) -> void:
 			content = ConstellationBlockquote.TEMPLATE
 		3: # Button
 			U.l(U.bold("--New Button"))
+			content = ConstellationButton.TEMPLATE
 		4: # Separator
 			U.l(U.bold("--New Separator"))
 			content = ConstellationSeparator.TEMPLATE
@@ -42,6 +43,7 @@ func _on_popup_id_pressed(id:int) -> void:
 			content = ConstellationImage.TEMPLATE
 		6: # Reel
 			U.l(U.bold("--New Reel"))
+			content = ConstellationReel.TEMPLATE
 
 	if is_instance_valid(Main.selected_editable):
 		Main.add_content(

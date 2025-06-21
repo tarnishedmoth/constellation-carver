@@ -2,7 +2,7 @@ class_name ConstellationButton extends Button
 
 const TEMPLATE = {
 	"type": "button",
-	"label": "Lorem",
+	"label": "Click Me",
 	"action": "."
 }
 
