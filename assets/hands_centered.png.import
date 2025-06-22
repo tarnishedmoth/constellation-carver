@@ -1,0 +1,14 @@
+[remap]
+
+importer="image"
+type="Image"
+uid="uid://bg0sdgicv3hku"
+path="res://.godot/imported/hands_centered.png-b74d41b1d5ca13f617fdc2cf76fc0ae4.image"
+
+[deps]
+
+source_file="res://assets/hands_centered.png"
+dest_files=["res://.godot/imported/hands_centered.png-b74d41b1d5ca13f617fdc2cf76fc0ae4.image"]
+
+[params]
+

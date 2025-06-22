@@ -38,6 +38,10 @@ var style:Style = Style.new():
 		style = value
 		refresh_visuals()
 
+var display_image:TextureRect
+
+var redraw_count:int = 0
+
 func _init(width, height, pixels:String, rescale:int = 1) -> void:
 	self._width = maxi(int(width), 0)
 	self._height = maxi(int(height), 0)
@@ -53,20 +57,10 @@ func _init(width, height, pixels:String, rescale:int = 1) -> void:
 	self.tooltip_text = "Image"
 
 func _ready() -> void:
-	toggle_placeholder(true)
+	display_image = TextureRect.new()
+	add_child(display_image)
 
-#func _draw() -> void:
-	#draw_texture_rect(
-		#TEXTURE,
-		#Rect2i(
-			#centered(_width*style.scale),
-			#0,
-			#_width*style.scale,
-			#_height*style.scale
-		#),
-		#false
-		##Color.YELLOW
-	#)
+	refresh_visuals()
 
 func toggle_placeholder(on=true) -> void:
 	if on:
@@ -78,15 +72,27 @@ func toggle_placeholder(on=true) -> void:
 		if placeholder:
 			placeholder.queue_free()
 
+
 func centered(width:int) -> int: return 400/2 - width/2
 
 func refresh_visuals() -> void:
-	custom_minimum_size = Vector2i(_width*style.scale, _height*style.scale)
-	queue_redraw()
-	#_data_to_pixels()
+	if not display_image:
+		# Not set up yet
+		return
 
-func _data_to_pixels(data:String) -> void:
-	pass
+	redraw_count += 1
+	custom_minimum_size = Vector2i(_width*style.scale, _height*style.scale)
+
+	if not _pixels.is_empty():
+		var image = create_image_from(ConstellationImageProcessor.decompress_buffer(_pixels), _width, _height, style.scale)
+		display_image.texture = ImageTexture.create_from_image(image)
+		display_image.show()
+		toggle_placeholder(false)
+	else:
+		display_image.hide()
+		toggle_placeholder(true)
+	queue_redraw()
+
 
 func to_dict() -> Dictionary:
 	var data:Dictionary = TEMPLATE.duplicate()
@@ -102,3 +108,20 @@ func to_dict() -> Dictionary:
 
 func _to_string() -> String:
 	return JSON.stringify(to_dict(), "\t", false)
+
+
+static func create_image_from(binary:String, width:int, height:int, rescale:int = 1) -> Image:
+	var img:Image = Image.create_empty(width, height, false, Image.FORMAT_L8)
+
+	var pos:Vector2i = Vector2i(0,0)
+	var index:int = 0
+	for c in binary:
+		var column = index % width
+		var row = index / width
+		pos = Vector2i(column, row)
+		var color:Color = Color.BLACK if c == "1" else Color.WHITE
+		#img.set_pixelv(pos, color)
+		var rect = Rect2i(pos * rescale, Vector2i(rescale, rescale))
+		img.fill_rect(rect, color)
+		index += 1
+	return img
