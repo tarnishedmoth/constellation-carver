@@ -9,9 +9,11 @@ class_name MainScreen extends Control
 ## WORKING File menu (export/import page as JSON in popup code edit box)
 ## WORKING Provide entire page JSON for easy copy.
 ## WORKING Delete page button in memory, TODO doesn't delete files yet
-## BUG FIXED Open project folder? Show filepath at least?
-## BUG FIXED Editing Page Title causes caret to go to beginning (TODO rework instant update+refresh)
+## BUG FIXED Editing Page Title causes caret to go to beginning (reworked instant update+refresh)
 ## BUG FIXED Creating a new Button breaks things
+## BUG FIXED Open project folder? Show filepath at least? Doesn't do anything on Web
+## WORKING Delete files. "Deleted" pages are moved to a special folder for safe keeping.
+## BUG FIXED Can't set a Button to No Action
 ## TODO Select from any page in page export as json popup.
 ## BUG Investigate if Clipboard access works at all or if TODO we should provide a text box popup to capture it.
 ##----0.8--|
@@ -26,10 +28,11 @@ class_name MainScreen extends Control
 ## FEATURE Reels basic support following images.
 ## TODO File exports don't work on Web.
 ##----1.0--|
-## TASK Rename projects & pages.
-## TASK User configurable content templates.
-## TASK Duplicate content on page.
-## TASK Copy/paste content across pages.
+## FEATURE Rename projects & pages.
+## FEATURE User configurable content templates.
+## FEATURE Duplicate content on page.
+## FEATURE Copy/paste content across pages.
+## TODO Double clicking a Button (or something) takes you to the page it points to.
 ##----1.1--|
 ## FEATURE User editor options?
 ## FEATURE Use alternate fonts and render to image on page.
@@ -54,6 +57,11 @@ const TILE_0233 = preload("res://assets/tile_0233.png") # New project icon
 const BUTTON_ACTION_EMPTY = {
 	DISPLAY = "(No Action)",
 	VALUE = "."
+}
+const BUTTON_ACTION_MENU_ID_INDEX = {
+	MANUAL_ENTRY = 0,
+	NO_ACTION = 1,
+	SEPARATOR = 2
 }
 
 enum TOP_TABS {
@@ -91,6 +99,10 @@ const PAGE_TEMPLATE:Array = [
 
 var flag_fs_not_persistent:bool = false
 var flag_user_no_projects:bool = true
+
+var file_deleted_directory:String:
+	get:
+		return U.cat([current_project_filepath, "deleted_pages"])
 
 var pages: Dictionary[String,Dictionary] = {} # Key is absolute filepath, value is json dictionary
 var is_pages_cached:bool = false
@@ -495,10 +507,12 @@ func delete_page(page:String, in_current_project:bool = true) -> void: # Filepat
 	if in_current_project:
 		if page in pages:
 			# Delete the file
-			# TODO
+			_move_file_to_deleted_cache(page)
 
 			# Delete our page in memory
 			var next_page:String # Filepath
+
+			# Find a valid page to switch to
 			for _page in pages:
 				if _page == current_page_filepath:
 					continue
@@ -511,6 +525,32 @@ func delete_page(page:String, in_current_project:bool = true) -> void: # Filepat
 				load_page(next_page)
 			else:
 				ui_reset_current_tabs()
+
+func _move_file_to_deleted_cache(filepath:String) -> void:
+	if filepath.is_absolute_path():
+		## Get the filename+extension
+		var target_filename:String = filepath.get_file()
+		## Temporarily remove the extension
+		var ideal_target_filepath:String = U.cat([file_deleted_directory, target_filename.get_basename()])
+
+		## Make a copy to work with
+		var _actual_target_filepath:String = ideal_target_filepath
+		var iter:int = 1
+		while FileAccess.file_exists(_actual_target_filepath):
+			## Add the iterator to the end of the filename if it exists
+			_actual_target_filepath = ideal_target_filepath + "_" + str(iter)
+			iter += 1
+
+		## Add the extension back on
+		_actual_target_filepath = _actual_target_filepath + "." + target_filename.get_extension()
+
+		## Copy the data from source file to target
+		var source = FileAccess.open(filepath, FileAccess.READ)
+		ParticleParser.save_json_to_file(source.get_as_text(), _actual_target_filepath)
+		source.close()
+
+		## Delete the source file
+		DirAccess.remove_absolute(filepath)
 
 
 func _render_content(obj:Dictionary) -> Control:
@@ -1069,12 +1109,13 @@ func _on_project_option_button_popup_id_pressed(id:int) -> void:
 
 
 func _on_open_user_folder_button_pressed() -> void:
-	if flag_fs_not_persistent:
+	#if flag_fs_not_persistent: # Doesn't work?
+	if OS.has_feature("web"):
 		special_popup_window.popup(
-			"Some features are not yet available on Web, such as user file access.
-			If you want to export your pages, use [b]Project->File->Export[/b], and copy the JSON manually into your file.
+			"Some features are not yet available on Web, such as user file access.\n
+			If you want to export your pages, use (Project->File->Export), and copy the JSON manually into your file.\
 			You can also select individual content objects, and navigate to the JSON tab to copy only specific pieces.",
-			"Web Version  -  File Access Blocked"
+			"Web Version  -  File Access Restricted"
 		)
 		return
 	else:
@@ -1163,7 +1204,11 @@ func _on_new_page_pressed() -> void:
 		true,
 		SpecialPopupWindow.TEXT_FORMAT.FILE
 	)
-	new_page(text_input, false, ParticleParser.pagify(PAGE_TEMPLATE), current_page_filepath.get_base_dir())
+	if not text_input.is_empty():
+		new_page(text_input, false, ParticleParser.pagify(PAGE_TEMPLATE), current_page_filepath.get_base_dir())
+	else:
+		## Cancelled
+		return
 
 func _on_load_page_pressed() -> void:
 	load_page(page_filename_edit.text, true)
@@ -1285,14 +1330,24 @@ func _on_button_action_menu_about_to_popup() -> void:
 	var popup = button_action_menu.get_popup()
 	popup.clear(true)
 
-	popup.add_icon_radio_check_item(TILE_0233, "URL / Enter Manually", 0)
+	## Manual Entry
+	popup.add_icon_radio_check_item(TILE_0233, "URL / Enter Manually", BUTTON_ACTION_MENU_ID_INDEX.MANUAL_ENTRY)
 	var _current_action_value:String = selected_editable["_action"]
-	if not _current_action_value.is_empty():
-		popup.set_item_checked(0, true)
-		popup.set_item_text(0, _current_action_value)
+	if not _current_action_value.is_empty() && _current_action_value != BUTTON_ACTION_EMPTY.VALUE:
+		popup.set_item_checked(BUTTON_ACTION_MENU_ID_INDEX.MANUAL_ENTRY, true)
+		popup.set_item_text(BUTTON_ACTION_MENU_ID_INDEX.MANUAL_ENTRY, _current_action_value)
 
-	popup.add_separator("Project Pages:", 1)
-	var index_id = 2
+	## No Action
+	popup.add_radio_check_item(BUTTON_ACTION_EMPTY.DISPLAY, BUTTON_ACTION_MENU_ID_INDEX.NO_ACTION)
+	popup.set_item_metadata(BUTTON_ACTION_MENU_ID_INDEX.NO_ACTION, BUTTON_ACTION_EMPTY.VALUE)
+	if _current_action_value == BUTTON_ACTION_EMPTY.VALUE:
+		popup.set_item_checked(BUTTON_ACTION_MENU_ID_INDEX.NO_ACTION, true)
+
+	## Separator
+	popup.add_separator("Project Pages:", BUTTON_ACTION_MENU_ID_INDEX.SEPARATOR)
+
+	## Project pages items
+	var index_id = BUTTON_ACTION_MENU_ID_INDEX.SEPARATOR + 1
 	for page:String in pages:
 		var formatted_path:String = page.trim_prefix(current_project_filepath).rstrip(".json")
 		if formatted_path == _current_action_value:
@@ -1313,22 +1368,25 @@ func _on_button_action_menu_pressed(id:int) -> void:
 	var _result_action:String = selected_editable["_action"]
 
 	var popup:PopupMenu = button_action_menu.get_popup()
-	if id == 0:
+	if id == BUTTON_ACTION_MENU_ID_INDEX.MANUAL_ENTRY:
 		## Manual entry / existing action
+		var display:String = selected_editable["_action"]
+		if display == BUTTON_ACTION_EMPTY.VALUE:
+			display = ""
 		var custom_action:String = await special_popup_window.popup_text_entry(
 			"Type a value to assign to this button's action field. You don't need to include the file extension.\
 			This should begin with a forward slash '/' for local paths.\
 			If the path ends in a slash, it's treated as a directory, within Constellation will try to load 'index.json'.",
 			"Manual Button 'Action'",
 			true, 0,
-			selected_editable["_action"]
+			display
 		)
 		if custom_action.is_empty():
 			## User canceled
 			return
 		else:
 			_result_action = custom_action
-	else:
+	elif id != BUTTON_ACTION_MENU_ID_INDEX.SEPARATOR:
 		_result_action = str(popup.get_item_metadata(id))
 	# Set the UI
 	if not ParticleParser.is_valid_webpath(_result_action):

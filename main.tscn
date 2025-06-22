@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3 uid="uid://c2mlaly46p3v5"]
+[gd_scene load_steps=18 format=3 uid="uid://c2mlaly46p3v5"]
 
 [ext_resource type="Script" uid="uid://dle4w1sl7v6dy" path="res://main.gd" id="1_ig7tw"]
 [ext_resource type="Theme" uid="uid://ct03hqqci348h" path="res://objects/objects.tres" id="2_0xm2m"]
@@ -12,6 +12,7 @@
 [ext_resource type="Texture2D" uid="uid://ckq6uacedwlvw" path="res://assets/tile_0693.png" id="9_dg77c"]
 [ext_resource type="Texture2D" uid="uid://dw1os5pxq4nwu" path="res://assets/plusdown.png" id="10_ycdy4"]
 [ext_resource type="PackedScene" uid="uid://bba6fstf66qx5" path="res://welcome.tscn" id="12_dg77c"]
+[ext_resource type="FontFile" uid="uid://cvg1mk60ex8dm" path="res://assets/fonts/Roboto-BoldCondensed.ttf" id="12_w48qg"]
 [ext_resource type="Script" uid="uid://iwl4fjvrmqc3" path="res://file_popup_window.gd" id="12_ycdy4"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lquwl"]
@@ -23,6 +24,9 @@ bg_color = Color(0, 0, 0, 1)
 border_width_top = 237
 border_color = Color(0, 0, 0, 0)
 anti_aliasing = false
+
+[sub_resource type="LabelSettings" id="LabelSettings_vivmo"]
+font = ExtResource("12_w48qg")
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dg77c"]
 bg_color = Color(0, 0, 0, 1)
@@ -799,6 +803,7 @@ layout_mode = 2
 [node name="Header" type="Label" parent="SpecialPopupWindow/VBoxContainer"]
 layout_mode = 2
 text = "Warning"
+label_settings = SubResource("LabelSettings_vivmo")
 horizontal_alignment = 1
 
 [node name="Details" type="Label" parent="SpecialPopupWindow/VBoxContainer"]

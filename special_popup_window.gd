@@ -54,7 +54,7 @@ func popup_text_entry(details_text:String, heading:String = "Input Text", user_c
 					TEXT_FORMAT.ABS_PATH:
 						if let.is_absolute_path(): break
 					TEXT_FORMAT.WEB_PATH:
-						if ParticleParser.is_valid_webpath(let): break
+						if ParticleParser.is_valid_webpath(let): break # TODO
 					_:
 						break
 

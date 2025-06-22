@@ -106,7 +106,7 @@ static func is_valid_page(page:Dictionary) -> bool:
 	if not "content" in page: return false
 	return true
 
-static func is_valid_webpath(path:String) -> bool:
+static func is_valid_webpath(path:String) -> bool: # TODO ?
 	return true
 
 static func grab_json_from_clipboard() -> Dictionary:
