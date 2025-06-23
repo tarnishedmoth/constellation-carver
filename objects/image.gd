@@ -84,7 +84,12 @@ func refresh_visuals() -> void:
 	custom_minimum_size = Vector2i(_width*style.scale, _height*style.scale)
 
 	if not _pixels.is_empty():
-		var image = create_image_from(ConstellationImageProcessor.decompress_buffer(_pixels), _width, _height, style.scale)
+		var image = ConstellationImageProcessor.create_image_from(
+			ConstellationImageProcessor.decompress_unicode(_pixels),
+			_width,
+			_height,
+			style.scale
+			)
 		display_image.texture = ImageTexture.create_from_image(image)
 		display_image.show()
 		toggle_placeholder(false)
@@ -108,20 +113,3 @@ func to_dict() -> Dictionary:
 
 func _to_string() -> String:
 	return JSON.stringify(to_dict(), "\t", false)
-
-
-static func create_image_from(binary:String, width:int, height:int, rescale:int = 1) -> Image:
-	var img:Image = Image.create_empty(width, height, false, Image.FORMAT_L8)
-
-	var pos:Vector2i = Vector2i(0,0)
-	var index:int = 0
-	for c in binary:
-		var column = index % width
-		var row = index / width
-		pos = Vector2i(column, row)
-		var color:Color = Color.BLACK if c == "1" else Color.WHITE
-		#img.set_pixelv(pos, color)
-		var rect = Rect2i(pos * rescale, Vector2i(rescale, rescale))
-		img.fill_rect(rect, color)
-		index += 1
-	return img
