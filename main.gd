@@ -21,6 +21,9 @@ class_name MainScreen extends Control
 ## BUG FIXED Deleting content objects isn't updating the content tree correctly.
 ## BUG Investigate if Clipboard access works at all or if TODO we should provide a text box popup to capture it.
 ## BUG FIXED Image display should auto-scale images to largest scale possible
+## BUG FIXED App header doesn't update automatically with project settings.
+## BUG Image file import dialog shows on Web where it's useless for now.
+## BUG FIXED Images scale larger than max scale.
 ##----0.8--|
 ## FEATURE Margins implemented for all objects
 ## FEATURE Editable content highlighting/frame while editing;
@@ -55,7 +58,7 @@ class_name MainScreen extends Control
 signal initialized
 
 #region MEMORY
-const APP_NAME:String = "[i]Constellation Carver v0.6.9[/i]"
+var APP_NAME:String = "[i]Constellation Carver v" + str(ProjectSettings.get_setting("application/config/version"))
 const TILE_0233 = preload("res://assets/tile_0233.png") # New project icon
 
 const BUTTON_ACTION_EMPTY = {

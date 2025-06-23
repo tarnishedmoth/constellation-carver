@@ -23,6 +23,11 @@ const TEXT_ALIGN_OPTIONS:Array[String] = [
 	"right"
 ]
 
+const SCALE_LIMIT:Dictionary = {
+	MAX = 4,
+	MIN = 1
+}
+
 var text_align:String = DEFAULT["text-align"]:
 	set(value):
 		if value in TEXT_ALIGN_OPTIONS:
@@ -58,7 +63,7 @@ var margin_bottom:int:
 
 var scale:int:
 	set(value):
-		scale = clampi(value, 1, 4)
+		scale = clampi(value, SCALE_LIMIT.MIN, SCALE_LIMIT.MAX)
 		is_scale_set = true
 	get:
 		if is_scale_set:

@@ -89,7 +89,7 @@ func refresh_visuals() -> void:
 
 	var _scaled:int
 	if not is_scale_set():
-		_scaled = U.get_max_integer_scale(_width, _height, MAX_WIDTH, MAX_HEIGHT)
+		_scaled = clampi(U.get_max_integer_scale(_width, _height, MAX_WIDTH, MAX_HEIGHT), Style.SCALE_LIMIT.MIN, Style.SCALE_LIMIT.MAX)
 	else:
 		_scaled = style.scale
 
