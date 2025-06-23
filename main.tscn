@@ -432,7 +432,6 @@ caret_blink = true
 
 [node name="ImageEditContainer" type="VBoxContainer" parent="VBoxContainer/BottomContainer/BottomTabContainer/Content"]
 unique_name_in_owner = true
-visible = false
 layout_mode = 2
 size_flags_vertical = 3
 alignment = 1
@@ -454,7 +453,6 @@ popup/item_0/text = "... from Clipboard"
 popup/item_0/id = 0
 popup/item_1/text = "... from File"
 popup/item_1/id = 1
-popup/item_1/disabled = true
 popup/item_2/text = "... from Page"
 popup/item_2/id = 2
 popup/item_2/disabled = true
@@ -853,7 +851,7 @@ size_flags_vertical = 4
 theme_override_font_sizes/font_size = 18
 text = "Confirm"
 
-[node name="FilePopupWindow" type="PanelContainer" parent="." node_paths=PackedStringArray("text_box", "confirm_button", "cancel_button")]
+[node name="FilePopupWindow" type="PanelContainer" parent="." node_paths=PackedStringArray("code_box", "confirm_button", "cancel_button")]
 visible = false
 layout_mode = 0
 anchor_right = 1.0
@@ -863,9 +861,24 @@ grow_vertical = 2
 theme = ExtResource("3_h2yge")
 theme_override_styles/panel = SubResource("StyleBoxFlat_dg77c")
 script = ExtResource("12_ycdy4")
-text_box = NodePath("MarginContainer/VBoxContainer/CodeEdit")
+code_box = NodePath("MarginContainer/VBoxContainer/CodeEdit")
 confirm_button = NodePath("MarginContainer/VBoxContainer/HBoxContainer/ConfirmButton")
 cancel_button = NodePath("MarginContainer/VBoxContainer/HBoxContainer/CancelButton")
+
+[node name="OpenImageFileDialog" type="FileDialog" parent="FilePopupWindow"]
+unique_name_in_owner = true
+title = "Open a File"
+position = Vector2i(2, 28)
+size = Vector2i(396, 690)
+unresizable = true
+borderless = true
+popup_window = true
+ok_button_text = "Open"
+dialog_close_on_escape = false
+file_mode = 0
+access = 1
+root_subfolder = "assets"
+filters = PackedStringArray("*.jpeg", "*.png", "*.bmp", "*.gif")
 
 [node name="MarginContainer" type="MarginContainer" parent="FilePopupWindow"]
 layout_mode = 2
@@ -886,6 +899,7 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="CodeEdit" type="CodeEdit" parent="FilePopupWindow/MarginContainer/VBoxContainer"]
+visible = false
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_font_sizes/font_size = 12
@@ -933,7 +947,6 @@ layout_mode = 1
 [connection signal="pressed" from="VBoxContainer/TopContainer/VBoxContainer/TopTabContainer/Debug/ForceRefresh" to="." method="_on_force_refresh_pressed"]
 [connection signal="tab_selected" from="VBoxContainer/BottomContainer/BottomTabContainer" to="." method="_on_bottom_tab_container_tab_selected"]
 [connection signal="about_to_popup" from="VBoxContainer/BottomContainer/BottomTabContainer/Content/ButtonEditContainer/ActionMenuButton" to="." method="_on_button_action_menu_about_to_popup"]
-[connection signal="pressed" from="VBoxContainer/BottomContainer/BottomTabContainer/Content/ImageEditContainer/ImageEditButtons/ImportImageDataButton" to="." method="_on_import_image_button_pressed"]
 [connection signal="item_selected" from="VBoxContainer/BottomContainer/BottomTabContainer/Content/ListEditContainer/ContentTree" to="." method="_on_content_tree_item_selected"]
 [connection signal="pressed" from="VBoxContainer/BottomContainer/BottomTabContainer/Content/ListEditContainer/ListEditButtonsContainer/ListInsertAbove" to="." method="_on_list_insert_above_pressed"]
 [connection signal="pressed" from="VBoxContainer/BottomContainer/BottomTabContainer/Content/ListEditContainer/ListEditButtonsContainer/ListSelectedDelete" to="." method="_on_list_selected_delete_pressed"]
@@ -946,5 +959,7 @@ layout_mode = 1
 [connection signal="pressed" from="SpecialPopupWindow/VBoxContainer/ButtonsHBoxContainer/Cancel" to="SpecialPopupWindow" method="_on_cancel_pressed"]
 [connection signal="pressed" from="SpecialPopupWindow/VBoxContainer/ButtonsHBoxContainer/OK" to="SpecialPopupWindow" method="_on_confirm_pressed"]
 [connection signal="pressed" from="SpecialPopupWindow/VBoxContainer/ButtonsHBoxContainer/Confirm" to="SpecialPopupWindow" method="_on_confirm_pressed"]
+[connection signal="canceled" from="FilePopupWindow/OpenImageFileDialog" to="FilePopupWindow" method="_on_open_image_file_dialog_canceled"]
+[connection signal="file_selected" from="FilePopupWindow/OpenImageFileDialog" to="FilePopupWindow" method="_on_open_image_file_dialog_file_selected"]
 [connection signal="pressed" from="FilePopupWindow/MarginContainer/VBoxContainer/HBoxContainer/CancelButton" to="FilePopupWindow" method="_on_cancel_button_pressed"]
 [connection signal="pressed" from="FilePopupWindow/MarginContainer/VBoxContainer/HBoxContainer/ConfirmButton" to="FilePopupWindow" method="_on_confirm_button_pressed"]

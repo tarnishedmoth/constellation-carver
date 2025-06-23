@@ -27,16 +27,49 @@ var text_align:String = DEFAULT["text-align"]:
 	set(value):
 		if value in TEXT_ALIGN_OPTIONS:
 			text_align = value
+			is_text_align_set = true
 		else:
 			push_error("Invalid text alignment assigned to style")
+	get:
+		if is_text_align_set:
+			return text_align
+		else:
+			return DEFAULT["text-align"]
 
-var margin_top:int = DEFAULT["margin-top"]
+var margin_top:int:
+	set(value):
+		margin_top = maxi(value, 0)
+		is_margin_top_set = true
+	get:
+		if is_margin_top_set:
+			return margin_top
+		else:
+			return DEFAULT["margin-top"]
 
-var margin_bottom:int = DEFAULT["margin-bottom"]
+var margin_bottom:int:
+	set(value):
+		margin_bottom = maxi(value, 0)
+		is_margin_bottom_set = true
+	get:
+		if is_margin_bottom_set:
+			return margin_bottom
+		else:
+			return DEFAULT["margin-bottom"]
 
-var scale:int = DEFAULT["scale"]:
+var scale:int:
 	set(value):
 		scale = clampi(value, 1, 4)
+		is_scale_set = true
+	get:
+		if is_scale_set:
+			return scale
+		else:
+			return DEFAULT["scale"]
+
+var is_text_align_set:bool = false
+var is_margin_top_set:bool = false
+var is_margin_bottom_set:bool = false
+var is_scale_set:bool = false
 
 func _init(params:Dictionary = {}) -> void:
 	if not params.is_empty():
@@ -79,19 +112,23 @@ func get_modified_properties(defaults:Dictionary = DEFAULT) -> Dictionary:
 	var write:Dictionary = {}
 
 	#if text_align:
-	if text_align != _defaults["text-align"]:
+	#if text_align != _defaults["text-align"]:
+	if is_text_align_set:
 		write["text-align"] = text_align
 
 	#if margin_top:
-	if margin_top != int(_defaults["margin-top"]):
+	#if margin_top != int(_defaults["margin-top"]):
+	if is_margin_top_set:
 		write["margin-top"] = margin_top
 
 	#if margin_bottom:
-	if margin_bottom != int(_defaults["margin-bottom"]):
+	#if margin_bottom != int(_defaults["margin-bottom"]):
+	if is_margin_bottom_set:
 		write["margin-bottom"] = margin_bottom
 
 	#if scale:
-	if scale != int(_defaults["scale"]):
+	#if scale != int(_defaults["scale"]):
+	if is_scale_set:
 		write["scale"] = scale
 
 	return write

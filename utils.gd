@@ -54,3 +54,9 @@ func cat(strings:Array[String], knot:String = "/", tail:String = "", check_knots
 func is_relative_path(path:String) -> bool:
 	if path.trim_prefix("/").is_relative_path(): return true
 	else: return false
+
+func get_max_integer_scale(width: int, height: int, max_width: int, max_height: int) -> int:
+	var scale_w = max_width / width
+	var scale_h = max_height / height
+	var scale:int = mini(scale_w, scale_h)
+	return scale

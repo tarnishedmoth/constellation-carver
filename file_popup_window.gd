@@ -1,12 +1,15 @@
 class_name FilePopupMenu extends PanelContainer
 
 signal exited(confirmed:bool)
+signal selected_filepath(filepath:String)
 
 const FADE_TIME:float = 1.0
 
-@export var text_box:CodeEdit
+@export var code_box:CodeEdit
 @export var confirm_button:Button
 @export var cancel_button:Button
+
+@onready var open_image_file_dialog: FileDialog = %OpenImageFileDialog
 
 var modulate_tween:Tween
 
@@ -14,10 +17,11 @@ func _ready() -> void:
 	hide()
 
 func popup_code(code:String = "", editable:bool = false) -> bool:
-	text_box.text = code
-	text_box.editable = editable
-	text_box.get_v_scroll_bar().self_modulate = Utils.TRANSPARENT ## WORKING
-	#text_box.get_v_scroll_bar().add_theme_stylebox_override("normal", StyleBoxEmpty.new()) # not working
+	code_box.show()
+	code_box.text = code
+	code_box.editable = editable
+	code_box.get_v_scroll_bar().self_modulate = Utils.TRANSPARENT ## WORKING
+	#code_box.get_v_scroll_bar().add_theme_stylebox_override("normal", StyleBoxEmpty.new()) # not working
 
 	show()
 	confirm_button.show()
@@ -32,6 +36,12 @@ func popup_code(code:String = "", editable:bool = false) -> bool:
 	hide()
 	return result
 
+func popup_image_file_picker() -> String: ## Filepath
+	open_image_file_dialog.popup()
+	var _filepath:String = await selected_filepath
+	return _filepath
+
+
 func _on_visibility_changed() -> void:
 	if visible:
 		if modulate_tween:
@@ -44,3 +54,10 @@ func _on_cancel_button_pressed() -> void:
 
 func _on_confirm_button_pressed() -> void:
 	exited.emit(true)
+
+
+func _on_open_image_file_dialog_file_selected(path: String) -> void:
+	selected_filepath.emit(path)
+
+func _on_open_image_file_dialog_canceled() -> void:
+	selected_filepath.emit("")

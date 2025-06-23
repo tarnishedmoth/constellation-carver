@@ -11,13 +11,9 @@ class_name ConstellationImageProcessor extends Control
 # statics
 # Enums
 # constants
-const IMAGE_MAX_WIDTH = 400
-const IMAGE_MAX_HEIGHT = 260
 # @exports
 @export_file() var test_image:String
 # public
-var image_pixels:String
-var copy_pixels:String
 # _private
 # @onready
 @onready var vbox: VBoxContainer = $VBoxContainer
@@ -28,11 +24,18 @@ var copy_pixels:String
 #region--Virtuals
 #func _init() -> void: pass
 #func _enter_tree() -> void: pass
-func _ready() -> void:
-	test_binary()
-	test_display_images()
-	pass
+#func _ready() -> void:
+	#test_binary()
+	#test_display_images()
+	#pass
 
+#func _input(event: InputEvent) -> void: pass
+#func _unhandled_input(event: InputEvent) -> void: pass
+#func _physics_process(delta: float) -> void: pass
+#func _process(delta: float) -> void: pass
+#endregion
+
+#region TESTS
 func test_binary() -> void:
 	var image:Image = Image.new().load_from_file(test_image)
 	image.convert(Image.Format.FORMAT_RGB8)
@@ -75,12 +78,8 @@ func test_display_images() -> void:
 			)
 		)
 	vbox.add_child(preview_copy_display)
-
-#func _input(event: InputEvent) -> void: pass
-#func _unhandled_input(event: InputEvent) -> void: pass
-#func _physics_process(delta: float) -> void: pass
-#func _process(delta: float) -> void: pass
 #endregion
+
 #region Public
 static func convert_rgb8_to_binary(image:Image, brightness:float = 0.5) -> String:
 	var buffer:String = ""
@@ -111,8 +110,8 @@ static func create_constellation_image_from(filepath:String, brightness:float = 
 	var img:Image = Image.load_from_file(filepath)
 	img.convert(Image.FORMAT_RGB8)
 
-	if img.get_width() > IMAGE_MAX_WIDTH or img.get_height() > IMAGE_MAX_HEIGHT:
-		U.l("Image dimensions can only be up to %sx%s pixels." % [IMAGE_MAX_WIDTH, IMAGE_MAX_HEIGHT])
+	if img.get_width() > ConstellationImage.MAX_WIDTH or img.get_height() > ConstellationImage.MAX_HEIGHT:
+		U.l("Image dimensions can only be up to %sx%s pixels." % [ConstellationImage.MAX_WIDTH, ConstellationImage.MAX_HEIGHT])
 		return null
 
 
@@ -130,7 +129,7 @@ static func create_constellation_image_from(filepath:String, brightness:float = 
 
 
 static func create_image_from(binary:String, width:int, height:int, rescale:int = 1) -> Image:
-	var img:Image = Image.create_empty(width, height, false, Image.FORMAT_L8)
+	var img:Image = Image.create_empty(width * rescale, height * rescale, false, Image.FORMAT_L8)
 
 	var pos:Vector2i = Vector2i(0,0)
 	var index:int = 0
@@ -143,9 +142,9 @@ static func create_image_from(binary:String, width:int, height:int, rescale:int 
 		pos = Vector2i(column, row)
 
 		var color:Color = Color.BLACK if c == "1" else Color.WHITE
-		img.set_pixelv(pos, color)
-		#var rect = Rect2i(pos * rescale, Vector2i(rescale, rescale))
-		#img.fill_rect(rect, color)
+		#img.set_pixelv(pos, color)
+		var rect = Rect2i(pos * rescale, Vector2i(rescale, rescale))
+		img.fill_rect(rect, color)
 
 		index += 1
 	return img

@@ -14,25 +14,29 @@ class_name MainScreen extends Control
 ## BUG FIXED Open project folder? Show filepath at least? Doesn't do anything on Web
 ## WORKING Delete files. "Deleted" pages are moved to a special folder for safe keeping.
 ## BUG FIXED Can't set a Button to No Action
+##----0.7--|
+## WORKING Images encoding/decoding and rendering
+## WORKING Import images from file
 ## TODO Select from any page in page export as json popup.
+## BUG FIXED Deleting content objects isn't updating the content tree correctly.
 ## BUG Investigate if Clipboard access works at all or if TODO we should provide a text box popup to capture it.
+## BUG FIXED Image display should auto-scale images to largest scale possible
 ##----0.8--|
 ## FEATURE Margins implemented for all objects
 ## FEATURE Editable content highlighting/frame while editing;
 ## WORKING Object tree matches/follows selected editable object.
+##----0.9--|
+## FEATURE Reels basic support following images.
 ## TASK Import project from external folder.
 ## TASK Import page data from clipboard.
 ## TODO Boot splash icon, background image, branding images, etc.
-##----0.9--|
-## FEATURE Images encoding/decoding (and rendering?)
-## FEATURE Reels basic support following images.
-## TODO File exports don't work on Web.
 ##----1.0--|
 ## FEATURE Rename projects & pages.
 ## FEATURE User configurable content templates.
 ## FEATURE Duplicate content on page.
 ## FEATURE Copy/paste content across pages.
-## TODO Double clicking a Button (or something) takes you to the page it points to.
+## TODO File exports don't work on Web.
+## TODO Double clicking a Button (or something) takes you to the page it points to?
 ##----1.1--|
 ## FEATURE User editor options?
 ## FEATURE Use alternate fonts and render to image on page.
@@ -1249,16 +1253,15 @@ func _on_delete_selected_pressed() -> void:
 
 		current_page_content.erase(selected_editable)
 		selected_editable.queue_free()
+		cache_changes(true)
 		reset_editables()
-		await get_tree().process_frame
-		cache_changes()
 
 #func _on_page_title_edit_text_changed(new_text: String) -> void:
 func _on_page_title_edit_text_submitted(new_text: String) -> void:
 	current_page_json["title"] = new_text
 	l("Page title modified.")
 	cache_changes()
-	render_current_page_content() # Might not be necessary
+	#render_current_page_content() # Might not be necessary
 
 func _on_save_edits_button_pressed() -> void:
 	save_content_edits()
@@ -1430,6 +1433,21 @@ func _on_import_image_button_popup_id_pressed(id:int) -> void:
 				# TODO Style import from clipboard data
 				#for param in jason["style"]:
 				pass
+
+		IMAGE_IMPORT_MENU_ID_INDEX.FILE:
+			## TODO File picker from Assets folder
+			var user_selection:String = await file_popup_window.popup_image_file_picker()
+			if user_selection.is_empty():
+				## User cancel
+				return
+			elif not user_selection.is_absolute_path():
+				push_error("Bad path!")
+			elif selected_editable is ConstellationImage:
+				var image:ConstellationImage = ConstellationImageProcessor.create_constellation_image_from(user_selection, 0.5) # TODO allow user to configure
+				content_text_edit.text = image._pixels
+				image_height_spin_box.value = image._height
+				image_width_spin_box.value = image._width
+			pass
 
 ## STYLE
 

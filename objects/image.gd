@@ -1,9 +1,14 @@
 class_name ConstellationImage extends Control
 
 # TODO margins, helper methods for showing content & creating
+# TODO default scale is actually largest that the width fits within 400.
+# for example a 200x8 wide image will get scaled to 400x16
 
 const PLACEHOLDER_SCENE = preload("res://objects/placeholder.tscn")
 var placeholder:Control # Instance
+
+const MAX_WIDTH:int = 400
+const MAX_HEIGHT:int = 260
 
 const DEFAULTS:Dictionary = {
 	WIDTH = 16,
@@ -81,14 +86,22 @@ func refresh_visuals() -> void:
 		return
 
 	redraw_count += 1
-	custom_minimum_size = Vector2i(_width*style.scale, _height*style.scale)
+
+	var _scaled:int
+	if not is_scale_set():
+		_scaled = U.get_max_integer_scale(_width, _height, MAX_WIDTH, MAX_HEIGHT)
+	else:
+		_scaled = style.scale
+
+
+	custom_minimum_size = Vector2i(_width*_scaled, _height*_scaled)
 
 	if not _pixels.is_empty():
 		var image = ConstellationImageProcessor.create_image_from(
 			ConstellationImageProcessor.decompress_unicode(_pixels),
 			_width,
 			_height,
-			style.scale
+			_scaled
 			)
 		display_image.texture = ImageTexture.create_from_image(image)
 		display_image.show()
@@ -97,6 +110,12 @@ func refresh_visuals() -> void:
 		display_image.hide()
 		toggle_placeholder(true)
 	queue_redraw()
+
+
+func is_scale_set() -> bool:
+	if style:
+		return style.is_scale_set
+	return false
 
 
 func to_dict() -> Dictionary:

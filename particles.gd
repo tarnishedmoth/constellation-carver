@@ -9,8 +9,16 @@ const HEADER:Dictionary = {
 var file_saves_directory:String = "user://projects"
 var file_assets_directory:String = "user://assets"
 
-func _ready() -> void:
-	pass
+var create_directories_on_load:Array = [
+	file_saves_directory,
+	file_assets_directory
+]
+
+func _init() -> void:
+	for dir in create_directories_on_load:
+		if not DirAccess.dir_exists_absolute(dir):
+			DirAccess.make_dir_recursive_absolute(dir)
+
 
 static func load_json_from_file(filepath:String) -> Dictionary:
 	if FileAccess.file_exists(filepath):
