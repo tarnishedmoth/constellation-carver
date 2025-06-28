@@ -17,6 +17,7 @@ class_name MainScreen extends Control
 ##----0.7--|
 ## WORKING Images encoding/decoding and rendering
 ## WORKING Import images from file
+## WORKING Fullscreen mode on web (resizing)
 ## TODO Select from any page in page export as json popup.
 ## BUG FIXED Deleting content objects isn't updating the content tree correctly.
 ## BUG Investigate if Clipboard access works at all or if TODO we should provide a text box popup to capture it.
